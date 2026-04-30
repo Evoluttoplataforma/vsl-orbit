@@ -2084,8 +2084,9 @@
       <!-- Footer (input ou chips) -->
       <div class="chat-footer" id="chat-footer"></div>
 
-      <!-- Form oculto (lido pelo GTM) -->
+      <!-- Form oculto (lido pelo GTM e tracking script) -->
       <form id="lead-form" style="display:none" novalidate>
+        <!-- Lead fields (preenchidos pelo chat) -->
         <input type="text"  name="name" />
         <input type="email" name="email" />
         <input type="tel"   name="phone" data-gtm="phone" />
@@ -2095,9 +2096,38 @@
         <input type="text"  name="faturamento" />
         <input type="text"  name="projetos" />
         <input type="text"  name="prioridade" />
+
+        <!-- A/B context -->
         <input type="text"  name="variant" />
         <input type="text"  name="segment" />
-        <input type="text"  name="page_url" />
+        <input type="text"  name="page_url" data-field-id="page_url" />
+
+        <!-- UTMs (preenchidas automaticamente pelo tracking script) -->
+        <input type="hidden" name="utm_source"   data-field-id="utm_source" />
+        <input type="hidden" name="utm_medium"   data-field-id="utm_medium" />
+        <input type="hidden" name="utm_campaign" data-field-id="utm_campaign" />
+        <input type="hidden" name="utm_content"  data-field-id="utm_content" />
+        <input type="hidden" name="utm_term"     data-field-id="utm_term" />
+
+        <!-- Click IDs (Google, Meta, TikTok, MS, LinkedIn, etc) -->
+        <input type="hidden" name="gclid"          data-field-id="gclid" />
+        <input type="hidden" name="fbclid"         data-field-id="fbclid" />
+        <input type="hidden" name="gbraid"         data-field-id="gbraid" />
+        <input type="hidden" name="wbraid"         data-field-id="wbraid" />
+        <input type="hidden" name="ttclid"         data-field-id="ttclid" />
+        <input type="hidden" name="gad_campaignid" data-field-id="gad_campaignid" />
+        <input type="hidden" name="gad_source"     data-field-id="gad_source" />
+        <input type="hidden" name="msclkid"        data-field-id="msclkid" />
+        <input type="hidden" name="li_fat_id"      data-field-id="li_fat_id" />
+        <input type="hidden" name="twclid"         data-field-id="twclid" />
+        <input type="hidden" name="sck"            data-field-id="sck" />
+
+        <!-- Sessão / atribuição -->
+        <input type="hidden" name="session_id"                 id="hidden_session_id" />
+        <input type="hidden" name="landing_page"               data-field-id="landing_page" />
+        <input type="hidden" name="origin_page"                data-field-id="origin_page" />
+        <input type="hidden" name="session_attributes_encoded" data-field-id="session_attributes_encoded" />
+
         <!-- Honeypot anti-spam (invisível pra humanos, atrai bots) -->
         <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
       </form>
@@ -2520,7 +2550,8 @@
         }
 
         if (current.type === 'submit') {
-          // Preenche campos extras + dispara submit
+          // Preenche os campos extras (variant/segment/page_url).
+          // O tracking script já preencheu UTMs, click IDs e session attributes.
           var variant = (window.__orbit && window.__orbit.variant) || '';
           var segment = (window.__orbit && window.__orbit.segment) || '';
           form.querySelector('[name="variant"]').value = variant;
@@ -2532,34 +2563,19 @@
             removeTyping();
             addBotMsg('Perfeito! Vou enviar pro time agora — te redireciono pra próxima etapa em 1 segundo. ⚡');
             setTimeout(function() {
-              // Coleta payload
-              var payload = {};
-              new FormData(form).forEach(function(v, k) { payload[k] = v; });
+              // Persiste o lead pra página de obrigado ler (cargo dinâmico, etc)
+              try {
+                var snapshot = {};
+                new FormData(form).forEach(function(v, k) { snapshot[k] = v; });
+                sessionStorage.setItem('orbit_lead', JSON.stringify(snapshot));
+              } catch (e) {}
 
-              // Eventos GTM/Pixel
-              if (window.dataLayer) {
-                window.dataLayer.push({ event: 'lead_submit', variant: variant, segment: segment });
-              }
+              // Dispara o submit — o tracking script captura, monta payload completo
+              // (com UTMs/click IDs/session/atribuição) e envia pro webhook.
+              // Também faz dataLayer.push({ event: 'form_submit', ... }).
               try {
                 form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
               } catch (e) {}
-              if (window.fbq) window.fbq('track', 'Lead', { variant: variant });
-              if (window.gtag) window.gtag('event', 'generate_lead', { variant: variant });
-
-              // Persiste o lead pra página de obrigado ler
-              try { sessionStorage.setItem('orbit_lead', JSON.stringify(payload)); } catch (e) {}
-
-              // Envia pro webhook do n8n (fire-and-forget, não bloqueia o redirect)
-              try {
-                fetch('https://webhook.rodriguinhodomarketing.com.br/webhook/orbit-lead-vsl', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload),
-                  keepalive: true
-                }).catch(function(err) { console.warn('[Lead] webhook error:', err); });
-              } catch (e) {}
-
-              console.log('[Lead] payload:', payload);
 
               // Redireciona pra página de obrigado
               setTimeout(function() {
@@ -2725,6 +2741,372 @@
         nodes.forEach(function(n) { n.classList.remove('orbit-node--active', 'orbit-node--dimmed'); });
       });
     })();
+  </script>
+
+  <!-- ============================================
+       TRACKING INTEGRATION
+       Cookies de atribuição first-touch, session_id, dataLayer events
+       (custom_page_view, scroll_depth, time_on_page_heartbeat, form_submit),
+       hidden inputs do form populados automaticamente.
+       ============================================ -->
+  <script>
+  (function() {
+
+    // ── Configuração ─────────────────────────────────────────────────
+    var DOMAIN      = '.orbitgestao.com.br';
+    var MAX_AGE     = 63072000; // 2 anos
+    var WEBHOOK_URL = 'https://webhook.rodriguinhodomarketing.com.br/webhook/orbit-lead-vsl';
+
+    var utms   = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+    var clicks = ['gclid','gbraid','wbraid','fbclid','ttclid','gad_campaignid','gad_source','msclkid','li_fat_id','twclid','sck'];
+
+    // ── Helpers ──────────────────────────────────────────────────────
+    function getCookie(name) {
+      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+    function setCookie(name, value) {
+      document.cookie = name + '=' + encodeURIComponent(value)
+        + ';max-age=' + MAX_AGE
+        + ';path=/;domain=' + DOMAIN
+        + ';SameSite=None;Secure';
+    }
+    function setCookieFirstTouch(name, value) {
+      if (getCookie(name)) return;
+      setCookie(name, value);
+    }
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+    function isInternalReferrer(referrer) {
+      if (!referrer) return false;
+      try {
+        var ref = new URL(referrer).hostname;
+        var cur = window.location.hostname;
+        return ref === cur
+          || ref.endsWith('.' + cur.replace('www.',''))
+          || cur.endsWith('.' + ref.replace('www.',''));
+      } catch(e) { return false; }
+    }
+
+    // ── Session ID ───────────────────────────────────────────────────
+    var sessionId = (function() {
+      try {
+        var key = 'lp_session_id';
+        var s = sessionStorage.getItem(key);
+        if (!s) {
+          s = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          sessionStorage.setItem(key, s);
+        }
+        return s;
+      } catch(e) {
+        return Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      }
+    })();
+
+    // ── Referrer Mapping ─────────────────────────────────────────────
+    var referrerMap = {
+      'google.com':        { utm_source: 'google',       utm_medium: 'organic' },
+      'bing.com':          { utm_source: 'bing',         utm_medium: 'organic' },
+      'yahoo.com':         { utm_source: 'yahoo',        utm_medium: 'organic' },
+      'duckduckgo.com':    { utm_source: 'duckduckgo',   utm_medium: 'organic' },
+      'yandex.com':        { utm_source: 'yandex',       utm_medium: 'organic' },
+      'instagram.com':     { utm_source: 'instagram',    utm_medium: 'organic' },
+      'youtube.com':       { utm_source: 'youtube',      utm_medium: 'organic' },
+      'facebook.com':      { utm_source: 'facebook',     utm_medium: 'organic' },
+      'twitter.com':       { utm_source: 'twitter',      utm_medium: 'organic' },
+      'x.com':             { utm_source: 'twitter',      utm_medium: 'organic' },
+      'linkedin.com':      { utm_source: 'linkedin',     utm_medium: 'organic' },
+      'tiktok.com':        { utm_source: 'tiktok',       utm_medium: 'organic' },
+      'pinterest.com':     { utm_source: 'pinterest',    utm_medium: 'organic' },
+      'whatsapp.com':      { utm_source: 'whatsapp',     utm_medium: 'organic' },
+      'telegram.org':      { utm_source: 'telegram',     utm_medium: 'organic' },
+      'reddit.com':        { utm_source: 'reddit',       utm_medium: 'organic' },
+      'chat.openai.com':   { utm_source: 'chatgpt',      utm_medium: 'ai' },
+      'chatgpt.com':       { utm_source: 'chatgpt',      utm_medium: 'ai' },
+      'gemini.google.com': { utm_source: 'gemini',       utm_medium: 'ai' },
+      'claude.ai':         { utm_source: 'claude',       utm_medium: 'ai' },
+      'poe.com':           { utm_source: 'poe',          utm_medium: 'ai' },
+      'wikipedia.org':     { utm_source: 'wikipedia',    utm_medium: 'referral' },
+      'github.com':        { utm_source: 'github',       utm_medium: 'referral' }
+    };
+
+    // ── 1. UTMs da URL — first touch ─────────────────────────────────
+    var hasUtmInUrl = utms.some(function(p) { return !!getParam(p); });
+    if (hasUtmInUrl) {
+      utms.forEach(function(p) {
+        var val = getParam(p) || '';
+        setCookieFirstTouch(p, val);
+      });
+    } else {
+      var referrer = document.referrer || '';
+      if (referrer && !isInternalReferrer(referrer)) {
+        for (var domain in referrerMap) {
+          if (referrer.indexOf(domain) !== -1) {
+            var map = referrerMap[domain];
+            utms.forEach(function(p) {
+              setCookieFirstTouch(p, map[p] || '');
+            });
+            break;
+          }
+        }
+      }
+    }
+
+    // ── 2. Click params — first touch ────────────────────────────────
+    clicks.forEach(function(p) {
+      var val = getParam(p);
+      if (val) setCookieFirstTouch(p, val);
+    });
+
+    // ── 3. Gera _fbc se veio fbclid ──────────────────────────────────
+    var fbclid = getParam('fbclid');
+    if (fbclid && !getCookie('_fbc')) {
+      setCookie('_fbc', 'fb.1.' + Date.now() + '.' + fbclid);
+    }
+
+    // ── 4. First visit, landing page, origin page ─────────────────────
+    if (!getCookie('first_visit')) {
+      setCookie('first_visit', new Date().toISOString());
+    }
+    if (!getCookie('landing_page')) {
+      setCookie('landing_page', window.location.href);
+    }
+    if (!getCookie('origin_page')) {
+      var originRef = document.referrer || '';
+      if (originRef && !isInternalReferrer(originRef)) {
+        setCookie('origin_page', originRef);
+      }
+    }
+
+    // ── 5. Ref param ─────────────────────────────────────────────────
+    var refParam = getParam('ref');
+    if (refParam && !getCookie('ref')) {
+      setCookie('ref', refParam);
+    }
+
+    // ── 6. User Agent cookie ──────────────────────────────────────────
+    setCookie('user_agent', navigator.userAgent);
+
+    // ── 7. Session attributes encoded ────────────────────────────────
+    var sessionAttrs = {
+      utm_source:    getCookie('utm_source') || '',
+      utm_medium:    getCookie('utm_medium') || '',
+      utm_campaign:  getCookie('utm_campaign') || '',
+      utm_content:   getCookie('utm_content') || '',
+      utm_term:      getCookie('utm_term') || '',
+      gclid:         getCookie('gclid') || '',
+      fbclid:        getCookie('fbclid') || '',
+      ttclid:        getCookie('ttclid') || '',
+      msclkid:       getCookie('msclkid') || '',
+      landing_page:  getCookie('landing_page') || '',
+      origin_page:   getCookie('origin_page') || '',
+      first_visit:   getCookie('first_visit') || '',
+      ref:           getCookie('ref') || ''
+    };
+    try {
+      setCookie('session_attributes_encoded', btoa(unescape(encodeURIComponent(JSON.stringify(sessionAttrs)))));
+    } catch(e) {}
+
+    // ── 8. Preenche hidden inputs do form ────────────────────────────
+    utms.concat(clicks).forEach(function(p) {
+      var val = getCookie(p);
+      if (!val) return;
+      document.querySelectorAll(
+        'input[name="' + p + '"], input[data-field-id="' + p + '"]'
+      ).forEach(function(f) { f.value = val; });
+    });
+
+    var sessionIdInput = document.getElementById('hidden_session_id');
+    if (sessionIdInput) sessionIdInput.value = sessionId;
+
+    var lpInput = document.querySelector('input[data-field-id="landing_page"]');
+    if (lpInput) lpInput.value = getCookie('landing_page') || window.location.href;
+
+    var opInput = document.querySelector('input[data-field-id="origin_page"]');
+    if (opInput) opInput.value = getCookie('origin_page') || document.referrer || '';
+
+    var saeInput = document.querySelector('input[data-field-id="session_attributes_encoded"]');
+    if (saeInput) saeInput.value = getCookie('session_attributes_encoded') || '';
+
+    // ── 9. DataLayer ─────────────────────────────────────────────────
+    window.dataLayer = window.dataLayer || [];
+    var dl = {};
+
+    // First-touch (cookies — nunca sobrescreve)
+    utms.concat(clicks).forEach(function(p) {
+      var val = getCookie(p);
+      if (val) dl['ft_' + p] = val;
+    });
+
+    // Last-touch UTMs
+    utms.forEach(function(p) {
+      var fromUrl = getParam(p);
+      if (fromUrl) {
+        dl[p] = fromUrl;
+      } else {
+        var ref = document.referrer;
+        var detected = null;
+        if (ref) {
+          for (var d in referrerMap) {
+            if (ref.indexOf(d) !== -1) { detected = referrerMap[d]; break; }
+          }
+        }
+        if (detected && p === 'utm_source') dl[p] = detected.utm_source;
+        else if (detected && p === 'utm_medium') dl[p] = detected.utm_medium;
+        else dl[p] = getCookie(p) || '';
+      }
+    });
+
+    // Last-touch click IDs
+    clicks.forEach(function(p) {
+      var fromUrl = getParam(p);
+      dl[p] = fromUrl || getCookie(p) || '';
+    });
+
+    dl.session_id = sessionId;
+    dl.landing_page = getCookie('landing_page') || '';
+    dl.origin_page = getCookie('origin_page') || '';
+    dl.first_visit = getCookie('first_visit') || '';
+    dl.ref = getCookie('ref') || '';
+    dl.user_agent = navigator.userAgent;
+    dl.session_attributes_encoded = getCookie('session_attributes_encoded') || '';
+
+    if (Object.keys(dl).length) window.dataLayer.push(dl);
+
+    // Evento custom_page_view
+    window.dataLayer.push({
+      event:         'custom_page_view',
+      session_id:    sessionId,
+      page_url:      window.location.href,
+      page_path:     window.location.pathname,
+      page_hostname: window.location.hostname,
+      referrer:      document.referrer || ''
+    });
+
+    // ── 10. Scroll Depth ─────────────────────────────────────────────
+    (function() {
+      var milestones = [25, 50, 75, 90];
+      var reached = {};
+      var pageStart = Date.now();
+
+      function getScrollPercent() {
+        var doc = document.documentElement;
+        var body = document.body;
+        var scrollTop = doc.scrollTop || body.scrollTop;
+        var scrollHeight = Math.max(doc.scrollHeight, body.scrollHeight) - doc.clientHeight;
+        if (scrollHeight <= 0) return 100;
+        return Math.round((scrollTop / scrollHeight) * 100);
+      }
+
+      window.addEventListener('scroll', function() {
+        var pct = getScrollPercent();
+        milestones.forEach(function(m) {
+          if (!reached[m] && pct >= m) {
+            reached[m] = true;
+            var timeOnPage = Math.round((Date.now() - pageStart) / 1000);
+            window.dataLayer.push({
+              event:        'scroll_depth',
+              session_id:    sessionId,
+              scroll_depth:  m,
+              time_on_page:  timeOnPage,
+              page_path:     window.location.pathname
+            });
+          }
+        });
+      }, { passive: true });
+    })();
+
+    // ── 11. Time on Page Heartbeat ───────────────────────────────────
+    (function() {
+      var pageStart = Date.now();
+      var heartbeatCount = 0;
+
+      document.addEventListener('submit', function() {
+        var timeOnPage = Math.round((Date.now() - pageStart) / 1000);
+        window.dataLayer.push({
+          session_id: sessionId,
+          time_on_page_at_submit: timeOnPage
+        });
+      }, true);
+
+      var hb = setInterval(function() {
+        heartbeatCount++;
+        var timeOnPage = Math.round((Date.now() - pageStart) / 1000);
+        window.dataLayer.push({
+          event:       'time_on_page_heartbeat',
+          session_id:   sessionId,
+          time_on_page: timeOnPage,
+          heartbeat:    heartbeatCount,
+          page_path:    window.location.pathname
+        });
+        if (heartbeatCount >= 20) clearInterval(hb); // 10 min
+      }, 30000);
+    })();
+
+    // ── 12. Form Submit Handler ──────────────────────────────────────
+    var form = document.getElementById('lead-form');
+    if (form) {
+      var formPageStart = Date.now();
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Lead data
+        var nameField  = form.querySelector('input[name="name"]');
+        var emailField = form.querySelector('input[name="email"]');
+        var phoneField = form.querySelector('input[name="phone"]');
+
+        var leadName  = nameField  ? nameField.value.trim()  : '';
+        var leadEmail = emailField ? emailField.value.trim().toLowerCase() : '';
+        var leadPhone = phoneField ? phoneField.value.trim().replace(/\D/g, '') : '';
+
+        var nameParts = leadName.split(' ');
+        var firstName = nameParts[0] || '';
+        var lastName  = nameParts.slice(1).join(' ') || '';
+
+        // Evento form_submit no dataLayer
+        window.dataLayer.push({
+          event:                  'form_submit',
+          session_id:              sessionId,
+          lead_name:               leadName,
+          lead_email:              leadEmail,
+          lead_phone:              leadPhone,
+          lead_first_name:         firstName,
+          lead_last_name:          lastName,
+          time_on_page_at_submit:  Math.round((Date.now() - formPageStart) / 1000)
+        });
+
+        // Monta payload completo
+        var formData = new FormData(form);
+        var payload = {};
+        formData.forEach(function(value, key) {
+          if (value) payload[key] = value;
+        });
+
+        payload.first_name   = firstName;
+        payload.last_name    = lastName;
+        payload.session_id   = sessionId;
+        payload.page_url     = window.location.href;
+        payload.page_path    = window.location.pathname;
+        payload.referrer     = document.referrer || '';
+        payload.submitted_at = new Date().toISOString();
+
+        // Fire-and-forget pro webhook (keepalive sobrevive ao redirect)
+        try {
+          fetch(WEBHOOK_URL, {
+            method:    'POST',
+            headers:   { 'Content-Type': 'application/json' },
+            body:      JSON.stringify(payload),
+            keepalive: true
+          }).catch(function(err) { console.warn('[Lead] webhook error:', err); });
+        } catch(err) {
+          console.warn('[Lead] fetch threw:', err);
+        }
+      });
+    }
+
+  })();
   </script>
 </body>
 </html>

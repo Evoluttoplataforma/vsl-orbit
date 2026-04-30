@@ -732,5 +732,120 @@
       })();
     })();
   </script>
+
+  <!-- ============================================
+       TRACKING INTEGRATION (sem form submit — não tem form aqui)
+       Mantém atribuição (cookies first-touch já existem do LP)
+       e dispara custom_page_view, scroll_depth, time_on_page_heartbeat.
+       ============================================ -->
+  <script>
+  (function() {
+    var DOMAIN = '.orbitgestao.com.br';
+    var MAX_AGE = 63072000;
+    var utms   = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
+    var clicks = ['gclid','gbraid','wbraid','fbclid','ttclid','gad_campaignid','gad_source','msclkid','li_fat_id','twclid','sck'];
+
+    function getCookie(name) {
+      var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    }
+    function setCookie(name, value) {
+      document.cookie = name + '=' + encodeURIComponent(value)
+        + ';max-age=' + MAX_AGE
+        + ';path=/;domain=' + DOMAIN
+        + ';SameSite=None;Secure';
+    }
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    var sessionId = (function() {
+      try {
+        var key = 'lp_session_id';
+        var s = sessionStorage.getItem(key);
+        if (!s) {
+          s = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          sessionStorage.setItem(key, s);
+        }
+        return s;
+      } catch(e) {
+        return Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      }
+    })();
+
+    setCookie('user_agent', navigator.userAgent);
+
+    window.dataLayer = window.dataLayer || [];
+    var dl = { session_id: sessionId };
+    utms.concat(clicks).forEach(function(p) {
+      var fromUrl = getParam(p);
+      var fromCookie = getCookie(p);
+      dl[p] = fromUrl || fromCookie || '';
+      if (fromCookie) dl['ft_' + p] = fromCookie;
+    });
+    dl.landing_page = getCookie('landing_page') || '';
+    dl.origin_page  = getCookie('origin_page')  || '';
+    dl.first_visit  = getCookie('first_visit')  || '';
+    dl.user_agent   = navigator.userAgent;
+    dl.session_attributes_encoded = getCookie('session_attributes_encoded') || '';
+    window.dataLayer.push(dl);
+
+    window.dataLayer.push({
+      event:         'custom_page_view',
+      session_id:    sessionId,
+      page_url:      window.location.href,
+      page_path:     window.location.pathname,
+      page_hostname: window.location.hostname,
+      referrer:      document.referrer || ''
+    });
+
+    // Scroll depth
+    (function() {
+      var milestones = [25, 50, 75, 90];
+      var reached = {};
+      var pageStart = Date.now();
+      function getScrollPercent() {
+        var doc = document.documentElement;
+        var body = document.body;
+        var scrollTop = doc.scrollTop || body.scrollTop;
+        var scrollHeight = Math.max(doc.scrollHeight, body.scrollHeight) - doc.clientHeight;
+        if (scrollHeight <= 0) return 100;
+        return Math.round((scrollTop / scrollHeight) * 100);
+      }
+      window.addEventListener('scroll', function() {
+        var pct = getScrollPercent();
+        milestones.forEach(function(m) {
+          if (!reached[m] && pct >= m) {
+            reached[m] = true;
+            window.dataLayer.push({
+              event:        'scroll_depth',
+              session_id:    sessionId,
+              scroll_depth:  m,
+              time_on_page:  Math.round((Date.now() - pageStart) / 1000),
+              page_path:     window.location.pathname
+            });
+          }
+        });
+      }, { passive: true });
+    })();
+
+    // Heartbeat
+    (function() {
+      var pageStart = Date.now();
+      var hbCount = 0;
+      var hb = setInterval(function() {
+        hbCount++;
+        window.dataLayer.push({
+          event:        'time_on_page_heartbeat',
+          session_id:    sessionId,
+          time_on_page:  Math.round((Date.now() - pageStart) / 1000),
+          heartbeat:     hbCount,
+          page_path:     window.location.pathname
+        });
+        if (hbCount >= 20) clearInterval(hb);
+      }, 30000);
+    })();
+  })();
+  </script>
 </body>
 </html>
