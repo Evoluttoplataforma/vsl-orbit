@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#FAFAFA" />
+  <meta name="theme-color" content="#0A0A0A" />
   <meta name="robots" content="noindex,nofollow" />
   <title>Orbit · Dashboard</title>
 
@@ -21,32 +21,20 @@
       theme: {
         extend: {
           colors: {
-            'orbit-yellow': '#F59E0B',
-            'orbit-yellow-hi': '#FBBF24',
-            'orbit-yellow-lo': '#D97706',
+            'orbit-yellow': '#FFBA1A',
+            'orbit-yellow-hi': '#FFCC4D',
+            'orbit-yellow-lo': '#E5A30D',
             'orbit-black': '#0C0C0C',
-            'orbit-bg': '#FAFAFA',
-            'orbit-surface': '#FFFFFF',
-            'orbit-surface-2': '#F5F5F5',
-            'orbit-border': '#E5E5E5',
-            'orbit-text': '#0C0C0C',
-            'orbit-muted': '#71717A',
-            'orbit-dim': '#A1A1AA',
-            'math-green': '#059669',
-            'math-green-hi': '#10B981',
-            'orbit-red': '#DC2626',
-            'orbit-blue': '#2563EB',
+            'orbit-bg': '#0A0A0A',
+            'orbit-surface-1': '#141414',
+            'orbit-surface-2': '#1F1F1F',
+            'orbit-border': '#2A2A2A',
+            'math-green': '#10B981',
           },
           fontFamily: {
             geist: ['Geist', 'sans-serif'],
             'geist-mono': ['Geist Mono', 'monospace'],
             display: ['Oswald', 'sans-serif'],
-          },
-          boxShadow: {
-            'card': '0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.06)',
-            'card-hover': '0 8px 24px -8px rgba(0,0,0,0.10), 0 2px 6px -2px rgba(0,0,0,0.06)',
-            'card-elev': '0 12px 32px -12px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06)',
-            'glow-yellow': '0 0 0 1px rgba(245,158,11,0.18), 0 8px 24px -8px rgba(245,158,11,0.30)',
           },
         },
       },
@@ -54,7 +42,7 @@
   </script>
 
   <style>
-    body { font-family: 'Geist', sans-serif; background: #FAFAFA; color: #0C0C0C; }
+    body { font-family: 'Geist', sans-serif; background: #0A0A0A; color: #FAFAFA; }
 
     .material-symbols-rounded {
       font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
@@ -64,43 +52,57 @@
       display: inline-block;
     }
 
-    /* Background pattern subtle */
+    /* Background ambient */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        radial-gradient(circle at 20% 0%, rgba(245,158,11,0.04), transparent 40%),
-        radial-gradient(circle at 80% 100%, rgba(5,150,105,0.03), transparent 40%);
+        radial-gradient(circle at 15% 0%, rgba(255,186,26,0.08), transparent 45%),
+        radial-gradient(circle at 85% 100%, rgba(16,185,129,0.05), transparent 45%);
       pointer-events: none;
       z-index: 0;
     }
     #app, header { position: relative; z-index: 1; }
 
+    .glow-yellow {
+      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.25), rgba(255, 186, 26, 0) 70%);
+      filter: blur(60px);
+    }
+
     /* KPI cards */
     .kpi {
       position: relative;
       overflow: hidden;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.06);
+      transition: transform 0.25s ease, border-color 0.25s ease;
     }
-    .kpi:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -12px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06); }
+    .kpi:hover { transform: translateY(-2px); border-color: rgba(255,186,26,0.4); }
+    .kpi__sweep {
+      position: absolute;
+      top: -50%;
+      left: -10%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255,186,26,0.08), transparent);
+      transform: rotate(15deg);
+      pointer-events: none;
+    }
 
     .kpi-num {
       font-family: 'Oswald', sans-serif;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: -0.025em;
     }
 
     /* Score badges */
     .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Geist Mono', monospace; white-space: nowrap; }
-    .badge--hot   { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
-    .badge--warm  { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
-    .badge--cold  { background: #E0E7FF; color: #3730A3; border: 1px solid #A5B4FC; }
-    .badge--a     { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
-    .badge--b     { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
-    .badge--neutral { background: #F4F4F5; color: #52525B; border: 1px solid #E4E4E7; }
-    .badge--urgent { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    .badge--hot   { background: rgba(255,186,26,0.15); color: #FFBA1A; border: 1px solid rgba(255,186,26,0.4); }
+    .badge--warm  { background: rgba(255,255,255,0.08); color: #FAFAFA; border: 1px solid rgba(255,255,255,0.15); }
+    .badge--cold  { background: rgba(107,107,107,0.12); color: #A3A3A3; border: 1px solid rgba(107,107,107,0.3); }
+    .badge--a     { background: rgba(255,186,26,0.12); color: #FFBA1A; border: 1px solid rgba(255,186,26,0.3); }
+    .badge--b     { background: rgba(16,185,129,0.12); color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
+    .badge--neutral { background: rgba(255,255,255,0.05); color: #A3A3A3; border: 1px solid rgba(255,255,255,0.1); }
+    .badge--urgent { background: rgba(239,68,68,0.15); color: #F87171; border: 1px solid rgba(239,68,68,0.4); }
 
     /* Filter pills */
     .filter-pill {
@@ -109,14 +111,14 @@
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.02em;
-      background: #FFFFFF;
-      border: 1px solid #E5E5E5;
-      color: #52525B;
+      background: #141414;
+      border: 1px solid #2A2A2A;
+      color: #A3A3A3;
       transition: all 0.2s ease;
       cursor: pointer;
     }
-    .filter-pill:hover { color: #0C0C0C; border-color: #F59E0B; box-shadow: 0 2px 8px -2px rgba(245,158,11,0.2); }
-    .filter-pill.is-active { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: #FFFFFF; border-color: #F59E0B; box-shadow: 0 4px 12px -2px rgba(245,158,11,0.4); }
+    .filter-pill:hover { color: #FAFAFA; border-color: rgba(255,186,26,0.4); }
+    .filter-pill.is-active { background: linear-gradient(135deg, #FFBA1A, #FFCC4D); color: #0C0C0C; border-color: #FFBA1A; box-shadow: 0 4px 12px -2px rgba(255,186,26,0.35); }
 
     /* Login screen */
     #login-screen { display: none; }
@@ -132,26 +134,26 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #71717A;
+      color: #6B6B6B;
       font-family: 'Geist Mono', monospace;
-      background: #FAFAFA;
-      border-bottom: 1px solid #E5E5E5;
+      background: #0A0A0A;
+      border-bottom: 1px solid #2A2A2A;
       white-space: nowrap;
     }
     .data-table td {
       padding: 14px;
-      border-bottom: 1px solid #F4F4F5;
-      color: #0C0C0C;
+      border-bottom: 1px solid #1F1F1F;
+      color: #FAFAFA;
       vertical-align: middle;
     }
     .data-table tbody tr { cursor: pointer; transition: background 0.15s ease; }
-    .data-table tbody tr:hover { background: #FFFBEB; }
+    .data-table tbody tr:hover { background: rgba(255,186,26,0.05); }
     .data-table .truncate-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* Drawer */
     .drawer-backdrop {
       position: fixed; inset: 0; z-index: 50;
-      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
       opacity: 0; pointer-events: none;
       transition: opacity 0.25s ease;
     }
@@ -159,10 +161,10 @@
     .drawer {
       position: fixed; top: 0; right: 0; bottom: 0; z-index: 51;
       width: 100%; max-width: 480px;
-      background: #FFFFFF; border-left: 1px solid #E5E5E5;
+      background: #0A0A0A; border-left: 1px solid #2A2A2A;
       transform: translateX(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
       overflow-y: auto; overflow-x: hidden;
-      box-shadow: -24px 0 48px -12px rgba(0,0,0,0.10);
+      box-shadow: -24px 0 48px -12px rgba(0,0,0,0.5);
     }
     .drawer.is-open { transform: translateX(0); }
 
@@ -170,16 +172,15 @@
     .insight {
       position: relative;
       overflow: hidden;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+      transition: transform 0.25s ease, border-color 0.25s ease;
     }
-    .insight:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -12px rgba(0,0,0,0.12); }
+    .insight:hover { transform: translateY(-2px); border-color: rgba(255,186,26,0.3); }
     .insight::before {
       content: '';
       position: absolute;
       top: -40px; right: -40px;
       width: 180px; height: 180px;
-      background: radial-gradient(closest-side, rgba(245,158,11,0.10), transparent 70%);
+      background: radial-gradient(closest-side, rgba(255,186,26,0.10), transparent 70%);
       pointer-events: none;
     }
 
@@ -195,10 +196,10 @@
       border-radius: 4px;
       transition: transform 0.15s ease;
     }
-    .heatmap-cell:hover { transform: scale(1.2); outline: 2px solid #F59E0B; }
+    .heatmap-cell:hover { transform: scale(1.2); outline: 2px solid #FFBA1A; }
     .heatmap-label {
       font-family: 'Geist Mono', monospace;
-      color: #A1A1AA;
+      color: #6B6B6B;
       text-align: right;
       padding-right: 6px;
       font-size: 0.6rem;
@@ -206,48 +207,45 @@
       font-weight: 600;
     }
 
-    /* Hot lead cards */
-    .hot-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
-      box-shadow: 0 4px 12px -4px rgba(245,158,11,0.20);
-    }
-    .hot-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 32px -8px rgba(245,158,11,0.35);
-    }
-
     /* Drawer field rows */
-    .field-row { padding: 12px 0; border-bottom: 1px solid #F4F4F5; }
+    .field-row { padding: 12px 0; border-bottom: 1px solid #1F1F1F; }
     .field-row:last-child { border-bottom: none; }
-    .field-label { font-family: 'Geist Mono', monospace; font-size: 0.6rem; color: #A1A1AA; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
-    .field-value { color: #0C0C0C; font-size: 0.875rem; word-break: break-word; }
+    .field-label { font-family: 'Geist Mono', monospace; font-size: 0.6rem; color: #6B6B6B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+    .field-value { color: #FAFAFA; font-size: 0.875rem; word-break: break-word; }
 
     /* Search input */
     .search-input {
       width: 100%;
-      background: #FFFFFF;
-      border: 1px solid #E5E5E5;
+      background: #0A0A0A;
+      border: 1px solid #2A2A2A;
       border-radius: 9999px;
       padding: 8px 14px 8px 40px;
       font-size: 0.825rem;
-      color: #0C0C0C;
+      color: #FAFAFA;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
     .search-input:focus {
       outline: none;
-      border-color: #F59E0B;
-      box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+      border-color: #FFBA1A;
+      box-shadow: 0 0 0 3px rgba(255,186,26,0.15);
     }
-    .search-input::placeholder { color: #A1A1AA; }
+    .search-input::placeholder { color: #6B6B6B; }
 
-    /* Card containers — base */
+    /* Card base */
     .card {
-      background: #FFFFFF;
-      border: 1px solid #E5E5E5;
+      background: #141414;
+      border: 1px solid #2A2A2A;
       border-radius: 1rem;
-      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.06);
     }
+
+    /* A vs B progress bars */
+    .progress-track {
+      height: 6px;
+      background: #0A0A0A;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.7s cubic-bezier(.4,0,.2,1); }
 
     /* Mobile */
     @media (max-width: 640px) {
@@ -262,15 +260,6 @@
       }
       .heatmap-cell { min-width: 8px; }
     }
-
-    /* A vs B progress bars */
-    .progress-track {
-      height: 6px;
-      background: #F4F4F5;
-      border-radius: 9999px;
-      overflow: hidden;
-    }
-    .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.7s cubic-bezier(.4,0,.2,1); }
   </style>
 </head>
 
@@ -278,20 +267,20 @@
 
   <!-- LOGIN -->
   <div id="login-screen" class="fixed inset-0 z-50 items-center justify-center p-6 bg-orbit-bg">
-    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 50% 40%, rgba(245,158,11,0.12), transparent 50%)"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] glow-yellow pointer-events-none"></div>
     <div class="relative w-full max-w-sm">
       <div class="text-center mb-8">
-        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-7 w-auto mx-auto mb-6" style="filter:invert(1) brightness(0.2)" />
-        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.25em] text-orbit-yellow-lo">Acesso restrito</span>
-        <h1 class="text-2xl font-semibold text-orbit-text tracking-tight mt-2">Dashboard Orbit</h1>
+        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-7 w-auto mx-auto mb-6" />
+        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.25em] text-orbit-yellow">Acesso restrito</span>
+        <h1 class="text-2xl font-semibold text-white tracking-tight mt-2">Dashboard Orbit</h1>
       </div>
       <form id="login-form" class="card p-6 space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-orbit-text mb-2">Senha</label>
-          <input type="password" id="login-key" placeholder="••••••••" class="w-full px-4 py-3 bg-white border border-orbit-border rounded-xl text-orbit-text placeholder-zinc-400 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20" autofocus />
-          <p id="login-error" class="hidden mt-2 text-xs text-orbit-red">Senha incorreta.</p>
+          <label class="block text-xs font-semibold text-zinc-300 mb-2">Senha</label>
+          <input type="password" id="login-key" placeholder="••••••••" class="w-full px-4 py-3 bg-orbit-bg border border-orbit-border rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20" autofocus />
+          <p id="login-error" class="hidden mt-2 text-xs text-red-400">Senha incorreta.</p>
         </div>
-        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-orbit-yellow text-white hover:bg-orbit-yellow-hi px-5 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02] shadow-[0_8px_24px_-8px_rgba(245,158,11,0.5)]">
+        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-5 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02] shadow-[0_8px_24px_-8px_rgba(255,186,26,0.5)]">
           Entrar
           <span class="material-symbols-rounded text-base">arrow_forward</span>
         </button>
@@ -306,27 +295,27 @@
     <header class="sticky top-0 z-30 backdrop-blur-md bg-orbit-bg/85 border-b border-orbit-border">
       <div class="max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-10 h-16 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0">
-          <a href="/" class="flex items-center shrink-0"><img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" style="filter:invert(1) brightness(0.2)" /></a>
-          <span class="hidden sm:inline-block text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-orbit-muted border-l border-orbit-border pl-3 truncate">Dashboard · Leads</span>
+          <a href="/" class="flex items-center shrink-0"><img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" /></a>
+          <span class="hidden sm:inline-block text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-zinc-500 border-l border-orbit-border pl-3 truncate">Dashboard · Leads</span>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <span id="live-dot" class="hidden sm:inline-flex items-center gap-1.5 text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">
+          <span id="live-dot" class="hidden sm:inline-flex items-center gap-1.5 text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">
             <span class="w-1.5 h-1.5 rounded-full bg-math-green animate-pulse"></span>live
           </span>
-          <button id="refresh-btn" class="inline-flex items-center gap-1.5 text-xs text-orbit-muted hover:text-orbit-text transition px-3 py-2 rounded-full bg-white hover:bg-orbit-surface-2 border border-orbit-border">
+          <button id="refresh-btn" class="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition px-3 py-2 rounded-full bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border">
             <span class="material-symbols-rounded text-base">refresh</span>
             <span class="hidden sm:inline">Atualizar</span>
           </button>
-          <span id="last-update" class="hidden md:inline-block text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest"></span>
+          <span id="last-update" class="hidden md:inline-block text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest"></span>
         </div>
       </div>
     </header>
 
     <!-- FILTERS -->
-    <section class="border-b border-orbit-border bg-white/60">
+    <section class="border-b border-orbit-border bg-orbit-bg/60">
       <div class="max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-10 py-3 sm:py-4 flex flex-wrap items-center gap-3 lg:gap-5">
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Período</span>
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Período</span>
           <div class="flex flex-wrap gap-1.5" data-filter-group="range">
             <button class="filter-pill" data-value="1">24h</button>
             <button class="filter-pill" data-value="7">7d</button>
@@ -336,7 +325,7 @@
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Variant</span>
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Variant</span>
           <div class="flex gap-1.5" data-filter-group="variant">
             <button class="filter-pill is-active" data-value="all">Todas</button>
             <button class="filter-pill" data-value="a">A</button>
@@ -344,7 +333,7 @@
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Score</span>
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Score</span>
           <div class="flex gap-1.5" data-filter-group="score">
             <button class="filter-pill is-active" data-value="all">Todos</button>
             <button class="filter-pill" data-value="Hot">Hot</button>
@@ -353,7 +342,7 @@
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Segmento</span>
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Segmento</span>
           <div class="flex gap-1.5" data-filter-group="segment">
             <button class="filter-pill is-active" data-value="all">Todos</button>
             <button class="filter-pill" data-value="1">S1</button>
@@ -366,152 +355,141 @@
 
     <main class="max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-10 py-5 sm:py-6 lg:py-10 space-y-5 sm:space-y-6 lg:space-y-10">
 
-      <!-- HOT LEADS STRIP -->
-      <section id="hot-strip-wrap" class="hidden">
-        <div class="flex items-baseline justify-between mb-3 gap-3 flex-wrap">
-          <h2 class="text-base sm:text-lg font-semibold text-orbit-text tracking-tight inline-flex items-center gap-2">
-            <span class="material-symbols-rounded text-orbit-yellow" style="font-size:22px;font-variation-settings:'FILL' 1, 'wght' 600">local_fire_department</span>
-            Hot leads pra contatar agora
-          </h2>
-          <span id="hot-strip-count" class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest"></span>
-        </div>
-        <div id="hot-strip" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"></div>
-      </section>
-
       <!-- INSIGHTS ROW -->
       <section class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-5">
         <div class="insight card p-5">
-          <p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Variant vencedora</p>
-          <p id="insight-winner" class="text-xl lg:text-2xl font-semibold text-orbit-text">—</p>
-          <p id="insight-winner-detail" class="text-xs text-orbit-muted mt-1">aguardando dados</p>
+          <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-2">Variant vencedora</p>
+          <p id="insight-winner" class="text-xl lg:text-2xl font-semibold text-white">—</p>
+          <p id="insight-winner-detail" class="text-xs text-zinc-500 mt-1">aguardando dados</p>
         </div>
         <div class="insight card p-5">
-          <p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Segmento mais quente</p>
-          <p id="insight-segment" class="text-xl lg:text-2xl font-semibold text-orbit-text">—</p>
-          <p id="insight-segment-detail" class="text-xs text-orbit-muted mt-1">aguardando dados</p>
+          <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-2">Segmento mais quente</p>
+          <p id="insight-segment" class="text-xl lg:text-2xl font-semibold text-white">—</p>
+          <p id="insight-segment-detail" class="text-xs text-zinc-500 mt-1">aguardando dados</p>
         </div>
         <div class="insight card p-5">
-          <p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Pico de leads</p>
-          <p id="insight-peak" class="text-xl lg:text-2xl font-semibold text-orbit-text">—</p>
-          <p id="insight-peak-detail" class="text-xs text-orbit-muted mt-1">aguardando dados</p>
+          <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-2">Pico de leads</p>
+          <p id="insight-peak" class="text-xl lg:text-2xl font-semibold text-white">—</p>
+          <p id="insight-peak-detail" class="text-xs text-zinc-500 mt-1">aguardando dados</p>
         </div>
       </section>
 
       <!-- KPIs -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
         <div class="kpi card p-5 lg:p-6">
-          <div class="flex items-start justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-              <span class="material-symbols-rounded text-orbit-muted" style="font-size:20px">groups</span>
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
+              <span class="material-symbols-rounded text-zinc-400" style="font-size:20px">groups</span>
             </div>
-            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest">total</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">total</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-orbit-text" id="kpi-total">—</p>
-          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-total-delta" class="font-semibold">—</span> nas últimas 24h</p>
+          <p class="kpi-num text-4xl lg:text-5xl text-white" id="kpi-total">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-total-delta" class="font-semibold">—</span> nas últimas 24h</p>
         </div>
 
-        <div class="kpi card p-5 lg:p-6" style="background:linear-gradient(135deg,#FFFBEB 0%,#FFFFFF 60%);border-color:#FCD34D">
-          <div class="flex items-start justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#FCD34D,#F59E0B)">
-              <span class="material-symbols-rounded text-white" style="font-size:20px;font-variation-settings:'FILL' 1">local_fire_department</span>
+        <div class="kpi card p-5 lg:p-6" style="background:linear-gradient(135deg,rgba(255,186,26,0.08),#141414 60%);border-color:rgba(255,186,26,0.35)">
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#FFCC4D,#FFBA1A)">
+              <span class="material-symbols-rounded text-orbit-black" style="font-size:20px;font-variation-settings:'FILL' 1">local_fire_department</span>
             </div>
-            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono uppercase tracking-widest" style="color:#92400E">hot</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono uppercase tracking-widest" style="color:#FFCC4D">hot</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl" id="kpi-hot" style="color:#B45309">—</p>
-          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-hot-pct" class="font-semibold">—</span>% do total</p>
-        </div>
-
-        <div class="kpi card p-5 lg:p-6">
-          <div class="flex items-start justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-              <span class="material-symbols-rounded text-orbit-muted" style="font-size:20px">thermostat</span>
-            </div>
-            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest">warm</span>
-          </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-orbit-text" id="kpi-warm">—</p>
-          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-warm-pct" class="font-semibold">—</span>% do total</p>
+          <p class="kpi-num text-4xl lg:text-5xl text-orbit-yellow" id="kpi-hot">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-hot-pct" class="font-semibold">—</span>% do total</p>
         </div>
 
         <div class="kpi card p-5 lg:p-6">
-          <div class="flex items-start justify-between mb-3">
-            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-              <span class="material-symbols-rounded text-orbit-muted" style="font-size:20px">ac_unit</span>
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
+              <span class="material-symbols-rounded text-zinc-400" style="font-size:20px">thermostat</span>
             </div>
-            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest">cold</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">warm</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-orbit-muted" id="kpi-cold">—</p>
-          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-cold-pct" class="font-semibold">—</span>% do total</p>
+          <p class="kpi-num text-4xl lg:text-5xl text-white" id="kpi-warm">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-warm-pct" class="font-semibold">—</span>% do total</p>
+        </div>
+
+        <div class="kpi card p-5 lg:p-6">
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
+              <span class="material-symbols-rounded text-zinc-500" style="font-size:20px">ac_unit</span>
+            </div>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">cold</span>
+          </div>
+          <p class="kpi-num text-4xl lg:text-5xl text-zinc-400" id="kpi-cold">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-cold-pct" class="font-semibold">—</span>% do total</p>
         </div>
       </section>
 
       <!-- A vs B + MATRIX -->
       <section>
         <div class="flex items-baseline gap-3 mb-4 flex-wrap">
-          <h2 class="text-lg lg:text-xl font-semibold text-orbit-text tracking-tight">Variant A <span class="text-orbit-muted font-normal">vs</span> B</h2>
-          <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">comparativo + por segmento</span>
+          <h2 class="text-lg lg:text-xl font-semibold text-white tracking-tight">Variant A <span class="text-zinc-500 font-normal">vs</span> B</h2>
+          <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">comparativo + por segmento</span>
         </div>
         <div class="grid md:grid-cols-2 gap-3 lg:gap-5 mb-4">
-          <!-- A -->
           <div class="card p-5 lg:p-6">
             <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
               <span class="badge badge--a">Variant A · Dor + Evolução</span>
-              <span class="text-[0.6rem] font-geist-mono text-orbit-dim">Igor + Christian</span>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">Igor + Christian</span>
             </div>
             <div class="grid grid-cols-3 gap-4">
               <div>
-                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Leads</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="va-total">—</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Leads</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="va-total">—</p>
               </div>
               <div>
-                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">% Hot</p>
-                <p class="kpi-num text-3xl lg:text-4xl mt-1" id="va-hot-pct" style="color:#B45309">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% Hot</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-orbit-yellow mt-1" id="va-hot-pct">—%</p>
               </div>
               <div>
-                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Share</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="va-share">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Share</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="va-share">—%</p>
               </div>
             </div>
             <div class="mt-4 progress-track">
-              <div class="progress-fill" id="va-bar" style="width:0%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div>
+              <div class="progress-fill" id="va-bar" style="width:0%;background:linear-gradient(90deg,#FFBA1A,#FFCC4D)"></div>
             </div>
           </div>
-          <!-- B -->
           <div class="card p-5 lg:p-6">
             <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
               <span class="badge badge--b">Variant B · Oportunidade + Math</span>
-              <span class="text-[0.6rem] font-geist-mono text-orbit-dim">Christian solo</span>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">Christian solo</span>
             </div>
             <div class="grid grid-cols-3 gap-4">
               <div>
-                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Leads</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="vb-total">—</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Leads</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="vb-total">—</p>
               </div>
               <div>
-                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">% Hot</p>
-                <p class="kpi-num text-3xl lg:text-4xl mt-1" id="vb-hot-pct" style="color:#065F46">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% Hot</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-math-green mt-1" id="vb-hot-pct">—%</p>
               </div>
               <div>
-                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Share</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="vb-share">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Share</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="vb-share">—%</p>
               </div>
             </div>
             <div class="mt-4 progress-track">
-              <div class="progress-fill" id="vb-bar" style="width:0%;background:linear-gradient(90deg,#059669,#10B981)"></div>
+              <div class="progress-fill" id="vb-bar" style="width:0%;background:linear-gradient(90deg,#10B981,#34D399)"></div>
             </div>
           </div>
         </div>
-        <p id="winner-msg" class="text-sm text-orbit-muted mb-5"></p>
+        <p id="winner-msg" class="text-sm text-zinc-400 mb-5"></p>
 
-        <!-- Matrix variant × segment -->
         <div class="card p-5 lg:p-6">
           <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-orbit-text">Matriz Variant × Segmento</h3>
-            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">% hot por célula</span>
+            <h3 class="font-semibold text-white">Matriz Variant × Segmento</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% hot por célula</span>
           </div>
           <div class="overflow-x-auto -mx-2 px-2">
             <table class="w-full text-sm" id="matrix-table">
               <thead>
-                <tr class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">
+                <tr class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">
                   <th class="text-left py-2 pr-4">Segmento</th>
                   <th class="text-center py-2 px-2"><span class="badge badge--a">A</span></th>
                   <th class="text-center py-2 px-2"><span class="badge badge--b">B</span></th>
@@ -528,45 +506,45 @@
       <section class="grid lg:grid-cols-2 gap-3 lg:gap-5">
         <div class="card p-5 lg:p-6">
           <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-orbit-text">Leads por dia</h3>
-            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">A vs B</span>
+            <h3 class="font-semibold text-white">Leads por dia</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">A vs B</span>
           </div>
           <div class="relative h-64 sm:h-72"><canvas id="chart-timeline"></canvas></div>
         </div>
         <div class="card p-5 lg:p-6">
           <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-orbit-text">Score por variant</h3>
-            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">distribuição</span>
+            <h3 class="font-semibold text-white">Score por variant</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">distribuição</span>
           </div>
           <div class="relative h-64 sm:h-72"><canvas id="chart-score-variant"></canvas></div>
         </div>
         <div class="card p-5 lg:p-6">
           <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-orbit-text">Prioridade declarada</h3>
-            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">urgência sales</span>
+            <h3 class="font-semibold text-white">Prioridade declarada</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">urgência sales</span>
           </div>
           <div class="relative h-64 sm:h-72"><canvas id="chart-priority"></canvas></div>
         </div>
         <div class="card p-5 lg:p-6">
           <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-orbit-text">Faturamento dos leads</h3>
-            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">faixa</span>
+            <h3 class="font-semibold text-white">Faturamento dos leads</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">faixa</span>
           </div>
           <div class="relative h-64 sm:h-72"><canvas id="chart-revenue"></canvas></div>
         </div>
         <div class="card p-5 lg:p-6 lg:col-span-2">
           <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
-            <h3 class="font-semibold text-orbit-text">Heatmap de leads por hora</h3>
-            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">dia × hora · use pra horário de ads</span>
+            <h3 class="font-semibold text-white">Heatmap de leads por hora</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">dia × hora · use pra horário de ads</span>
           </div>
           <div id="heatmap-host" class="overflow-x-auto -mx-2 px-2"></div>
-          <div class="flex items-center justify-end gap-2 mt-3 text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">
+          <div class="flex items-center justify-end gap-2 mt-3 text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">
             <span>menos</span>
-            <span class="w-3 h-3 rounded-sm" style="background:#F4F4F5"></span>
-            <span class="w-3 h-3 rounded-sm" style="background:#FEF3C7"></span>
-            <span class="w-3 h-3 rounded-sm" style="background:#FCD34D"></span>
-            <span class="w-3 h-3 rounded-sm" style="background:#F59E0B"></span>
-            <span class="w-3 h-3 rounded-sm" style="background:#B45309"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#1A1A1A"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#3A2D0A"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#7A5C14"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#FFBA1A"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#FFCC4D"></span>
             <span>mais</span>
           </div>
         </div>
@@ -576,15 +554,15 @@
       <section class="card overflow-hidden">
         <div class="p-4 sm:p-5 lg:p-6 flex flex-wrap items-center justify-between gap-4 border-b border-orbit-border">
           <div>
-            <h3 class="font-semibold text-orbit-text">Leads recentes</h3>
-            <p class="text-xs text-orbit-muted mt-0.5"><span id="table-count">0</span> de <span id="table-total">0</span> registros · clique pra ver detalhes</p>
+            <h3 class="font-semibold text-white">Leads recentes</h3>
+            <p class="text-xs text-zinc-500 mt-0.5"><span id="table-count">0</span> de <span id="table-total">0</span> registros · clique pra ver detalhes</p>
           </div>
           <div class="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none w-full sm:w-auto">
             <div class="relative flex-1 sm:flex-none sm:w-72">
-              <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-orbit-dim" style="font-size:18px">search</span>
+              <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-zinc-600" style="font-size:18px">search</span>
               <input id="search-input" type="text" class="search-input" placeholder="Buscar nome, email, empresa..." />
             </div>
-            <button id="export-csv" class="inline-flex items-center gap-1.5 text-xs text-orbit-muted hover:text-orbit-yellow-lo transition px-3 py-2 rounded-full bg-white hover:bg-orbit-surface-2 border border-orbit-border whitespace-nowrap">
+            <button id="export-csv" class="inline-flex items-center gap-1.5 text-xs text-zinc-300 hover:text-orbit-yellow transition px-3 py-2 rounded-full bg-orbit-bg hover:bg-orbit-surface-2 border border-orbit-border whitespace-nowrap">
               <span class="material-symbols-rounded text-base">download</span>
               <span class="hidden sm:inline">Export CSV</span>
             </button>
@@ -606,13 +584,13 @@
               </tr>
             </thead>
             <tbody id="leads-tbody">
-              <tr><td colspan="9" class="text-center py-12 text-orbit-muted">Carregando...</td></tr>
+              <tr><td colspan="9" class="text-center py-12 text-zinc-500">Carregando...</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <p class="text-center text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-dim uppercase tracking-widest pt-4 sm:pt-6">
+      <p class="text-center text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-zinc-700 uppercase tracking-widest pt-4 sm:pt-6">
         dashboard orbit · dados em tempo real do google sheets
       </p>
     </main>
@@ -621,12 +599,12 @@
   <!-- DRAWER -->
   <div class="drawer-backdrop" id="drawer-backdrop"></div>
   <aside class="drawer" id="drawer">
-    <div class="sticky top-0 bg-white/95 backdrop-blur-md border-b border-orbit-border px-5 sm:px-6 py-4 flex items-center justify-between z-10">
+    <div class="sticky top-0 bg-orbit-bg/95 backdrop-blur-md border-b border-orbit-border px-5 sm:px-6 py-4 flex items-center justify-between z-10">
       <div class="flex items-center gap-2">
-        <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Lead</span>
-        <span id="drawer-id" class="text-[0.6rem] font-geist-mono text-orbit-dim"></span>
+        <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Lead</span>
+        <span id="drawer-id" class="text-[0.6rem] font-geist-mono text-zinc-600"></span>
       </div>
-      <button id="drawer-close" class="w-8 h-8 rounded-full bg-orbit-surface-2 border border-orbit-border flex items-center justify-center text-orbit-muted hover:text-orbit-text hover:border-orbit-yellow transition">
+      <button id="drawer-close" class="w-8 h-8 rounded-full bg-orbit-surface-1 border border-orbit-border flex items-center justify-center text-zinc-400 hover:text-white hover:border-orbit-yellow transition">
         <span class="material-symbols-rounded" style="font-size:18px">close</span>
       </button>
     </div>
@@ -648,20 +626,14 @@
       '': 'Direto / sem segmento'
     };
 
-    // Chart palette (light theme)
     var PALETTE = {
-      a: '#F59E0B',
-      aLight: 'rgba(245,158,11,0.18)',
-      aBorder: 'rgba(245,158,11,0.55)',
-      b: '#059669',
-      bLight: 'rgba(5,150,105,0.18)',
-      bBorder: 'rgba(5,150,105,0.55)',
-      grid: 'rgba(0,0,0,0.05)',
-      tick: '#71717A',
-      text: '#0C0C0C'
+      a: '#FFBA1A',
+      b: '#10B981',
+      grid: 'rgba(255,255,255,0.05)',
+      tick: '#A3A3A3',
+      text: '#FAFAFA'
     };
 
-    // ─── ACCESS CONTROL ───
     (function() {
       var params = new URLSearchParams(window.location.search);
       var urlKey = params.get('key');
@@ -691,7 +663,6 @@
       charts: {}
     };
 
-    // ─── FETCH ───
     async function fetchLeads() {
       var url = 'https://docs.google.com/spreadsheets/d/' + CONFIG.SHEET_ID
               + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(CONFIG.SHEET_NAME)
@@ -733,7 +704,6 @@
       }
     }
 
-    // ─── FILTERS + SEARCH ───
     function applyFilters(leads) {
       var f = state.filters;
       var now = Date.now();
@@ -757,7 +727,6 @@
       });
     }
 
-    // ─── KPIs ───
     function renderKPIs(leads) {
       var total = leads.length;
       var hot   = leads.filter(function(l) { return l.score === 'Hot'; }).length;
@@ -775,10 +744,9 @@
       document.getElementById('kpi-cold-pct').textContent = pct(cold);
       var deltaEl = document.getElementById('kpi-total-delta');
       deltaEl.textContent = (last24h > 0 ? '+' : '') + last24h;
-      deltaEl.style.color = last24h > 0 ? '#059669' : '#A1A1AA';
+      deltaEl.style.color = last24h > 0 ? '#10B981' : '#6B6B6B';
     }
 
-    // ─── A vs B ───
     function renderAB(leads) {
       var a = leads.filter(function(l) { return (l.variant || '').toLowerCase() === 'a'; });
       var b = leads.filter(function(l) { return (l.variant || '').toLowerCase() === 'b'; });
@@ -800,13 +768,12 @@
       var msg = document.getElementById('winner-msg');
       var minSample = 30;
       if (a.length === 0 && b.length === 0) msg.innerHTML = 'Sem leads suficientes pra comparar.';
-      else if (total < minSample) msg.innerHTML = '<span class="text-orbit-muted">Amostra ainda pequena</span> (' + total + '/' + minSample + ' leads pra ler com confiança).';
-      else if (aHotPct > bHotPct) msg.innerHTML = '<strong style="color:#B45309">Variant A converte mais Hots</strong> — diferença de <strong>' + (aHotPct - bHotPct) + 'pp</strong>.';
-      else if (bHotPct > aHotPct) msg.innerHTML = '<strong style="color:#065F46">Variant B converte mais Hots</strong> — diferença de <strong>' + (bHotPct - aHotPct) + 'pp</strong>.';
+      else if (total < minSample) msg.innerHTML = '<span class="text-zinc-400">Amostra ainda pequena</span> (' + total + '/' + minSample + ' leads pra ler com confiança).';
+      else if (aHotPct > bHotPct) msg.innerHTML = '<strong class="text-orbit-yellow">Variant A converte mais Hots</strong> — diferença de <strong>' + (aHotPct - bHotPct) + 'pp</strong>.';
+      else if (bHotPct > aHotPct) msg.innerHTML = '<strong class="text-math-green">Variant B converte mais Hots</strong> — diferença de <strong>' + (bHotPct - aHotPct) + 'pp</strong>.';
       else msg.innerHTML = '<strong>Empate técnico</strong> entre as duas variantes — siga rodando pra ter mais sinal.';
     }
 
-    // ─── Matrix ───
     function renderMatrix(leads) {
       var segments = ['1', '2', '3', ''];
       var body = document.getElementById('matrix-body');
@@ -818,20 +785,20 @@
         var bHot = bRows.filter(function(l) { return l.score === 'Hot'; }).length;
         var aHotPct = aRows.length ? Math.round((aHot / aRows.length) * 100) : null;
         var bHotPct = bRows.length ? Math.round((bHot / bRows.length) * 100) : null;
-        var winner = '<span class="text-orbit-dim text-xs">—</span>';
+        var winner = '<span class="text-zinc-600 text-xs">—</span>';
         if (aHotPct != null && bHotPct != null) {
           if (aHotPct > bHotPct) winner = '<span class="badge badge--a">A · +' + (aHotPct - bHotPct) + 'pp</span>';
           else if (bHotPct > aHotPct) winner = '<span class="badge badge--b">B · +' + (bHotPct - aHotPct) + 'pp</span>';
           else winner = '<span class="badge badge--neutral">empate</span>';
         }
         function cell(rs, hot, pct) {
-          if (!rs.length) return '<span class="text-orbit-dim">sem dados</span>';
-          return '<span class="text-orbit-text font-semibold">' + rs.length + '</span> <span class="text-orbit-muted text-xs">leads</span> · <span class="font-semibold" style="color:#B45309">' + pct + '%</span> <span class="text-orbit-muted text-xs">hot</span>';
+          if (!rs.length) return '<span class="text-zinc-700">sem dados</span>';
+          return '<span class="text-white font-semibold">' + rs.length + '</span> <span class="text-zinc-500 text-xs">leads</span> · <span class="text-orbit-yellow font-semibold">' + pct + '%</span> <span class="text-zinc-500 text-xs">hot</span>';
         }
         var label = seg ? ('S' + seg) : 'Direto';
         var sub = SEGMENT_LABELS[seg] || '—';
-        return '<tr class="border-t border-orbit-border/60">' +
-          '<td class="py-3 pr-4"><div class="text-orbit-text font-medium">' + label + '</div><div class="text-orbit-muted text-xs">' + sub + '</div></td>' +
+        return '<tr class="border-t border-orbit-border/50">' +
+          '<td class="py-3 pr-4"><div class="text-white font-medium">' + label + '</div><div class="text-zinc-500 text-xs">' + sub + '</div></td>' +
           '<td class="text-center py-3 px-2 text-sm">' + cell(aRows, aHot, aHotPct) + '</td>' +
           '<td class="text-center py-3 px-2 text-sm">' + cell(bRows, bHot, bHotPct) + '</td>' +
           '<td class="text-right py-3 pl-4">' + winner + '</td>' +
@@ -839,7 +806,6 @@
       }).join('');
     }
 
-    // ─── Insights ───
     function renderInsights(leads) {
       var a = leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'a'; });
       var b = leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'b'; });
@@ -848,16 +814,16 @@
       var winnerEl = document.getElementById('insight-winner');
       var winnerDetail = document.getElementById('insight-winner-detail');
       if (a.length + b.length < 10) {
-        winnerEl.innerHTML = '<span class="text-orbit-dim">—</span>';
+        winnerEl.innerHTML = '<span class="text-zinc-500">—</span>';
         winnerDetail.textContent = 'precisa de pelo menos 10 leads';
       } else if (aHotPct > bHotPct) {
-        winnerEl.innerHTML = '<span style="color:#B45309">Variant A</span>';
+        winnerEl.innerHTML = '<span class="text-orbit-yellow">Variant A</span>';
         winnerDetail.textContent = aHotPct + '% Hot · +' + (aHotPct - bHotPct) + 'pp vs B';
       } else if (bHotPct > aHotPct) {
-        winnerEl.innerHTML = '<span style="color:#065F46">Variant B</span>';
+        winnerEl.innerHTML = '<span class="text-math-green">Variant B</span>';
         winnerDetail.textContent = bHotPct + '% Hot · +' + (bHotPct - aHotPct) + 'pp vs A';
       } else {
-        winnerEl.innerHTML = '<span class="text-orbit-text">Empate</span>';
+        winnerEl.innerHTML = '<span class="text-white">Empate</span>';
         winnerDetail.textContent = 'ambas com ' + aHotPct + '% Hot';
       }
 
@@ -879,10 +845,10 @@
       var segEl = document.getElementById('insight-segment');
       var segDetail = document.getElementById('insight-segment-detail');
       if (bestSeg) {
-        segEl.innerHTML = '<span class="text-orbit-text">S' + bestSeg + '</span> <span class="text-orbit-dim text-base font-normal">·</span> <span style="color:#B45309" class="text-lg">' + Math.round(bestPct) + '%</span>';
+        segEl.innerHTML = '<span class="text-white">S' + bestSeg + '</span> <span class="text-zinc-500 text-base font-normal">·</span> <span class="text-orbit-yellow text-lg">' + Math.round(bestPct) + '%</span>';
         segDetail.textContent = SEGMENT_LABELS[bestSeg] + ' · ' + segCounts[bestSeg].hot + ' hot/' + segCounts[bestSeg].tot;
       } else {
-        segEl.innerHTML = '<span class="text-orbit-dim">—</span>';
+        segEl.innerHTML = '<span class="text-zinc-500">—</span>';
         segDetail.textContent = 'precisa de 3+ leads por segmento';
       }
 
@@ -893,51 +859,14 @@
       var peakEl = document.getElementById('insight-peak');
       var peakDetail = document.getElementById('insight-peak-detail');
       if (maxH >= 0 && maxCount > 0) {
-        peakEl.innerHTML = '<span class="text-orbit-text">' + (maxH < 10 ? '0' + maxH : maxH) + 'h</span> <span class="text-orbit-dim text-base font-normal">·</span> <span style="color:#B45309" class="text-lg">' + maxCount + '</span>';
+        peakEl.innerHTML = '<span class="text-white">' + (maxH < 10 ? '0' + maxH : maxH) + 'h</span> <span class="text-zinc-500 text-base font-normal">·</span> <span class="text-orbit-yellow text-lg">' + maxCount + '</span>';
         peakDetail.textContent = 'horário com mais leads — boa pra concentrar ad spend';
       } else {
-        peakEl.innerHTML = '<span class="text-orbit-dim">—</span>';
+        peakEl.innerHTML = '<span class="text-zinc-500">—</span>';
         peakDetail.textContent = 'aguardando dados';
       }
     }
 
-    // ─── Hot strip ───
-    function renderHotStrip(leads) {
-      var wrap = document.getElementById('hot-strip-wrap');
-      var grid = document.getElementById('hot-strip');
-      var hots = leads.filter(function(l) { return l.score === 'Hot'; })
-                      .sort(function(a, b) { return (b.ts ? b.ts.getTime() : 0) - (a.ts ? a.ts.getTime() : 0); })
-                      .slice(0, 3);
-      if (!hots.length) { wrap.classList.add('hidden'); return; }
-      wrap.classList.remove('hidden');
-      var totalHot = leads.filter(function(l){return l.score==='Hot';}).length;
-      document.getElementById('hot-strip-count').textContent = totalHot + ' total · mostrando 3 mais recentes';
-      grid.innerHTML = hots.map(function(l) {
-        var when = l.ts ? formatDate(l.ts) : '—';
-        var phone = l.phone ? String(l.phone).replace(/\D/g, '') : '';
-        var msg = encodeURIComponent('Oi ' + (l.name || '').split(' ')[0] + '! Aqui é da Orbit. Você acabou de assistir nossa apresentação e marcou interesse — bora conversar?');
-        var waLink = phone ? 'https://wa.me/55' + phone + '?text=' + msg : '#';
-        return '<div class="hot-card rounded-2xl p-5 border" style="background:linear-gradient(135deg,#FFFBEB,#FFFFFF);border-color:#FCD34D" data-lead-id="' + l.__id + '">' +
-          '<div class="flex items-start justify-between mb-3 gap-2">' +
-            '<span class="badge badge--hot">' + when + '</span>' +
-            '<span class="badge badge--' + ((l.variant||'').toLowerCase() === 'a' ? 'a' : 'b') + '">' + ((l.variant||'').toUpperCase() || '?') + '</span>' +
-          '</div>' +
-          '<p class="text-orbit-text font-semibold truncate">' + escapeHTML(l.name || '—') + '</p>' +
-          '<p class="text-orbit-muted text-xs truncate mt-0.5">' + escapeHTML(l.empresa || '') + (l.cargo ? ' · ' + escapeHTML(l.cargo) : '') + '</p>' +
-          '<p class="text-orbit-muted text-xs mt-1">' + escapeHTML((l.faturamento || '').replace('/mês', '')) + (l.prioridade ? ' · ' + escapeHTML(l.prioridade) : '') + '</p>' +
-          (phone ? '<a class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-orbit-yellow to-orbit-yellow-hi hover:from-orbit-yellow-lo hover:to-orbit-yellow px-3 py-1.5 rounded-full transition shadow-[0_4px_12px_-4px_rgba(245,158,11,0.5)]" href="' + waLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><span class="material-symbols-rounded" style="font-size:14px">chat</span>WhatsApp</a>' : '') +
-        '</div>';
-      }).join('');
-      grid.querySelectorAll('[data-lead-id]').forEach(function(card) {
-        card.addEventListener('click', function() {
-          var id = parseInt(card.getAttribute('data-lead-id'), 10);
-          var lead = state.leads.find(function(l) { return l.__id === id; });
-          if (lead) openDrawer(lead);
-        });
-      });
-    }
-
-    // ─── CHARTS ───
     function chartOpts(extra) {
       var base = {
         responsive: true,
@@ -946,11 +875,11 @@
         plugins: {
           legend: { labels: { color: PALETTE.tick, font: { family: 'Geist', size: 11, weight: '500' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, padding: 16 } },
           tooltip: {
-            backgroundColor: '#FFFFFF',
-            borderColor: '#E5E5E5',
+            backgroundColor: '#0A0A0A',
+            borderColor: '#2A2A2A',
             borderWidth: 1,
             titleColor: PALETTE.text,
-            bodyColor: '#52525B',
+            bodyColor: '#A3A3A3',
             titleFont: { family: 'Geist', weight: '600' },
             bodyFont: { family: 'Geist Mono', size: 11 },
             padding: 12,
@@ -981,13 +910,6 @@
       }
     }
 
-    function gradientFill(ctx, hexFrom, alphaFrom, alphaTo) {
-      var g = ctx.createLinearGradient(0, 0, 0, 280);
-      g.addColorStop(0, hexFrom + Math.round(alphaFrom * 255).toString(16).padStart(2, '0'));
-      g.addColorStop(1, hexFrom + Math.round(alphaTo * 255).toString(16).padStart(2, '0'));
-      return g;
-    }
-
     function renderTimelineChart(leads) {
       destroyChart('timeline');
       var rangeDays = state.filters.range === 'all' ? 30 : parseInt(state.filters.range, 10);
@@ -1013,18 +935,18 @@
       var canvas = document.getElementById('chart-timeline');
       var ctx = canvas.getContext('2d');
       var gradA = ctx.createLinearGradient(0, 0, 0, 280);
-      gradA.addColorStop(0, 'rgba(245,158,11,0.35)');
-      gradA.addColorStop(1, 'rgba(245,158,11,0.02)');
+      gradA.addColorStop(0, 'rgba(255,186,26,0.40)');
+      gradA.addColorStop(1, 'rgba(255,186,26,0.02)');
       var gradB = ctx.createLinearGradient(0, 0, 0, 280);
-      gradB.addColorStop(0, 'rgba(5,150,105,0.30)');
-      gradB.addColorStop(1, 'rgba(5,150,105,0.02)');
+      gradB.addColorStop(0, 'rgba(16,185,129,0.35)');
+      gradB.addColorStop(1, 'rgba(16,185,129,0.02)');
       state.charts.timeline = new Chart(ctx, {
         type: 'line',
         data: {
           labels: keys.map(function(k) { return k.slice(5); }),
           datasets: [
-            { label: 'Variant A', data: keys.map(function(k) { return byDay[k].a; }), borderColor: PALETTE.a, backgroundColor: gradA, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: PALETTE.a, pointHoverBorderColor: '#FFFFFF', pointHoverBorderWidth: 2, borderWidth: 2.5 },
-            { label: 'Variant B', data: keys.map(function(k) { return byDay[k].b; }), borderColor: PALETTE.b, backgroundColor: gradB, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: PALETTE.b, pointHoverBorderColor: '#FFFFFF', pointHoverBorderWidth: 2, borderWidth: 2.5 }
+            { label: 'Variant A', data: keys.map(function(k) { return byDay[k].a; }), borderColor: PALETTE.a, backgroundColor: gradA, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: PALETTE.a, pointHoverBorderColor: '#0A0A0A', pointHoverBorderWidth: 2, borderWidth: 2.5 },
+            { label: 'Variant B', data: keys.map(function(k) { return byDay[k].b; }), borderColor: PALETTE.b, backgroundColor: gradB, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: PALETTE.b, pointHoverBorderColor: '#0A0A0A', pointHoverBorderWidth: 2, borderWidth: 2.5 }
           ]
         },
         options: chartOpts({ interaction: { mode: 'index', intersect: false } })
@@ -1041,9 +963,9 @@
       });
       var ctx = document.getElementById('chart-score-variant').getContext('2d');
       var gradA = ctx.createLinearGradient(0, 0, 0, 250);
-      gradA.addColorStop(0, '#FBBF24'); gradA.addColorStop(1, '#F59E0B');
+      gradA.addColorStop(0, '#FFCC4D'); gradA.addColorStop(1, '#FFBA1A');
       var gradB = ctx.createLinearGradient(0, 0, 0, 250);
-      gradB.addColorStop(0, '#10B981'); gradB.addColorStop(1, '#059669');
+      gradB.addColorStop(0, '#34D399'); gradB.addColorStop(1, '#10B981');
       state.charts.scoreVariant = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1075,8 +997,8 @@
           labels: ORDER,
           datasets: [{
             data: data,
-            backgroundColor: ['#DC2626', '#F59E0B', '#FBBF24', '#A1A1AA'],
-            borderColor: '#FFFFFF',
+            backgroundColor: ['#F87171', '#FFBA1A', '#FFCC4D', '#6B6B6B'],
+            borderColor: '#141414',
             borderWidth: 3,
             hoverOffset: 8
           }]
@@ -1089,8 +1011,8 @@
           plugins: {
             legend: { position: 'bottom', labels: { color: PALETTE.tick, font: { family: 'Geist', size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, padding: 12 } },
             tooltip: {
-              backgroundColor: '#FFFFFF', borderColor: '#E5E5E5', borderWidth: 1,
-              titleColor: PALETTE.text, bodyColor: '#52525B', padding: 12, cornerRadius: 10,
+              backgroundColor: '#0A0A0A', borderColor: '#2A2A2A', borderWidth: 1,
+              titleColor: PALETTE.text, bodyColor: '#A3A3A3', padding: 12, cornerRadius: 10,
               callbacks: {
                 label: function(c) {
                   var pct = total ? Math.round((c.parsed / total) * 100) : 0;
@@ -1112,8 +1034,6 @@
         if (counts.hasOwnProperty(l.faturamento)) counts[l.faturamento]++;
       });
       var ctx = document.getElementById('chart-revenue').getContext('2d');
-      var grad = ctx.createLinearGradient(0, 0, 0, 250);
-      grad.addColorStop(0, '#FBBF24'); grad.addColorStop(1, '#F59E0B');
       state.charts.revenue = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1121,7 +1041,7 @@
           datasets: [{
             label: 'Leads',
             data: ORDER.map(function(k) { return counts[k]; }),
-            backgroundColor: ['#E4E4E7', '#A1A1AA', '#FCD34D', '#F59E0B', '#B45309'],
+            backgroundColor: ['#3F3F3F', '#6B6B6B', '#FFCC4D', '#FFBA1A', '#E5A30D'],
             borderRadius: 8,
             borderSkipped: false,
             maxBarThickness: 56
@@ -1131,7 +1051,6 @@
       });
     }
 
-    // ─── HEATMAP ───
     function renderHeatmap(leads) {
       var DAYS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
       var grid = new Array(7).fill(0).map(function() { return new Array(24).fill(0); });
@@ -1142,12 +1061,12 @@
       var max = 0;
       grid.forEach(function(row) { row.forEach(function(c) { if (c > max) max = c; }); });
       function color(c) {
-        if (max === 0 || c === 0) return '#F4F4F5';
+        if (max === 0 || c === 0) return '#1A1A1A';
         var pct = c / max;
-        if (pct < 0.25) return '#FEF3C7';
-        if (pct < 0.5) return '#FCD34D';
-        if (pct < 0.75) return '#F59E0B';
-        return '#B45309';
+        if (pct < 0.25) return '#3A2D0A';
+        if (pct < 0.5) return '#7A5C14';
+        if (pct < 0.75) return '#FFBA1A';
+        return '#FFCC4D';
       }
       var host = document.getElementById('heatmap-host');
       var html = '<div style="min-width:600px">';
@@ -1168,7 +1087,6 @@
       host.innerHTML = html;
     }
 
-    // ─── TABLE ───
     function renderTable(leads, totalCount) {
       var tbody = document.getElementById('leads-tbody');
       var sorted = leads.slice().sort(function(a, b) {
@@ -1177,9 +1095,9 @@
       document.getElementById('table-count').textContent = sorted.length;
       document.getElementById('table-total').textContent = totalCount;
       if (!sorted.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-16 text-orbit-muted">' +
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-16 text-zinc-500">' +
           '<div class="flex flex-col items-center gap-3">' +
-          '<span class="material-symbols-rounded text-orbit-dim" style="font-size:48px">inbox</span>' +
+          '<span class="material-symbols-rounded text-zinc-700" style="font-size:48px">inbox</span>' +
           '<span>Nenhum lead encontrado pros filtros atuais.</span>' +
           '</div></td></tr>';
         return;
@@ -1191,20 +1109,20 @@
                       : '<span class="badge badge--cold">Cold</span>';
         var variantBadge = (l.variant || '').toLowerCase() === 'a' ? '<span class="badge badge--a">A</span>'
                          : (l.variant || '').toLowerCase() === 'b' ? '<span class="badge badge--b">B</span>'
-                         : '<span class="text-orbit-dim">—</span>';
-        var source = (l.utm_source || '').trim() || '<span class="text-orbit-dim">direct</span>';
+                         : '<span class="text-zinc-600">—</span>';
+        var source = (l.utm_source || '').trim() || '<span class="text-zinc-600">direct</span>';
         var phone = l.phone ? String(l.phone).replace(/\D/g, '') : '';
-        var phoneHref = phone ? '<a class="text-orbit-yellow-lo hover:text-orbit-yellow" href="https://wa.me/55' + phone + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="WhatsApp"><span class="material-symbols-rounded" style="font-size:18px">chat</span></a>' : '';
-        var emailHref = l.email ? '<a class="text-orbit-muted hover:text-orbit-yellow-lo ml-2" href="mailto:' + escapeHTML(l.email) + '" onclick="event.stopPropagation()" title="Email"><span class="material-symbols-rounded" style="font-size:18px">mail</span></a>' : '';
+        var phoneHref = phone ? '<a class="text-orbit-yellow hover:text-orbit-yellow-hi" href="https://wa.me/55' + phone + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="WhatsApp"><span class="material-symbols-rounded" style="font-size:18px">chat</span></a>' : '';
+        var emailHref = l.email ? '<a class="text-zinc-300 hover:text-orbit-yellow ml-2" href="mailto:' + escapeHTML(l.email) + '" onclick="event.stopPropagation()" title="Email"><span class="material-symbols-rounded" style="font-size:18px">mail</span></a>' : '';
         return '<tr data-lead-id="' + l.__id + '">' +
-          '<td class="text-orbit-muted font-geist-mono text-xs">' + when + '</td>' +
-          '<td><div class="text-orbit-text font-medium">' + escapeHTML(l.name || '—') + '</div><div class="text-orbit-muted text-xs">' + escapeHTML(l.email || '') + '</div></td>' +
+          '<td class="text-zinc-400 font-geist-mono text-xs">' + when + '</td>' +
+          '<td><div class="text-white font-medium">' + escapeHTML(l.name || '—') + '</div><div class="text-zinc-500 text-xs">' + escapeHTML(l.email || '') + '</div></td>' +
           '<td class="truncate-cell">' + escapeHTML(l.empresa || '—') + '</td>' +
-          '<td class="text-orbit-muted text-xs">' + escapeHTML(l.cargo || '—') + '</td>' +
-          '<td class="text-orbit-muted text-xs">' + escapeHTML((l.faturamento || '—').replace('/mês', '')) + '</td>' +
+          '<td class="text-zinc-400 text-xs">' + escapeHTML(l.cargo || '—') + '</td>' +
+          '<td class="text-zinc-400 text-xs">' + escapeHTML((l.faturamento || '—').replace('/mês', '')) + '</td>' +
           '<td>' + scoreBadge + '</td>' +
           '<td>' + variantBadge + '</td>' +
-          '<td class="text-xs text-orbit-muted">' + source + '</td>' +
+          '<td class="text-xs text-zinc-400">' + source + '</td>' +
           '<td class="flex items-center">' + phoneHref + emailHref + '</td>' +
         '</tr>';
       }).join('');
@@ -1217,7 +1135,6 @@
       });
     }
 
-    // ─── DRAWER ───
     function openDrawer(lead) {
       document.getElementById('drawer-id').textContent = '#' + (lead.__id + 1);
       var phone = lead.phone ? String(lead.phone).replace(/\D/g, '') : '';
@@ -1242,34 +1159,34 @@
       body += '<div class="flex items-center gap-2 flex-wrap mb-3">' + badgeFor(lead.score) + variantBadge + '<span class="badge badge--neutral">' + escapeHTML(segmentLabel) + '</span>';
       if (lead.prioridade === 'Urgente') body += '<span class="badge badge--urgent">⚡ urgente</span>';
       body += '</div>';
-      body += '<h2 class="text-2xl font-semibold text-orbit-text tracking-tight">' + escapeHTML(lead.name || '—') + '</h2>';
-      body += '<p class="text-orbit-muted mt-1">' + escapeHTML(lead.empresa || '') + (lead.cargo ? ' <span class="text-orbit-dim">·</span> ' + escapeHTML(lead.cargo) : '') + '</p>';
-      body += '<p class="text-orbit-dim text-xs mt-1 font-geist-mono">' + (lead.ts ? formatDateFull(lead.ts) : '—') + '</p>';
+      body += '<h2 class="text-2xl font-semibold text-white tracking-tight">' + escapeHTML(lead.name || '—') + '</h2>';
+      body += '<p class="text-zinc-400 mt-1">' + escapeHTML(lead.empresa || '') + (lead.cargo ? ' <span class="text-zinc-600">·</span> ' + escapeHTML(lead.cargo) : '') + '</p>';
+      body += '<p class="text-zinc-500 text-xs mt-1 font-geist-mono">' + (lead.ts ? formatDateFull(lead.ts) : '—') + '</p>';
       body += '</div>';
       if (phone) {
-        body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Templates de WhatsApp</p>';
+        body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-2">Templates de WhatsApp</p>';
         body += '<div class="space-y-2">';
-        body += '<a href="https://wa.me/55' + phone + '?text=' + msgGeneric + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orbit-yellow to-orbit-yellow-hi text-white text-xs font-bold transition shadow-[0_4px_12px_-4px_rgba(245,158,11,0.5)] hover:shadow-[0_8px_20px_-4px_rgba(245,158,11,0.6)]"><span class="material-symbols-rounded" style="font-size:16px">chat</span>Abertura genérica</a>';
+        body += '<a href="https://wa.me/55' + phone + '?text=' + msgGeneric + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orbit-yellow to-orbit-yellow-hi text-orbit-black text-xs font-bold transition shadow-[0_4px_12px_-4px_rgba(255,186,26,0.4)] hover:shadow-[0_8px_20px_-4px_rgba(255,186,26,0.6)]"><span class="material-symbols-rounded" style="font-size:16px">chat</span>Abertura genérica</a>';
         if (lead.prioridade === 'Urgente') {
-          body += '<a href="https://wa.me/55' + phone + '?text=' + msgUrgent + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orbit-surface-2 hover:bg-zinc-200 text-orbit-text text-xs font-semibold transition border border-orbit-border"><span class="material-symbols-rounded" style="font-size:16px">bolt</span>Foco em urgência</a>';
+          body += '<a href="https://wa.me/55' + phone + '?text=' + msgUrgent + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orbit-surface-2 hover:bg-orbit-surface-1 text-zinc-300 text-xs font-semibold transition border border-orbit-border"><span class="material-symbols-rounded" style="font-size:16px">bolt</span>Foco em urgência</a>';
         }
         if (['R$100k-R$500k/mês','R$500k-R$1mi/mês','Acima de R$1mi/mês'].indexOf(lead.faturamento) !== -1) {
-          body += '<a href="https://wa.me/55' + phone + '?text=' + msgMath + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orbit-surface-2 hover:bg-zinc-200 text-orbit-text text-xs font-semibold transition border border-orbit-border"><span class="material-symbols-rounded" style="font-size:16px">calculate</span>Foco em matemática</a>';
+          body += '<a href="https://wa.me/55' + phone + '?text=' + msgMath + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orbit-surface-2 hover:bg-orbit-surface-1 text-zinc-300 text-xs font-semibold transition border border-orbit-border"><span class="material-symbols-rounded" style="font-size:16px">calculate</span>Foco em matemática</a>';
         }
         body += '</div></div>';
       }
-      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-1">Contato</p>';
+      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-1">Contato</p>';
       body += field('Email', lead.email);
       body += field('Telefone', lead.phone);
       body += '</div>';
-      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-1">Qualificação</p>';
+      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-1">Qualificação</p>';
       body += field('Cargo', lead.cargo);
       body += field('Atuação', lead.atuacao);
       body += field('Faturamento', lead.faturamento);
       body += field('Projetos atuais', lead.projetos);
       body += field('Prioridade', lead.prioridade);
       body += '</div>';
-      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-1">Origem</p>';
+      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-1">Origem</p>';
       body += field('Variant', (lead.variant||'').toUpperCase());
       body += field('Segmento', lead.segment ? ('S' + lead.segment + ' · ' + (SEGMENT_LABELS[String(lead.segment)] || '')) : 'Direto');
       body += field('UTM source', lead.utm_source);
@@ -1289,7 +1206,6 @@
       document.body.style.overflow = '';
     }
 
-    // ─── CSV ───
     function exportCSV(leads) {
       if (!leads.length) return alert('Nenhum lead pra exportar com os filtros atuais.');
       var cols = ['timestamp','name','email','phone','empresa','cargo','atuacao','faturamento','projetos','prioridade','variant','segment','score','utm_source','utm_campaign','utm_content','utm_term'];
@@ -1309,7 +1225,6 @@
       a.click();
     }
 
-    // ─── UTILS ───
     function escapeHTML(s) {
       return String(s).replace(/[&<>"']/g, function(c) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -1329,7 +1244,6 @@
       return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' · ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
     }
 
-    // ─── MAIN ───
     var rendering = false;
     function render() {
       if (rendering) return;
@@ -1338,7 +1252,6 @@
       var searched = applySearch(filtered);
       renderKPIs(filtered);
       renderInsights(filtered);
-      renderHotStrip(filtered);
       renderAB(filtered);
       renderMatrix(filtered);
       renderTimelineChart(filtered);
