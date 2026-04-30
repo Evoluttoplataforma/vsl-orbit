@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Orbit · Dashboard</title>
+
+  <link rel="icon" type="image/png" href="brand/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'orbit-yellow': '#FFBA1A',
+            'orbit-yellow-hi': '#FFCC4D',
+            'orbit-yellow-lo': '#E5A30D',
+            'orbit-black': '#0C0C0C',
+            'orbit-bg': '#0A0A0A',
+            'orbit-surface-1': '#141414',
+            'orbit-surface-2': '#1F1F1F',
+            'orbit-border': '#2A2A2A',
+            'math-green': '#10B981',
+          },
+          fontFamily: {
+            geist: ['Geist', 'sans-serif'],
+            'geist-mono': ['Geist Mono', 'monospace'],
+            display: ['Oswald', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-family: 'Geist', sans-serif; }
+
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      user-select: none;
+      vertical-align: middle;
+      line-height: 1;
+      display: inline-block;
+    }
+
+    .glow-yellow {
+      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.18), rgba(255, 186, 26, 0) 70%);
+      filter: blur(60px);
+    }
+
+    /* KPI cards */
+    .kpi {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .kpi:hover { transform: translateY(-2px); border-color: rgba(255,186,26,0.4); }
+    .kpi__sweep {
+      position: absolute;
+      top: -50%;
+      left: -10%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255,186,26,0.06), transparent);
+      transform: rotate(15deg);
+      pointer-events: none;
+    }
+
+    .kpi-num {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* Score badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Geist Mono', monospace; }
+    .badge--hot   { background: rgba(255,186,26,0.15); color: #FFBA1A; border: 1px solid rgba(255,186,26,0.4); }
+    .badge--warm  { background: rgba(255,255,255,0.08); color: #FAFAFA; border: 1px solid rgba(255,255,255,0.15); }
+    .badge--cold  { background: rgba(107,107,107,0.12); color: #A3A3A3; border: 1px solid rgba(107,107,107,0.3); }
+    .badge--a     { background: rgba(255,186,26,0.12); color: #FFBA1A; border: 1px solid rgba(255,186,26,0.3); }
+    .badge--b     { background: rgba(16,185,129,0.12); color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
+
+    /* Tab buttons */
+    .filter-pill {
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      background: #141414;
+      border: 1px solid #2A2A2A;
+      color: #A3A3A3;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .filter-pill:hover { color: #FAFAFA; border-color: rgba(255,186,26,0.4); }
+    .filter-pill.is-active { background: #FFBA1A; color: #0C0C0C; border-color: #FFBA1A; }
+
+    /* Skeleton loaders */
+    .skel {
+      background: linear-gradient(90deg, #141414, #1F1F1F, #141414);
+      background-size: 200% 100%;
+      animation: skel 1.4s ease-in-out infinite;
+      border-radius: 6px;
+    }
+    @keyframes skel {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Login screen */
+    #login-screen { display: none; }
+    body.is-locked #app { display: none !important; }
+    body.is-locked #login-screen { display: flex; }
+
+    /* Table */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.825rem; }
+    .data-table th {
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6B6B6B;
+      font-family: 'Geist Mono', monospace;
+      border-bottom: 1px solid #2A2A2A;
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 14px;
+      border-bottom: 1px solid #1F1F1F;
+      color: #FAFAFA;
+      vertical-align: middle;
+    }
+    .data-table tbody tr:hover { background: rgba(255,186,26,0.03); }
+    .data-table .truncate-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  </style>
+</head>
+
+<body class="bg-orbit-bg text-zinc-100 min-h-screen antialiased">
+
+  <!-- LOGIN -->
+  <div id="login-screen" class="fixed inset-0 z-50 items-center justify-center p-6 bg-orbit-bg">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] glow-yellow pointer-events-none"></div>
+    <div class="relative w-full max-w-sm">
+      <div class="text-center mb-8">
+        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-7 w-auto mx-auto mb-6" />
+        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.25em] text-orbit-yellow">Acesso restrito</span>
+        <h1 class="text-2xl font-semibold text-white tracking-tight mt-2">Dashboard Orbit</h1>
+      </div>
+      <form id="login-form" class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-2">Senha</label>
+          <input type="password" id="login-key" placeholder="••••••••" class="w-full px-4 py-3 bg-orbit-bg border border-orbit-border rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20" autofocus />
+          <p id="login-error" class="hidden mt-2 text-xs text-red-400">Senha incorreta.</p>
+        </div>
+        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-5 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02]">
+          Entrar
+          <span class="material-symbols-rounded text-base">arrow_forward</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-30 backdrop-blur-md bg-orbit-bg/85 border-b border-orbit-border">
+      <div class="max-w-[1400px] mx-auto px-5 lg:px-10 h-16 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <a href="/" class="flex items-center"><img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" /></a>
+          <span class="hidden sm:inline-block text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-zinc-500 border-l border-orbit-border pl-3">Dashboard · Leads</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="refresh-btn" class="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition px-3 py-2 rounded-full bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border">
+            <span class="material-symbols-rounded text-base">refresh</span>
+            <span class="hidden sm:inline">Atualizar</span>
+          </button>
+          <span id="last-update" class="hidden sm:inline-block text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- FILTERS -->
+    <section class="border-b border-orbit-border bg-orbit-bg/60">
+      <div class="max-w-[1400px] mx-auto px-5 lg:px-10 py-4 flex flex-wrap items-center gap-3 lg:gap-5">
+        <div class="flex items-center gap-2">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Período</span>
+          <div class="flex flex-wrap gap-1.5" data-filter-group="range">
+            <button class="filter-pill" data-value="7">7d</button>
+            <button class="filter-pill is-active" data-value="30">30d</button>
+            <button class="filter-pill" data-value="90">90d</button>
+            <button class="filter-pill" data-value="all">Tudo</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Variant</span>
+          <div class="flex gap-1.5" data-filter-group="variant">
+            <button class="filter-pill is-active" data-value="all">Todas</button>
+            <button class="filter-pill" data-value="a">A</button>
+            <button class="filter-pill" data-value="b">B</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Score</span>
+          <div class="flex gap-1.5" data-filter-group="score">
+            <button class="filter-pill is-active" data-value="all">Todos</button>
+            <button class="filter-pill" data-value="Hot">Hot</button>
+            <button class="filter-pill" data-value="Warm">Warm</button>
+            <button class="filter-pill" data-value="Cold">Cold</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Segmento</span>
+          <div class="flex gap-1.5" data-filter-group="segment">
+            <button class="filter-pill is-active" data-value="all">Todos</button>
+            <button class="filter-pill" data-value="1">S1</button>
+            <button class="filter-pill" data-value="2">S2</button>
+            <button class="filter-pill" data-value="3">S3</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="max-w-[1400px] mx-auto px-5 lg:px-10 py-8 lg:py-10 space-y-8 lg:space-y-10">
+
+      <!-- KPIs -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
+              <span class="material-symbols-rounded text-zinc-400" style="font-size: 18px;">groups</span>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">total</span>
+          </div>
+          <p class="kpi-num text-4xl lg:text-5xl text-white" id="kpi-total">—</p>
+          <p class="text-xs text-zinc-500 mt-1">leads no período</p>
+        </div>
+
+        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-yellow/30 p-5 lg:p-6">
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-9 h-9 rounded-xl bg-orbit-yellow/15 border border-orbit-yellow/30 flex items-center justify-center">
+              <span class="material-symbols-rounded text-orbit-yellow" style="font-size: 18px;">local_fire_department</span>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-orbit-yellow/80 uppercase tracking-widest">hot</span>
+          </div>
+          <p class="kpi-num text-4xl lg:text-5xl text-orbit-yellow" id="kpi-hot">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-hot-pct">—</span>% do total</p>
+        </div>
+
+        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
+              <span class="material-symbols-rounded text-zinc-400" style="font-size: 18px;">thermostat</span>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">warm</span>
+          </div>
+          <p class="kpi-num text-4xl lg:text-5xl text-white" id="kpi-warm">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-warm-pct">—</span>% do total</p>
+        </div>
+
+        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="kpi__sweep"></div>
+          <div class="relative flex items-start justify-between mb-3">
+            <div class="w-9 h-9 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
+              <span class="material-symbols-rounded text-zinc-500" style="font-size: 18px;">ac_unit</span>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">cold</span>
+          </div>
+          <p class="kpi-num text-4xl lg:text-5xl text-zinc-400" id="kpi-cold">—</p>
+          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-cold-pct">—</span>% do total</p>
+        </div>
+      </section>
+
+      <!-- A vs B -->
+      <section>
+        <div class="flex items-baseline gap-3 mb-4">
+          <h2 class="text-lg lg:text-xl font-semibold text-white tracking-tight">Variant A <span class="text-zinc-500 font-normal">vs</span> B</h2>
+          <span class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">comparativo</span>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3 lg:gap-5">
+          <!-- A -->
+          <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="badge badge--a">Variant A · Dor + Evolução</span>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">Igor + Christian</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Leads</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="va-total">—</p>
+              </div>
+              <div>
+                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% Hot</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-orbit-yellow mt-1" id="va-hot-pct">—%</p>
+              </div>
+              <div>
+                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Share</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="va-share">—%</p>
+              </div>
+            </div>
+            <div class="mt-4 h-1.5 bg-orbit-bg rounded-full overflow-hidden">
+              <div class="h-full bg-orbit-yellow rounded-full transition-all duration-700" id="va-bar" style="width: 0%"></div>
+            </div>
+          </div>
+          <!-- B -->
+          <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="badge badge--b">Variant B · Oportunidade + Math</span>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">Christian solo</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Leads</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="vb-total">—</p>
+              </div>
+              <div>
+                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% Hot</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-math-green mt-1" id="vb-hot-pct">—%</p>
+              </div>
+              <div>
+                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Share</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="vb-share">—%</p>
+              </div>
+            </div>
+            <div class="mt-4 h-1.5 bg-orbit-bg rounded-full overflow-hidden">
+              <div class="h-full bg-math-green rounded-full transition-all duration-700" id="vb-bar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+        <p id="winner-msg" class="mt-4 text-sm text-zinc-400"></p>
+      </section>
+
+      <!-- Charts -->
+      <section class="grid lg:grid-cols-2 gap-3 lg:gap-5">
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4">
+            <h3 class="font-semibold text-white">Leads por dia</h3>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">A vs B</span>
+          </div>
+          <div class="relative h-64"><canvas id="chart-timeline"></canvas></div>
+        </div>
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4">
+            <h3 class="font-semibold text-white">Score por variant</h3>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">distribuição</span>
+          </div>
+          <div class="relative h-64"><canvas id="chart-score-variant"></canvas></div>
+        </div>
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4">
+            <h3 class="font-semibold text-white">Top fontes</h3>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">utm_source</span>
+          </div>
+          <div class="relative h-64"><canvas id="chart-source"></canvas></div>
+        </div>
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4">
+            <h3 class="font-semibold text-white">Faturamento dos leads</h3>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">faixa</span>
+          </div>
+          <div class="relative h-64"><canvas id="chart-revenue"></canvas></div>
+        </div>
+      </section>
+
+      <!-- Lead Table -->
+      <section class="rounded-2xl bg-orbit-surface-1 border border-orbit-border overflow-hidden">
+        <div class="p-5 lg:p-6 flex items-center justify-between gap-4 border-b border-orbit-border">
+          <div>
+            <h3 class="font-semibold text-white">Leads recentes</h3>
+            <p class="text-xs text-zinc-500 mt-0.5"><span id="table-count">0</span> registros · ordenados por mais recente</p>
+          </div>
+          <button id="export-csv" class="inline-flex items-center gap-1.5 text-xs text-zinc-300 hover:text-orbit-yellow transition px-3 py-2 rounded-full bg-orbit-bg hover:bg-orbit-surface-2 border border-orbit-border">
+            <span class="material-symbols-rounded text-base">download</span>
+            <span>Export CSV</span>
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Quando</th>
+                <th>Nome</th>
+                <th>Empresa</th>
+                <th>Cargo</th>
+                <th>Fatur.</th>
+                <th>Score</th>
+                <th>Variant</th>
+                <th>Fonte</th>
+                <th>Contato</th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody">
+              <tr><td colspan="9" class="text-center py-12 text-zinc-500">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="text-center text-[0.65rem] font-geist-mono text-zinc-700 uppercase tracking-widest pt-6">
+        dashboard orbit · dados em tempo real do google sheets
+      </p>
+    </main>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════
+    // CONFIG
+    // ═══════════════════════════════════════════════════════
+    var CONFIG = {
+      SHEET_ID:    '1XcvNpThEypgFh_q93T4oCTY-9_9pQ0kSywzdqQLy2bk',
+      SHEET_NAME:  'Página1',
+      ACCESS_KEY:  'orbit2026',  // ?key=orbit2026 OU senha de login
+      AUTO_REFRESH_MS: 60000     // refetch a cada 60s
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // ACCESS CONTROL
+    // ═══════════════════════════════════════════════════════
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var urlKey = params.get('key');
+      var stored = localStorage.getItem('orbit_dash_key');
+
+      function unlock() {
+        document.body.classList.remove('is-locked');
+        try { localStorage.setItem('orbit_dash_key', CONFIG.ACCESS_KEY); } catch (e) {}
+        boot();
+      }
+
+      if (urlKey === CONFIG.ACCESS_KEY || stored === CONFIG.ACCESS_KEY) {
+        unlock();
+      } else {
+        document.body.classList.add('is-locked');
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+          var v = document.getElementById('login-key').value;
+          if (v === CONFIG.ACCESS_KEY) unlock();
+          else document.getElementById('login-error').classList.remove('hidden');
+        });
+      }
+    })();
+
+    // ═══════════════════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════════════════
+    var state = {
+      leads: [],
+      filters: { range: '30', variant: 'all', score: 'all', segment: 'all' },
+      charts: {}
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // FETCH FROM GVIZ
+    // ═══════════════════════════════════════════════════════
+    async function fetchLeads() {
+      var url = 'https://docs.google.com/spreadsheets/d/' + CONFIG.SHEET_ID
+              + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(CONFIG.SHEET_NAME)
+              + '&t=' + Date.now();
+      try {
+        var res = await fetch(url);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var text = await res.text();
+        // Remove leading /*O_o*/ comment and isolate the JSON object
+        var start = text.indexOf('{');
+        var end = text.lastIndexOf('}');
+        if (start === -1 || end === -1) throw new Error('gviz response unparseable');
+        var json = JSON.parse(text.slice(start, end + 1));
+        var cols = json.table.cols.map(function(c) { return (c.label || c.id || '').toLowerCase().trim(); });
+        var rows = (json.table.rows || []).map(function(r) {
+          var obj = {};
+          (r.c || []).forEach(function(cell, i) {
+            var key = cols[i] || ('col' + i);
+            var val = cell ? (cell.f != null ? cell.f : cell.v) : null;
+            obj[key] = val;
+          });
+          return obj;
+        }).filter(function(r) { return r.email || r.name; });
+
+        // Parse timestamp
+        rows.forEach(function(r) {
+          if (r.timestamp && typeof r.timestamp === 'string') {
+            var t = new Date(r.timestamp);
+            r.ts = isNaN(t) ? null : t;
+          } else if (r.timestamp && r.timestamp.toString().indexOf('Date(') === 0) {
+            // gviz date format
+            var m = r.timestamp.toString().match(/Date\((\d+),(\d+),(\d+),?(\d*),?(\d*),?(\d*)\)/);
+            if (m) r.ts = new Date(+m[1], +m[2], +m[3], +m[4]||0, +m[5]||0, +m[6]||0);
+          }
+        });
+
+        return rows;
+      } catch (e) {
+        console.error('[Dashboard] fetch error:', e);
+        return null;
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // FILTERS
+    // ═══════════════════════════════════════════════════════
+    function applyFilters(leads) {
+      var f = state.filters;
+      var now = Date.now();
+      var rangeMs = f.range === 'all' ? Infinity : (parseInt(f.range, 10) * 86400000);
+      return leads.filter(function(l) {
+        if (l.ts) {
+          var age = now - l.ts.getTime();
+          if (age > rangeMs) return false;
+        }
+        if (f.variant !== 'all' && (l.variant || '').toLowerCase() !== f.variant) return false;
+        if (f.score   !== 'all' && (l.score   || '') !== f.score) return false;
+        if (f.segment !== 'all' && String(l.segment || '') !== String(f.segment)) return false;
+        return true;
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // RENDER — KPIs
+    // ═══════════════════════════════════════════════════════
+    function renderKPIs(leads) {
+      var total = leads.length;
+      var hot   = leads.filter(function(l) { return l.score === 'Hot'; }).length;
+      var warm  = leads.filter(function(l) { return l.score === 'Warm'; }).length;
+      var cold  = leads.filter(function(l) { return l.score === 'Cold'; }).length;
+
+      function pct(n) { return total ? Math.round((n / total) * 100) : 0; }
+
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-hot').textContent = hot;
+      document.getElementById('kpi-warm').textContent = warm;
+      document.getElementById('kpi-cold').textContent = cold;
+      document.getElementById('kpi-hot-pct').textContent = pct(hot);
+      document.getElementById('kpi-warm-pct').textContent = pct(warm);
+      document.getElementById('kpi-cold-pct').textContent = pct(cold);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // RENDER — A vs B
+    // ═══════════════════════════════════════════════════════
+    function renderAB(leads) {
+      var a = leads.filter(function(l) { return (l.variant || '').toLowerCase() === 'a'; });
+      var b = leads.filter(function(l) { return (l.variant || '').toLowerCase() === 'b'; });
+      var aHot = a.filter(function(l) { return l.score === 'Hot'; }).length;
+      var bHot = b.filter(function(l) { return l.score === 'Hot'; }).length;
+      var total = a.length + b.length;
+
+      var aHotPct = a.length ? Math.round((aHot / a.length) * 100) : 0;
+      var bHotPct = b.length ? Math.round((bHot / b.length) * 100) : 0;
+      var aShare  = total ? Math.round((a.length / total) * 100) : 0;
+      var bShare  = total ? Math.round((b.length / total) * 100) : 0;
+
+      document.getElementById('va-total').textContent = a.length;
+      document.getElementById('vb-total').textContent = b.length;
+      document.getElementById('va-hot-pct').textContent = aHotPct + '%';
+      document.getElementById('vb-hot-pct').textContent = bHotPct + '%';
+      document.getElementById('va-share').textContent = aShare + '%';
+      document.getElementById('vb-share').textContent = bShare + '%';
+      document.getElementById('va-bar').style.width = aShare + '%';
+      document.getElementById('vb-bar').style.width = bShare + '%';
+
+      var msg = document.getElementById('winner-msg');
+      if (a.length === 0 && b.length === 0) {
+        msg.innerHTML = 'Sem leads suficientes pra comparar.';
+      } else if (aHotPct > bHotPct) {
+        msg.innerHTML = '🔥 <strong class="text-orbit-yellow">Variant A converte mais Hots</strong> — diferença de ' + (aHotPct - bHotPct) + 'pp.';
+      } else if (bHotPct > aHotPct) {
+        msg.innerHTML = '🔥 <strong class="text-math-green">Variant B converte mais Hots</strong> — diferença de ' + (bHotPct - aHotPct) + 'pp.';
+      } else {
+        msg.innerHTML = '⚖️ <strong>Empate técnico</strong> entre as duas variantes — siga rodando pra ter mais sinal.';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // CHARTS
+    // ═══════════════════════════════════════════════════════
+    var CHART_DEFAULTS = {
+      legend: { labels: { color: '#A3A3A3', font: { family: 'Geist', size: 11 } } },
+      grid: { color: 'rgba(42,42,42,0.6)' },
+      tickColor: '#6B6B6B'
+    };
+
+    function chartOpts(extra) {
+      var base = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: CHART_DEFAULTS.legend.labels },
+          tooltip: {
+            backgroundColor: '#0A0A0A',
+            borderColor: '#2A2A2A',
+            borderWidth: 1,
+            titleColor: '#FAFAFA',
+            bodyColor: '#A3A3A3',
+            padding: 12
+          }
+        },
+        scales: {
+          x: { grid: { color: CHART_DEFAULTS.grid.color }, ticks: { color: CHART_DEFAULTS.tickColor, font: { family: 'Geist Mono', size: 10 } } },
+          y: { grid: { color: CHART_DEFAULTS.grid.color }, ticks: { color: CHART_DEFAULTS.tickColor, font: { family: 'Geist Mono', size: 10 }, precision: 0 } }
+        }
+      };
+      return Object.assign(base, extra || {});
+    }
+
+    function destroyChart(name) {
+      if (state.charts[name]) {
+        state.charts[name].destroy();
+        delete state.charts[name];
+      }
+    }
+
+    function renderTimelineChart(leads) {
+      destroyChart('timeline');
+      var byDay = {};
+      leads.forEach(function(l) {
+        if (!l.ts) return;
+        var key = l.ts.toISOString().slice(0, 10);
+        var v = (l.variant || '').toLowerCase();
+        if (!byDay[key]) byDay[key] = { a: 0, b: 0 };
+        if (v === 'a') byDay[key].a++;
+        else if (v === 'b') byDay[key].b++;
+      });
+      var keys = Object.keys(byDay).sort();
+      var ctx = document.getElementById('chart-timeline').getContext('2d');
+      state.charts.timeline = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: keys.map(function(k) { return k.slice(5); }),
+          datasets: [
+            { label: 'Variant A', data: keys.map(function(k) { return byDay[k].a; }), borderColor: '#FFBA1A', backgroundColor: 'rgba(255,186,26,0.12)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#FFBA1A' },
+            { label: 'Variant B', data: keys.map(function(k) { return byDay[k].b; }), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.12)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#10B981' }
+          ]
+        },
+        options: chartOpts()
+      });
+    }
+
+    function renderScoreVariantChart(leads) {
+      destroyChart('scoreVariant');
+      var dataA = ['Hot','Warm','Cold'].map(function(s) {
+        return leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'a' && l.score === s; }).length;
+      });
+      var dataB = ['Hot','Warm','Cold'].map(function(s) {
+        return leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'b' && l.score === s; }).length;
+      });
+      var ctx = document.getElementById('chart-score-variant').getContext('2d');
+      state.charts.scoreVariant = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Hot', 'Warm', 'Cold'],
+          datasets: [
+            { label: 'A', data: dataA, backgroundColor: '#FFBA1A', borderRadius: 6 },
+            { label: 'B', data: dataB, backgroundColor: '#10B981', borderRadius: 6 }
+          ]
+        },
+        options: chartOpts()
+      });
+    }
+
+    function renderSourceChart(leads) {
+      destroyChart('source');
+      var counts = {};
+      leads.forEach(function(l) {
+        var s = (l.utm_source || '').trim() || 'direct';
+        counts[s] = (counts[s] || 0) + 1;
+      });
+      var entries = Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
+      var ctx = document.getElementById('chart-source').getContext('2d');
+      state.charts.source = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: entries.map(function(e) { return e[0]; }),
+          datasets: [{ label: 'Leads', data: entries.map(function(e) { return e[1]; }), backgroundColor: '#FFBA1A', borderRadius: 6 }]
+        },
+        options: chartOpts({ indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0A0A0A', borderColor: '#2A2A2A', borderWidth: 1 } } })
+      });
+    }
+
+    function renderRevenueChart(leads) {
+      destroyChart('revenue');
+      var ORDER = ['Até R$30k/mês', 'R$30k-R$100k/mês', 'R$100k-R$500k/mês', 'R$500k-R$1mi/mês', 'Acima de R$1mi/mês'];
+      var counts = {};
+      ORDER.forEach(function(k) { counts[k] = 0; });
+      leads.forEach(function(l) {
+        if (counts.hasOwnProperty(l.faturamento)) counts[l.faturamento]++;
+      });
+      var ctx = document.getElementById('chart-revenue').getContext('2d');
+      state.charts.revenue = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ORDER.map(function(k) { return k.replace('/mês', '').replace('Acima de ', '+'); }),
+          datasets: [{ label: 'Leads', data: ORDER.map(function(k) { return counts[k]; }), backgroundColor: ['#6B6B6B','#A3A3A3','#FFCC4D','#FFBA1A','#E5A30D'], borderRadius: 6 }]
+        },
+        options: chartOpts({ plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0A0A0A', borderColor: '#2A2A2A', borderWidth: 1 } } })
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // TABLE
+    // ═══════════════════════════════════════════════════════
+    function renderTable(leads) {
+      var tbody = document.getElementById('leads-tbody');
+      var sorted = leads.slice().sort(function(a, b) {
+        return (b.ts ? b.ts.getTime() : 0) - (a.ts ? a.ts.getTime() : 0);
+      });
+      document.getElementById('table-count').textContent = sorted.length;
+
+      if (!sorted.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-zinc-500">Nenhum lead encontrado pros filtros atuais.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sorted.map(function(l) {
+        var when = l.ts ? formatDate(l.ts) : '—';
+        var scoreBadge = l.score === 'Hot' ? '<span class="badge badge--hot">🔥 Hot</span>'
+                      : l.score === 'Warm' ? '<span class="badge badge--warm">Warm</span>'
+                      : '<span class="badge badge--cold">Cold</span>';
+        var variantBadge = (l.variant || '').toLowerCase() === 'a' ? '<span class="badge badge--a">A</span>'
+                         : (l.variant || '').toLowerCase() === 'b' ? '<span class="badge badge--b">B</span>'
+                         : '<span class="text-zinc-600">—</span>';
+        var source = (l.utm_source || '').trim() || '<span class="text-zinc-600">direct</span>';
+        var phoneHref = l.phone ? '<a class="text-orbit-yellow hover:underline" href="https://wa.me/55' + escapeHTML(l.phone) + '" target="_blank" rel="noopener">📱</a>' : '';
+        var emailHref = l.email ? '<a class="text-zinc-300 hover:text-orbit-yellow ml-2" href="mailto:' + escapeHTML(l.email) + '">✉️</a>' : '';
+
+        return '<tr>' +
+          '<td class="text-zinc-400 font-geist-mono text-xs">' + when + '</td>' +
+          '<td><div class="text-white font-medium">' + escapeHTML(l.name || '—') + '</div><div class="text-zinc-500 text-xs">' + escapeHTML(l.email || '') + '</div></td>' +
+          '<td class="truncate-cell">' + escapeHTML(l.empresa || '—') + '</td>' +
+          '<td class="text-zinc-400 text-xs">' + escapeHTML(l.cargo || '—') + '</td>' +
+          '<td class="text-zinc-400 text-xs">' + escapeHTML((l.faturamento || '—').replace('/mês', '')) + '</td>' +
+          '<td>' + scoreBadge + '</td>' +
+          '<td>' + variantBadge + '</td>' +
+          '<td class="text-xs text-zinc-400">' + source + '</td>' +
+          '<td>' + phoneHref + emailHref + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // EXPORT CSV
+    // ═══════════════════════════════════════════════════════
+    function exportCSV(leads) {
+      if (!leads.length) return alert('Nenhum lead pra exportar com os filtros atuais.');
+      var cols = ['timestamp','name','email','phone','empresa','cargo','atuacao','faturamento','projetos','prioridade','variant','segment','score','utm_source','utm_campaign','utm_content','utm_term'];
+      var header = cols.join(',');
+      var lines = leads.map(function(l) {
+        return cols.map(function(c) {
+          var v = l[c] != null ? String(l[c]) : '';
+          if (v.indexOf(',') !== -1 || v.indexOf('"') !== -1 || v.indexOf('\n') !== -1) {
+            v = '"' + v.replace(/"/g, '""') + '"';
+          }
+          return v;
+        }).join(',');
+      });
+      var csv = '﻿' + header + '\n' + lines.join('\n');
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'orbit-leads-' + new Date().toISOString().slice(0, 10) + '.csv';
+      a.click();
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // UTILS
+    // ═══════════════════════════════════════════════════════
+    function escapeHTML(s) {
+      return String(s).replace(/[&<>"']/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function formatDate(d) {
+      var pad = function(n) { return n < 10 ? '0' + n : n; };
+      var same = d.toDateString() === new Date().toDateString();
+      var time = pad(d.getHours()) + ':' + pad(d.getMinutes());
+      if (same) return 'hoje · ' + time;
+      return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' · ' + time;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // MAIN
+    // ═══════════════════════════════════════════════════════
+    var rendering = false;
+    function render() {
+      if (rendering) return;
+      rendering = true;
+      var filtered = applyFilters(state.leads);
+      renderKPIs(filtered);
+      renderAB(filtered);
+      renderTimelineChart(filtered);
+      renderScoreVariantChart(filtered);
+      renderSourceChart(filtered);
+      renderRevenueChart(filtered);
+      renderTable(filtered);
+      rendering = false;
+    }
+
+    async function refresh() {
+      var btn = document.getElementById('refresh-btn');
+      btn.classList.add('opacity-50');
+      var leads = await fetchLeads();
+      btn.classList.remove('opacity-50');
+      if (!leads) {
+        alert('Falha ao ler o Sheet. Confere se está compartilhado como "qualquer pessoa com o link pode ver".');
+        return;
+      }
+      state.leads = leads;
+      render();
+      var now = new Date();
+      var pad = function(n) { return n < 10 ? '0' + n : n; };
+      document.getElementById('last-update').textContent = 'atualizado ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+    }
+
+    function setupFilters() {
+      document.querySelectorAll('[data-filter-group]').forEach(function(group) {
+        var key = group.getAttribute('data-filter-group');
+        group.querySelectorAll('.filter-pill').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            group.querySelectorAll('.filter-pill').forEach(function(b) { b.classList.remove('is-active'); });
+            btn.classList.add('is-active');
+            state.filters[key] = btn.getAttribute('data-value');
+            render();
+          });
+        });
+      });
+    }
+
+    function boot() {
+      setupFilters();
+      document.getElementById('refresh-btn').addEventListener('click', refresh);
+      document.getElementById('export-csv').addEventListener('click', function() {
+        exportCSV(applyFilters(state.leads));
+      });
+      refresh();
+      setInterval(refresh, CONFIG.AUTO_REFRESH_MS);
+    }
+  </script>
+</body>
+</html>

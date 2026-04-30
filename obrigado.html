@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Orbit · Obrigado!</title>
+  <meta name="description" content="Recebemos suas informações. Em instantes alguém do time te chama no WhatsApp." />
+
+  <link rel="icon" type="image/png" href="brand/favicon.ico" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-W6H3729J');</script>
+  <!-- End Google Tag Manager -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'orbit-yellow': '#FFBA1A',
+            'orbit-yellow-hi': '#FFCC4D',
+            'orbit-yellow-lo': '#E5A30D',
+            'orbit-black': '#0C0C0C',
+            'orbit-bg': '#0A0A0A',
+            'orbit-surface-1': '#141414',
+            'orbit-surface-2': '#1F1F1F',
+            'orbit-border': '#2A2A2A',
+            'math-green': '#10B981',
+          },
+          fontFamily: {
+            geist: ['Geist', 'sans-serif'],
+            'geist-mono': ['Geist Mono', 'monospace'],
+            display: ['Oswald', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-family: 'Geist', sans-serif; }
+
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      user-select: none;
+      vertical-align: middle;
+      line-height: 1;
+      display: inline-block;
+    }
+
+    /* ──────────────────────────────────────────────────────
+       BACKGROUND — mesh gradient animado + partículas
+       ────────────────────────────────────────────────────── */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-mesh__orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.5;
+      animation: orb-drift 20s ease-in-out infinite;
+    }
+    .bg-mesh__orb--1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, #FFBA1A 0%, transparent 70%);
+      top: -200px; left: -100px;
+      animation-delay: 0s;
+    }
+    .bg-mesh__orb--2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #E5A30D 0%, transparent 70%);
+      top: 30%; right: -150px;
+      animation-delay: -7s;
+    }
+    .bg-mesh__orb--3 {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, #FFCC4D 0%, transparent 70%);
+      bottom: -300px; left: 30%;
+      animation-delay: -14s;
+      opacity: 0.25;
+    }
+    @keyframes orb-drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%      { transform: translate(60px, -40px) scale(1.08); }
+      66%      { transform: translate(-50px, 30px) scale(0.95); }
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,186,26,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,186,26,0.04) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 80%);
+    }
+
+    /* Partículas flutuantes */
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #FFBA1A;
+      box-shadow: 0 0 8px #FFBA1A, 0 0 16px rgba(255,186,26,0.4);
+      animation: particle-float 14s linear infinite;
+      bottom: -10px;
+    }
+    @keyframes particle-float {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { transform: translateY(-110vh) translateX(40px); opacity: 0; }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       HERO CHECK — múltiplos anéis + brilho
+       ────────────────────────────────────────────────────── */
+    .ty-check-wrap { position: relative; display: inline-grid; place-items: center; }
+    .ty-check {
+      position: relative;
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFCC4D 0%, #FFBA1A 50%, #E5A30D 100%);
+      display: grid;
+      place-items: center;
+      box-shadow:
+        0 0 0 1px rgba(255,186,26,0.3),
+        0 0 40px rgba(255,186,26,0.5),
+        0 0 80px rgba(255,186,26,0.25),
+        inset 0 -4px 12px rgba(0,0,0,0.2);
+      animation: ty-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2;
+    }
+    .ty-check .material-symbols-rounded {
+      color: #0C0C0C;
+      font-size: 56px;
+      font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+      animation: ty-check-stamp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+    }
+    @keyframes ty-pop {
+      0%   { transform: scale(0) rotate(-45deg); opacity: 0; }
+      60%  { transform: scale(1.15) rotate(8deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+    @keyframes ty-check-stamp {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .ty-check-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 104px; height: 104px;
+      border-radius: 50%;
+      border: 2px solid #FFBA1A;
+      transform: translate(-50%, -50%);
+      animation: ty-ring 3s ease-out infinite;
+      z-index: 1;
+    }
+    .ty-check-ring--2 { animation-delay: 1s; }
+    .ty-check-ring--3 { animation-delay: 2s; }
+    @keyframes ty-ring {
+      0%   { opacity: 0.7; transform: translate(-50%, -50%) scale(0.8); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(2.2); }
+    }
+
+    /* Confetti */
+    .confetti-piece {
+      position: fixed;
+      top: 0;
+      width: 8px;
+      height: 14px;
+      pointer-events: none;
+      will-change: transform, opacity;
+      z-index: 80;
+      animation: confetti-fall 3.6s cubic-bezier(0.42, 0, 0.58, 1) forwards;
+    }
+    @keyframes confetti-fall {
+      0%   { transform: translate3d(0, -20px, 0) rotate(0deg); opacity: 1; }
+      100% { transform: translate3d(var(--cx, 80px), 110vh, 0) rotate(720deg); opacity: 0.85; }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       TYPOGRAPHY animations
+       ────────────────────────────────────────────────────── */
+    .anim-rise { animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    .anim-rise-1 { animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards; }
+    .anim-rise-2 { animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards; }
+    .anim-rise-3 { animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s backwards; }
+    .anim-rise-4 { animation: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.65s backwards; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .grad-text {
+      background: linear-gradient(135deg, #FFCC4D 0%, #FFBA1A 50%, #E5A30D 100%);
+      -webkit-background-clip: text;
+              background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 12px rgba(255,186,26,0.3));
+    }
+
+    /* ──────────────────────────────────────────────────────
+       VIDEO FRAME — glow pulsante + badge ao vivo
+       ────────────────────────────────────────────────────── */
+    .vsl-wrap {
+      position: relative;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .vsl-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -20px;
+      border-radius: 32px;
+      background: radial-gradient(ellipse at center, rgba(255,186,26,0.25), transparent 65%);
+      filter: blur(40px);
+      z-index: -1;
+      animation: vsl-glow 4s ease-in-out infinite;
+    }
+    @keyframes vsl-glow {
+      0%, 100% { opacity: 0.5; transform: scale(0.96); }
+      50%      { opacity: 0.85; transform: scale(1.04); }
+    }
+
+    .vsl-frame {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(255,186,26,0.2);
+      box-shadow:
+        0 0 0 1px rgba(255,186,26,0.15),
+        0 30px 80px -20px rgba(0,0,0,0.8),
+        0 0 60px -10px rgba(255,186,26,0.3);
+    }
+    .vsl-frame iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+    }
+
+    .vsl-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #FFCC4D, #E5A30D);
+      color: #0C0C0C;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 24px rgba(255,186,26,0.4), 0 0 0 1px rgba(255,186,26,0.5);
+      z-index: 5;
+      white-space: nowrap;
+    }
+    .vsl-badge__pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #0C0C0C;
+      animation: badge-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes badge-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.4; transform: scale(0.6); }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       TIMELINE STEPS
+       ────────────────────────────────────────────────────── */
+    .ty-timeline {
+      position: relative;
+      display: grid;
+      gap: 16px;
+    }
+    .ty-timeline::before {
+      content: '';
+      position: absolute;
+      top: 32px;
+      bottom: 32px;
+      left: 31px;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, rgba(255,186,26,0.4), rgba(255,186,26,0.4), transparent);
+    }
+    .ty-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 64px 1fr;
+      align-items: stretch;
+      gap: 18px;
+      padding: 22px;
+      background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(15,15,15,0.95));
+      border: 1px solid #2A2A2A;
+      border-radius: 18px;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .ty-step.is-visible { opacity: 1; transform: translateY(0); }
+    .ty-step:hover {
+      border-color: rgba(255,186,26,0.4);
+      transform: translateX(6px);
+      box-shadow: 0 12px 30px -10px rgba(255,186,26,0.2);
+    }
+    .ty-step:hover .ty-step__num {
+      transform: scale(1.08);
+      box-shadow: 0 0 0 4px rgba(255,186,26,0.15), 0 0 24px rgba(255,186,26,0.4);
+    }
+    .ty-step__num {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFCC4D, #FFBA1A 50%, #E5A30D);
+      color: #0C0C0C;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 24px rgba(255,186,26,0.25), inset 0 -3px 8px rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    .ty-step__num .material-symbols-rounded {
+      color: #0C0C0C;
+      font-size: 28px;
+      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 28;
+    }
+    .ty-step__num-tag {
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #0A0A0A;
+      border: 1.5px solid #FFBA1A;
+      color: #FFBA1A;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .ty-step__body { display: flex; flex-direction: column; justify-content: center; }
+    .ty-step__title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #FAFAFA;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .ty-step__title strong { color: #FFBA1A; font-weight: 600; }
+    .ty-step__desc {
+      margin-top: 6px;
+      font-size: 0.875rem;
+      color: #A3A3A3;
+      line-height: 1.5;
+    }
+    .ty-step__chip {
+      align-self: flex-start;
+      margin-top: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      background: rgba(255,186,26,0.08);
+      border: 1px solid rgba(255,186,26,0.25);
+      border-radius: 9999px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #FFBA1A;
+    }
+    .ty-step__chip .material-symbols-rounded { font-size: 12px; }
+
+    @media (min-width: 640px) {
+      .ty-step { padding: 26px 28px; gap: 22px; }
+      .ty-step__title { font-size: 1.15rem; }
+      .ty-step__desc { font-size: 0.95rem; }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       LIVE STATUS card
+       ────────────────────────────────────────────────────── */
+    .live-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(20,20,20,1));
+      border: 1px solid rgba(16,185,129,0.3);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .live-card__avatars {
+      display: flex;
+    }
+    .live-card__avatar {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid #0F0F0F;
+      background: linear-gradient(135deg, #FFCC4D, #E5A30D);
+      color: #0C0C0C;
+      display: grid;
+      place-items: center;
+      font-family: 'Oswald', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-left: -10px;
+      overflow: hidden;
+    }
+    .live-card__avatar:first-child { margin-left: 0; }
+    .live-card__avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      border-radius: 50%;
+      display: block;
+    }
+    .live-card__pulse {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 0 0 rgba(16,185,129,0.7);
+      animation: live-pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes live-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+      70%  { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    /* ──────────────────────────────────────────────────────
+       WHATSAPP CTA
+       ────────────────────────────────────────────────────── */
+    .wa-cta {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 24px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 12px 30px -8px rgba(37,211,102,0.5);
+      overflow: hidden;
+    }
+    .wa-cta:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -8px rgba(37,211,102,0.6); }
+    .wa-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+      transform: translateX(-100%);
+      animation: wa-shine 3s ease-in-out infinite;
+    }
+    @keyframes wa-shine {
+      0%, 100% { transform: translateX(-100%); }
+      50%      { transform: translateX(100%); }
+    }
+    .wa-cta__icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .wa-cta__icon-wrap .material-symbols-rounded {
+      color: #fff;
+      font-size: 22px;
+    }
+  </style>
+</head>
+
+<body class="bg-orbit-bg text-zinc-100 min-h-screen antialiased relative overflow-x-hidden">
+
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W6H3729J"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <!-- BG layers -->
+  <div class="bg-grid"></div>
+  <div class="bg-mesh">
+    <div class="bg-mesh__orb bg-mesh__orb--1"></div>
+    <div class="bg-mesh__orb bg-mesh__orb--2"></div>
+    <div class="bg-mesh__orb bg-mesh__orb--3"></div>
+  </div>
+  <div class="particles" id="particles"></div>
+
+  <!-- Header -->
+  <header class="relative z-10 border-b border-orbit-border/60 backdrop-blur-md bg-orbit-bg/40">
+    <div class="max-w-[1200px] mx-auto px-5 lg:px-12 h-16 flex items-center">
+      <a href="/" class="flex items-center">
+        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 lg:h-7 w-auto select-none" />
+      </a>
+    </div>
+  </header>
+
+  <main class="relative z-10">
+
+    <!-- HERO -->
+    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pt-16 lg:pt-24 pb-14 lg:pb-20 text-center">
+
+      <div class="anim-rise">
+        <div class="ty-check-wrap">
+          <span class="ty-check-ring"></span>
+          <span class="ty-check-ring ty-check-ring--2"></span>
+          <span class="ty-check-ring ty-check-ring--3"></span>
+          <div class="ty-check">
+            <span class="material-symbols-rounded">check</span>
+          </div>
+        </div>
+      </div>
+
+      <span class="inline-flex items-center gap-2 mt-9 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-orbit-yellow border border-orbit-yellow/30 bg-orbit-yellow/10 backdrop-blur-sm rounded-full px-4 py-1.5 anim-rise-1">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-orbit-yellow animate-pulse"></span>
+        Recebemos suas informações
+      </span>
+
+      <h1 class="mt-6 text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight leading-[1.02] text-white text-balance anim-rise-2" id="ty-headline">
+        Obrigado<span id="ty-name"></span>!<br />
+        <span class="grad-text">O próximo passo é seu.</span>
+      </h1>
+
+      <p class="mt-7 max-w-2xl mx-auto text-base sm:text-lg lg:text-xl text-zinc-400 leading-relaxed anim-rise-3">
+        Em instantes alguém do nosso time entra em contato pelo <strong class="text-white">WhatsApp</strong> pra alinhar o melhor horário pra conversa de 15 minutos.
+      </p>
+
+      <!-- Live status -->
+      <div class="mt-8 max-w-md mx-auto anim-rise-3">
+        <div class="live-card">
+          <div class="live-card__avatars">
+            <div class="live-card__avatar" title="Gabriel"><img src="brand/team/gabriel.png" alt="Gabriel" onerror="this.outerHTML='GA'" /></div>
+            <div class="live-card__avatar" title="Rodrigo"><img src="brand/team/rodrigo.png" alt="Rodrigo" onerror="this.outerHTML='RO'" /></div>
+            <div class="live-card__avatar" title="Christian"><img src="brand/team/christian.png" alt="Christian" onerror="this.outerHTML='CH'" /></div>
+          </div>
+          <div class="flex-1 text-left min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="live-card__pulse"></span>
+              <span class="text-sm font-semibold text-white">Time online agora</span>
+            </div>
+            <p class="text-xs text-zinc-500 mt-0.5">tempo médio de retorno · <span class="text-zinc-300 font-medium">3 min</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIDEO -->
+    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pb-16 lg:pb-24 anim-rise-4">
+      <div class="vsl-wrap">
+        <div class="vsl-badge">
+          <span class="vsl-badge__pulse"></span>
+          enquanto isso, assista
+        </div>
+        <div class="vsl-frame">
+          <iframe
+            id="ty-vsl-frame"
+            src=""
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- WhatsApp CTA -->
+    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pb-20 lg:pb-28 text-center">
+      <p class="text-sm text-zinc-500">Tem alguma dúvida urgente?</p>
+      <a href="https://wa.me/5511971999192?text=Ol%C3%A1%2C%20Gabriel!%20Agendei%20uma%20conversa%20para%20falar%20sobre%20o%20Orbit" target="_blank" rel="noopener" class="wa-cta mt-4">
+        <span class="wa-cta__icon-wrap">
+          <span class="material-symbols-rounded">chat</span>
+        </span>
+        <span>Falar no WhatsApp agora</span>
+        <span class="material-symbols-rounded">arrow_forward</span>
+      </a>
+    </section>
+  </main>
+
+  <footer class="relative z-10 border-t border-orbit-border/60">
+    <div class="max-w-[1200px] mx-auto px-5 lg:px-12 py-8 text-center">
+      <p class="text-[0.65rem] sm:text-xs text-zinc-600">© Orbit Gestão · Todos os direitos reservados</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // ─── Lê dados do lead da sessionStorage / URL ────────
+      var lead = {};
+      try { lead = JSON.parse(sessionStorage.getItem('orbit_lead') || '{}'); } catch (e) {}
+
+      // Personaliza headline com primeiro nome
+      var nameEl = document.getElementById('ty-name');
+      if (lead.name) {
+        var first = String(lead.name).trim().split(' ')[0];
+        if (first) nameEl.textContent = ', ' + first;
+      }
+
+      // ─── Vídeo dinâmico baseado no cargo ─────────────────
+      var VIDEOS = {
+        empresario: { id: '1188106890', ratio: 75    }, // 4:3
+        consultor:  { id: '1188103539', ratio: 56.25 }  // 16:9
+      };
+      var isEmpresario = (lead.cargo || '').toLowerCase().indexOf('ceo') !== -1
+                       || (lead.cargo || '').toLowerCase().indexOf('diretor') !== -1;
+      var pick = isEmpresario ? VIDEOS.empresario : VIDEOS.consultor;
+
+      var frame = document.getElementById('ty-vsl-frame');
+      var frameWrap = frame.parentNode;
+      frameWrap.style.paddingTop = pick.ratio + '%';
+      frame.src = 'https://player.vimeo.com/video/' + pick.id + '?autoplay=1&muted=1&controls=1&loop=0&dnt=1&playsinline=1';
+      console.log('[Orbit TY] video=' + (isEmpresario ? 'empresario' : 'consultor') + ' (' + pick.id + ')');
+
+      // ─── Conversion tracking ─────────────────────────────
+      var variant = lead.variant || '';
+      var segment = lead.segment || '';
+      if (window.dataLayer) {
+        window.dataLayer.push({ event: 'lead_thank_you', variant: variant, segment: segment, page: 'obrigado' });
+      }
+      if (window.fbq) window.fbq('track', 'CompleteRegistration', { variant: variant });
+      if (window.gtag) window.gtag('event', 'conversion', { variant: variant, segment: segment });
+      console.log('[Orbit TY] lead:', lead);
+
+      // ─── Confetti burst on load ──────────────────────────
+      (function fireConfetti() {
+        var COLORS = ['#FFBA1A', '#FFCC4D', '#E5A30D', '#FAFAFA', '#FFFFFF'];
+        var COUNT = window.innerWidth < 640 ? 30 : 60;
+        for (var i = 0; i < COUNT; i++) {
+          var piece = document.createElement('div');
+          piece.className = 'confetti-piece';
+          piece.style.left = (Math.random() * 100) + '%';
+          piece.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
+          piece.style.width = (6 + Math.random() * 6) + 'px';
+          piece.style.height = (10 + Math.random() * 10) + 'px';
+          piece.style.borderRadius = (Math.random() > 0.5 ? '2px' : '50%');
+          piece.style.setProperty('--cx', ((Math.random() - 0.5) * 240) + 'px');
+          piece.style.animationDelay = (Math.random() * 0.4) + 's';
+          piece.style.animationDuration = (3 + Math.random() * 1.5) + 's';
+          piece.style.opacity = '1';
+          document.body.appendChild(piece);
+          setTimeout((function(p) { return function() { p.remove(); }; })(piece), 5500);
+        }
+      })();
+
+      // ─── Floating particles ──────────────────────────────
+      (function spawnParticles() {
+        var container = document.getElementById('particles');
+        if (!container) return;
+        var COUNT = window.innerWidth < 640 ? 14 : 28;
+        for (var i = 0; i < COUNT; i++) {
+          var p = document.createElement('div');
+          p.className = 'particle';
+          p.style.left = (Math.random() * 100) + '%';
+          p.style.animationDelay = (Math.random() * 14) + 's';
+          p.style.animationDuration = (10 + Math.random() * 12) + 's';
+          var size = 2 + Math.random() * 3;
+          p.style.width = size + 'px';
+          p.style.height = size + 'px';
+          p.style.opacity = (0.4 + Math.random() * 0.5);
+          container.appendChild(p);
+        }
+      })();
+
+      // ─── Reveal steps on scroll ──────────────────────────
+      (function revealSteps() {
+        var steps = document.querySelectorAll('[data-reveal]');
+        if (!steps.length) return;
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry, i) {
+            if (entry.isIntersecting) {
+              setTimeout(function() {
+                entry.target.classList.add('is-visible');
+              }, i * 120);
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.2 });
+        steps.forEach(function(s) { observer.observe(s); });
+      })();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design System — Orbit · canal.orbitgestao.com.br</title>
+  <meta name="robots" content="noindex,nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap"
+    rel="stylesheet"
+  />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'orbit-yellow': '#FFBA1A',
+            'orbit-yellow-hi': '#FFCC4D',
+            'orbit-yellow-lo': '#E5A30D',
+            'orbit-black': '#0C0C0C',
+            'orbit-bg': '#0A0A0A',
+            'orbit-surface-1': '#141414',
+            'orbit-surface-2': '#1F1F1F',
+            'orbit-border': '#2A2A2A',
+            'math-green': '#10B981',
+          },
+          fontFamily: {
+            geist: ['Geist', 'sans-serif'],
+            'geist-mono': ['Geist Mono', 'monospace'],
+            display: ['Oswald', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-family: 'Geist', sans-serif; }
+
+    /* ── Material Symbols base ─────────────────────────── */
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      user-select: none;
+      vertical-align: middle;
+      line-height: 1;
+      display: inline-block;
+    }
+    .material-symbols-rounded.filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-rounded.thin { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-rounded.bold { font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24; }
+
+    /* ── Noise + glow ──────────────────────────────────── */
+    .noise {
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+      background-size: 200px 200px;
+      opacity: 0.18;
+      mix-blend-mode: soft-light;
+    }
+    .glow-yellow {
+      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.22), rgba(255, 186, 26, 0) 70%);
+      filter: blur(60px);
+    }
+    .glow-yellow-soft {
+      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.12), rgba(255, 186, 26, 0) 70%);
+      filter: blur(80px);
+    }
+
+    .border-gradient { position: relative; }
+    .border-gradient::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 40%, rgba(255,186,26,0.18));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Entrance / loop animations ────────────────────── */
+    @keyframes rise-in {
+      0%   { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes pulse-yellow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 186, 26, 0.45); }
+      50%      { box-shadow: 0 0 0 14px rgba(255, 186, 26, 0); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .anim-rise { animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .anim-fade { animation: fade-in 1.2s ease-out both; }
+    .anim-pulse-yellow { animation: pulse-yellow 2.4s ease-out infinite; }
+    .anim-shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,186,26,0.15), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2.5s linear infinite;
+    }
+
+    ::selection { background: #FFBA1A; color: #0A0A0A; }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #0A0A0A; }
+    ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 6px; border: 2px solid #0A0A0A; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+    code { font-family: 'Geist Mono', monospace; font-size: 0.85em; color: #FFBA1A; }
+
+    /* ══════════════════════════════════════════════════════════
+       ORBITAL HUB — Olívia + 12 agentes
+       ══════════════════════════════════════════════════════════ */
+    .orbit-hub {
+      position: relative;
+      width: 100%;
+      max-width: 880px;
+      margin: 0 auto;
+      height: 720px;
+    }
+    @media (min-width: 1024px) { .orbit-hub { height: 860px; } }
+
+    .orbit-hub__lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orbit-hub__center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 3;
+    }
+    .orbit-hub__glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,186,26,0.22) 0%, rgba(255,186,26,0.06) 50%, transparent 70%);
+      animation: orbit-glow 3.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes orbit-glow {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+    }
+    .orbit-hub__photo {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 4px solid rgba(255,186,26,0.6);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(255,186,26,0.35), 0 0 80px rgba(255,186,26,0.15);
+      animation: orbit-photo-breathe 3.5s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+      background: #1F1F1F;
+    }
+    @keyframes orbit-photo-breathe {
+      0%, 100% { box-shadow: 0 0 40px rgba(255,186,26,0.35), 0 0 80px rgba(255,186,26,0.15); }
+      50%      { box-shadow: 0 0 50px rgba(255,186,26,0.55), 0 0 100px rgba(255,186,26,0.25); }
+    }
+    .orbit-hub__photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .orbit-hub__name {
+      color: #FFBA1A;
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      margin-top: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .orbit-hub__role {
+      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-top: 6px;
+    }
+
+    .orbit-hub__ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,186,26,0.12);
+      pointer-events: none;
+      animation: orbit-ring 3.5s ease-in-out infinite;
+    }
+    .orbit-hub__ring--1 { width: 180px; height: 180px; transform: translate(-50%, calc(-50% - 30px)); }
+    .orbit-hub__ring--2 { width: 220px; height: 220px; border-color: rgba(255,186,26,0.07); transform: translate(-50%, calc(-50% - 30px)); animation-delay: 0.5s; }
+    .orbit-hub__ring--3 { width: 264px; height: 264px; border-color: rgba(255,186,26,0.04); transform: translate(-50%, calc(-50% - 30px)); animation-delay: 1s; }
+    @keyframes orbit-ring {
+      0%, 100% { opacity: 0.3; }
+      50%      { opacity: 1; }
+    }
+
+    .orbit-hub__node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      opacity: 0;
+      scale: 0.5;
+    }
+    .orbit-visible .orbit-hub__node { animation: orbit-node-in 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .orbit-visible .orbit-hub__node[data-idx="0"]  { animation-delay: 0.10s; }
+    .orbit-visible .orbit-hub__node[data-idx="1"]  { animation-delay: 0.15s; }
+    .orbit-visible .orbit-hub__node[data-idx="2"]  { animation-delay: 0.20s; }
+    .orbit-visible .orbit-hub__node[data-idx="3"]  { animation-delay: 0.25s; }
+    .orbit-visible .orbit-hub__node[data-idx="4"]  { animation-delay: 0.30s; }
+    .orbit-visible .orbit-hub__node[data-idx="5"]  { animation-delay: 0.35s; }
+    .orbit-visible .orbit-hub__node[data-idx="6"]  { animation-delay: 0.40s; }
+    .orbit-visible .orbit-hub__node[data-idx="7"]  { animation-delay: 0.45s; }
+    .orbit-visible .orbit-hub__node[data-idx="8"]  { animation-delay: 0.50s; }
+    .orbit-visible .orbit-hub__node[data-idx="9"]  { animation-delay: 0.55s; }
+    .orbit-visible .orbit-hub__node[data-idx="10"] { animation-delay: 0.60s; }
+    .orbit-visible .orbit-hub__node[data-idx="11"] { animation-delay: 0.65s; }
+    @keyframes orbit-node-in { to { opacity: 1; scale: 1; } }
+
+    .orbit-hub__node:hover { transform: translate(-50%, -50%) scale(1.12); }
+    .orbit-hub__node:hover .orbit-hub__node-icon {
+      border-color: #FFBA1A;
+      box-shadow: 0 0 24px rgba(255,186,26,0.5);
+      background: linear-gradient(135deg, rgba(255,186,26,0.35), rgba(255,186,26,0.10));
+    }
+
+    .orbit-hub__node-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,186,26,0.15), rgba(255,186,26,0.04));
+      border: 2px solid rgba(255,186,26,0.30);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFBA1A;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .orbit-hub__node-icon .material-symbols-rounded { font-size: 22px; }
+    .orbit-hub__node-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+    .orbit-hub__node-desc {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+      margin-top: -2px;
+    }
+
+    .orbit-hub__node.orbit-node--active {
+      transform: translate(-50%, -50%) scale(1.18);
+      z-index: 100;
+    }
+    .orbit-hub__node.orbit-node--active .orbit-hub__node-icon {
+      border-color: #FFBA1A;
+      box-shadow: 0 0 30px rgba(255,186,26,0.6);
+      background: linear-gradient(135deg, rgba(255,186,26,0.40), rgba(255,186,26,0.15));
+    }
+    .orbit-hub__node.orbit-node--dimmed { opacity: 0.30 !important; }
+
+    .orbit-node-card {
+      position: absolute;
+      top: calc(100% + 14px);
+      left: 50%;
+      transform: translateX(-50%) scale(0.92);
+      width: 264px;
+      background: rgba(20,20,20,0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,186,26,0.25);
+      border-radius: 16px;
+      padding: 18px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 200;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 40px rgba(255,186,26,0.08);
+      text-align: left;
+    }
+    .orbit-node--active .orbit-node-card {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) scale(1);
+    }
+    .orbit-node-card::before {
+      content: '';
+      position: absolute;
+      top: -6px; left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 10px; height: 10px;
+      background: rgba(20,20,20,0.96);
+      border-left: 1px solid rgba(255,186,26,0.25);
+      border-top: 1px solid rgba(255,186,26,0.25);
+    }
+
+    /* Smart flip: bottom-half agents open card upward */
+    .orbit-hub__node[data-idx="4"] .orbit-node-card,
+    .orbit-hub__node[data-idx="5"] .orbit-node-card,
+    .orbit-hub__node[data-idx="6"] .orbit-node-card,
+    .orbit-hub__node[data-idx="7"] .orbit-node-card,
+    .orbit-hub__node[data-idx="8"] .orbit-node-card {
+      top: auto;
+      bottom: calc(100% + 14px);
+    }
+    .orbit-hub__node[data-idx="4"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="5"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="6"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="7"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="8"] .orbit-node-card::before {
+      top: auto;
+      bottom: -6px;
+      border-left: none;
+      border-top: none;
+      border-right: 1px solid rgba(255,186,26,0.25);
+      border-bottom: 1px solid rgba(255,186,26,0.25);
+    }
+    .orbit-node-card__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #10B981;
+      background: rgba(16,185,129,0.10);
+      border: 1px solid rgba(16,185,129,0.20);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+    .orbit-node-card__status::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+    }
+    .orbit-node-card__title {
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .orbit-node-card__text {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.8rem;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .orbit-node-card__bar { margin-bottom: 12px; }
+    .orbit-node-card__bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      font-family: 'Geist Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 4px;
+    }
+    .orbit-node-card__bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .orbit-node-card__bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FFBA1A, #FFCC4D);
+      border-radius: 2px;
+    }
+    .orbit-node-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .orbit-node-card__tag {
+      font-size: 0.65rem;
+      font-family: 'Geist Mono', monospace;
+      color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    .orbit-hub__center { opacity: 0; scale: 0.3; }
+    .orbit-visible .orbit-hub__center { animation: orbit-center-in 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    @keyframes orbit-center-in { to { opacity: 1; scale: 1; } }
+    .orbit-hub__lines { opacity: 0; }
+    .orbit-visible .orbit-hub__lines { animation: orbit-lines-in 0.8s ease 0.3s forwards; }
+    @keyframes orbit-lines-in { to { opacity: 1; } }
+
+    @media (max-width: 768px) {
+      .orbit-hub { height: 480px; max-width: 100%; }
+      .orbit-hub__glow { width: 140px; height: 140px; }
+      .orbit-hub__photo { width: 80px; height: 80px; border-width: 3px; }
+      .orbit-hub__name { font-size: 16px; margin-top: 10px; }
+      .orbit-hub__role { font-size: 9px; }
+      .orbit-hub__ring--1 { width: 120px; height: 120px; }
+      .orbit-hub__ring--2 { width: 150px; height: 150px; }
+      .orbit-hub__ring--3 { display: none; }
+      .orbit-hub__node-icon { width: 40px; height: 40px; }
+      .orbit-hub__node-icon .material-symbols-rounded { font-size: 16px; }
+      .orbit-hub__node-label { font-size: 10px; }
+      .orbit-hub__node-desc { display: none; }
+      .orbit-node-card { width: 220px; padding: 14px; }
+    }
+    @media (max-width: 480px) {
+      .orbit-hub { height: 380px; }
+      .orbit-hub__photo { width: 60px; height: 60px; }
+      .orbit-hub__glow { width: 100px; height: 100px; }
+      .orbit-hub__name { font-size: 12px; margin-top: 6px; }
+      .orbit-hub__role { font-size: 8px; }
+      .orbit-hub__ring--1 { width: 90px; height: 90px; }
+      .orbit-hub__ring--2 { display: none; }
+      .orbit-hub__node-icon { width: 32px; height: 32px; }
+      .orbit-hub__node-icon .material-symbols-rounded { font-size: 14px; }
+      .orbit-hub__node-label { font-size: 9px; }
+    }
+  </style>
+</head>
+
+<body class="bg-orbit-bg text-zinc-100 font-geist min-h-screen antialiased selection:bg-orbit-yellow selection:text-orbit-black">
+
+  <!-- ============== TOP NAV ============== -->
+  <nav class="sticky top-0 z-50 backdrop-blur-md bg-orbit-bg/80 border-b border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 h-16 flex items-center justify-between gap-6">
+      <a href="#hero" class="flex items-center gap-3 group">
+        <img src="../../logo-orbit-white.png" alt="Orbit" class="h-7 w-auto select-none" />
+        <span class="hidden sm:inline-block text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-zinc-500 border-l border-orbit-border pl-3">design system</span>
+      </a>
+      <div class="hidden lg:flex items-center gap-7 text-[0.7rem] font-medium uppercase tracking-[0.2em] text-zinc-500">
+        <a href="#typography" class="hover:text-orbit-yellow transition-colors">Typography</a>
+        <a href="#colors" class="hover:text-orbit-yellow transition-colors">Colors</a>
+        <a href="#components" class="hover:text-orbit-yellow transition-colors">Components</a>
+        <a href="#patterns" class="hover:text-orbit-yellow transition-colors">Patterns</a>
+        <a href="#layout" class="hover:text-orbit-yellow transition-colors">Layout</a>
+        <a href="#motion" class="hover:text-orbit-yellow transition-colors">Motion</a>
+        <a href="#icons" class="hover:text-orbit-yellow transition-colors">Icons</a>
+      </div>
+      <span class="text-[0.6rem] font-geist-mono text-zinc-600 hidden sm:inline">v0.2 · INTERNAL</span>
+    </div>
+  </nav>
+
+  <!-- ============== HERO ============== -->
+  <section id="hero" class="relative overflow-hidden">
+    <div class="absolute top-[-25%] left-1/2 -translate-x-1/2 w-[1200px] h-[800px] glow-yellow pointer-events-none"></div>
+    <div class="absolute inset-0 noise pointer-events-none"></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-6 lg:px-12 pt-20 lg:pt-28 pb-20 lg:pb-28">
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-orbit-yellow mb-8 anim-rise">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-orbit-yellow align-middle mr-2 anim-pulse-yellow"></span>
+        Design System · v0.2
+      </p>
+
+      <h1 class="font-display uppercase font-medium tracking-tighter leading-[0.85] text-[14vw] md:text-[10vw] lg:text-[10rem] xl:text-[12rem] text-white anim-rise">
+        Canal<br />
+        <span class="text-orbit-yellow">Orbit</span>
+      </h1>
+
+      <p class="mt-10 max-w-2xl text-lg lg:text-xl text-zinc-400 leading-relaxed anim-rise">
+        Living style guide e biblioteca de padrões da landing page <span class="text-zinc-200 font-medium">canal.orbitgestao.com.br</span>. Tudo que aparece aqui é o que pode ser usado na LP — fora disto, nada.
+      </p>
+
+      <div class="mt-10 flex flex-wrap items-center gap-4 anim-rise">
+        <a href="#components" class="inline-flex items-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-7 py-4 rounded-full text-[0.7rem] font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_18px_40px_-12px_rgba(255,186,26,0.55)] group">
+          Ver componentes
+          <span class="material-symbols-rounded text-base transition-transform group-hover:translate-x-1">arrow_forward</span>
+        </a>
+        <a href="#colors" class="inline-flex items-center gap-2 bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border text-zinc-200 px-7 py-4 rounded-full text-[0.7rem] font-bold uppercase tracking-widest transition-colors">
+          Ver paleta
+          <span class="material-symbols-rounded text-base">palette</span>
+        </a>
+      </div>
+
+      <!-- VSL slot mock -->
+      <div class="mt-16 lg:mt-20 anim-fade">
+        <div class="relative aspect-video w-full max-w-[1080px] mx-auto rounded-[2rem] overflow-hidden border border-orbit-border bg-orbit-surface-1 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)] border-gradient">
+          <div class="absolute inset-0 bg-gradient-to-br from-orbit-surface-1 via-orbit-surface-2 to-black"></div>
+          <div class="absolute -inset-x-20 -top-20 h-64 glow-yellow-soft pointer-events-none"></div>
+
+          <button aria-label="Play VSL" class="absolute inset-0 flex items-center justify-center group">
+            <div class="relative">
+              <div class="absolute inset-0 bg-orbit-yellow rounded-full blur-2xl opacity-50 group-hover:opacity-80 transition-opacity"></div>
+              <div class="relative w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-orbit-yellow text-orbit-black flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl anim-pulse-yellow">
+                <span class="material-symbols-rounded filled" style="font-size: 38px;">play_arrow</span>
+              </div>
+            </div>
+          </button>
+
+          <div class="absolute top-5 left-5 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[0.65rem] font-medium uppercase tracking-widest text-zinc-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-orbit-yellow animate-pulse"></span>
+            VSL Slot
+          </div>
+
+          <div class="absolute bottom-0 left-0 right-0 p-5 lg:p-6 bg-gradient-to-t from-black/85 to-transparent">
+            <p class="text-xs lg:text-sm text-zinc-300 uppercase tracking-wider">
+              Player Vimeo · controlado por
+              <code class="text-orbit-yellow">?v=a|b</code>
+              · auto-play mudo + CTA gated por playtime
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== TYPOGRAPHY ============== -->
+  <section id="typography" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">01 · Typography</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Escala tipográfica</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Display em <span class="text-zinc-300">Oswald</span> (uppercase, tracking apertado). Body em <span class="text-zinc-300">Geist</span>. Geist Mono em meta-textos, códigos e labels técnicos.</p>
+      </div>
+
+      <div class="divide-y divide-orbit-border">
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Display 1</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Oswald · 500</p>
+          </div>
+          <div class="flex-grow overflow-hidden">
+            <p class="font-display uppercase font-medium tracking-tighter leading-[0.85] text-7xl lg:text-9xl text-white">CANAL ORBIT</p>
+          </div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">128px / 0.85</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Display 2</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Oswald · 500</p>
+          </div>
+          <div class="flex-grow"><p class="font-display uppercase font-medium tracking-tighter leading-[0.9] text-5xl lg:text-7xl text-white">R$24.000<span class="text-orbit-yellow">/mês</span></p></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">72px / 0.9</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Heading 1</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 500</p>
+          </div>
+          <div class="flex-grow"><h1 class="text-4xl lg:text-6xl font-medium tracking-tight text-white leading-[1.05]">Você entrega. O cliente não mantém.</h1></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">60px / 1.05</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Heading 2</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 500</p>
+          </div>
+          <div class="flex-grow"><h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white leading-tight">O ciclo que todo consultor conhece</h2></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">36px / 1.15</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Heading 3</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 500</p>
+          </div>
+          <div class="flex-grow"><h3 class="text-2xl lg:text-3xl font-medium tracking-tight text-white leading-snug">A conta que muda o modelo</h3></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">30px / 1.3</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Heading 4</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 600</p>
+          </div>
+          <div class="flex-grow"><h4 class="text-xl font-semibold tracking-tight text-white">DURANTE: agentes trabalham junto</h4></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">20px / 1.4</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Body L</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 400</p>
+          </div>
+          <div class="flex-grow max-w-3xl"><p class="text-lg lg:text-xl text-zinc-300 leading-relaxed">Agentes de IA que trabalham com você durante o projeto e continuam executando no cliente depois. O ciclo se quebra. A recorrência começa.</p></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">20px / 1.6</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Body M</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 400</p>
+          </div>
+          <div class="flex-grow max-w-3xl"><p class="text-base text-zinc-400 leading-relaxed">Sem entregar mais horas. Sem contratar equipe. Os agentes fazem o trabalho pesado.</p></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">16px / 1.6</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Body S</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 400</p>
+          </div>
+          <div class="flex-grow max-w-3xl"><p class="text-sm text-zinc-500 leading-relaxed">Sub-CTA: Sem compromisso. 15 minutos pra entender se faz sentido pra você.</p></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">14px / 1.6</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Eyebrow</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist · 600 · UPPERCASE</p>
+          </div>
+          <div class="flex-grow"><p class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">Seção · Problema</p></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">10.4px / 1.4</p></div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row lg:items-end gap-4 py-8">
+          <div class="lg:w-44 shrink-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-zinc-300">Mono</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-1">Geist Mono · 500</p>
+          </div>
+          <div class="flex-grow"><p class="font-geist-mono text-sm text-orbit-yellow">?s=1&amp;v=a — VSL A · Copy A</p></div>
+          <div class="lg:w-32 shrink-0 lg:text-right"><p class="font-geist-mono text-xs text-zinc-500">14px / 1.4</p></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== COLORS ============== -->
+  <section id="colors" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">02 · Colors &amp; Surfaces</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Paleta</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Extraída da logo Orbit. Tema escuro, accent único amarelo. Verde reservado — só Seção Matemática Copy B.</p>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Brand</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-orbit-yellow"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Orbit Yellow</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--orbit-yellow</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#FFBA1A</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-[#FFCC4D]"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Yellow High</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--orbit-yellow-hi</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#FFCC4D</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-[#E5A30D]"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Yellow Low</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--orbit-yellow-lo</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#E5A30D</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-orbit-black"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Orbit Black</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--orbit-black</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#0C0C0C</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Surfaces</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-orbit-bg"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Background</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--bg</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#0A0A0A</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-orbit-surface-1"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Surface 1</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--surface-1</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#141414</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-orbit-surface-2"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Surface 2</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--surface-2</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#1F1F1F</p>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[5/3] bg-orbit-border"></div>
+          <div class="p-4">
+            <p class="text-sm font-semibold text-white">Border</p>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-1">--border</p>
+            <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#2A2A2A</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Text</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-12">
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-6">
+          <p class="text-zinc-50 text-2xl font-medium">Aa Texto principal</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-3">--text · #FAFAFA</p>
+        </div>
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-6">
+          <p class="text-zinc-400 text-2xl font-medium">Aa Texto secundário</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-3">--text-muted · #A3A3A3</p>
+        </div>
+        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-6">
+          <p class="text-zinc-600 text-2xl font-medium">Aa Texto dim</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-500 mt-3">--text-dim · #6B6B6B</p>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Reserved</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[8/3] bg-math-green flex items-center justify-center">
+            <span class="font-display text-5xl font-semibold text-orbit-black">R$24.000</span>
+          </div>
+          <div class="p-4 flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-white">Math Green</p>
+              <p class="text-[0.65rem] text-zinc-500 mt-1">Uso restrito: <span class="text-zinc-300">Seção Matemática · Copy B</span></p>
+            </div>
+            <div class="text-right">
+              <p class="text-[0.65rem] font-geist-mono text-zinc-500">--math-green</p>
+              <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">#10B981</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden bg-orbit-surface-1 border border-orbit-border">
+          <div class="aspect-[8/3] relative overflow-hidden bg-orbit-bg">
+            <div class="absolute inset-0 glow-yellow"></div>
+            <div class="absolute inset-0 noise"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-300">glow + noise overlay</span>
+            </div>
+          </div>
+          <div class="p-4 flex items-start justify-between gap-3">
+            <div>
+              <p class="text-sm font-semibold text-white">Ambient Glow</p>
+              <p class="text-[0.65rem] text-zinc-500 mt-1">Hero + seções dramáticas (mathy)</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[0.65rem] font-geist-mono text-zinc-500">.glow-yellow</p>
+              <p class="text-[0.65rem] font-geist-mono text-orbit-yellow mt-1">radial · 22% alpha</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== COMPONENTS ============== -->
+  <section id="components" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">03 · Components</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Componentes</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Apenas o que a LP precisa: botões, cards, badges, stat, FAQ item, video player chrome, divisor.</p>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Buttons</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 lg:p-10 mb-10">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+
+          <div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-4">Primary</p>
+            <div class="flex flex-col items-start gap-3">
+              <button class="inline-flex items-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-7 py-4 rounded-full text-[0.7rem] font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_18px_40px_-12px_rgba(255,186,26,0.55)]">
+                Agendar conversa
+                <span class="material-symbols-rounded text-base">arrow_forward</span>
+              </button>
+              <button class="inline-flex items-center gap-2 bg-orbit-yellow text-orbit-black px-7 py-4 rounded-full text-[0.7rem] font-bold uppercase tracking-widest opacity-60 cursor-not-allowed">
+                Disabled
+                <span class="material-symbols-rounded text-base">arrow_forward</span>
+              </button>
+            </div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-4">default · hover · disabled</p>
+          </div>
+
+          <div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-4">Secondary</p>
+            <div class="flex flex-col items-start gap-3">
+              <button class="inline-flex items-center gap-2 bg-orbit-surface-2 hover:bg-orbit-border border border-orbit-border text-zinc-200 px-7 py-4 rounded-full text-[0.7rem] font-bold uppercase tracking-widest transition-colors">
+                Ver mais
+                <span class="material-symbols-rounded text-base">expand_more</span>
+              </button>
+              <button class="inline-flex items-center gap-2 bg-orbit-surface-2 border border-orbit-border text-zinc-500 px-7 py-4 rounded-full text-[0.7rem] font-bold uppercase tracking-widest opacity-60 cursor-not-allowed">
+                Disabled
+              </button>
+            </div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-4">default · hover · disabled</p>
+          </div>
+
+          <div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-4">Ghost</p>
+            <div class="flex flex-col items-start gap-3">
+              <button class="inline-flex items-center gap-2 hover:bg-orbit-surface-1 text-zinc-400 hover:text-white px-5 py-3 rounded-full text-[0.7rem] font-medium uppercase tracking-widest transition-colors">
+                Login
+                <span class="material-symbols-rounded text-sm">north_east</span>
+              </button>
+              <a href="#" class="inline-flex items-center gap-1.5 text-orbit-yellow hover:text-orbit-yellow-hi text-sm font-medium underline underline-offset-4 decoration-orbit-yellow/40 hover:decoration-orbit-yellow transition-colors">
+                Saiba mais
+                <span class="material-symbols-rounded text-sm">north_east</span>
+              </a>
+            </div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-4">ghost · text-link</p>
+          </div>
+
+          <div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-4">Icon</p>
+            <div class="flex items-center gap-3">
+              <button aria-label="Play" class="w-12 h-12 rounded-full bg-orbit-yellow text-orbit-black flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+                <span class="material-symbols-rounded filled" style="font-size: 22px;">play_arrow</span>
+              </button>
+              <button aria-label="Mute" class="w-12 h-12 rounded-full bg-orbit-surface-2 border border-orbit-border text-zinc-200 flex items-center justify-center hover:bg-orbit-border transition-colors">
+                <span class="material-symbols-rounded" style="font-size: 22px;">volume_up</span>
+              </button>
+              <button aria-label="Close" class="w-12 h-12 rounded-full hover:bg-orbit-surface-1 text-zinc-500 hover:text-white flex items-center justify-center transition-colors">
+                <span class="material-symbols-rounded" style="font-size: 22px;">close</span>
+              </button>
+            </div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-4">primary · ghost-bordered · ghost</p>
+          </div>
+
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Cards</h3>
+      <div class="grid md:grid-cols-3 gap-4 mb-10">
+        <div class="group rounded-3xl bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border p-8 transition-all hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-40 h-40 glow-yellow-soft pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="relative">
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-orbit-bg border border-orbit-border flex items-center justify-center text-orbit-yellow">
+                <span class="material-symbols-rounded" style="font-size: 22px;">check_circle</span>
+              </div>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">01</span>
+            </div>
+            <h4 class="text-xl font-semibold text-white mb-2 tracking-tight">Você entrega o projeto</h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">Diagnóstico, planejamento, dashboard. Tudo certo. O cliente sai feliz.</p>
+          </div>
+        </div>
+        <div class="group rounded-3xl bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border p-8 transition-all hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-40 h-40 glow-yellow-soft pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="relative">
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-orbit-bg border border-orbit-border flex items-center justify-center text-orbit-yellow">
+                <span class="material-symbols-rounded" style="font-size: 22px;">trending_down</span>
+              </div>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">02</span>
+            </div>
+            <h4 class="text-xl font-semibold text-white mb-2 tracking-tight">O cliente não mantém</h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">3 meses depois ninguém atualiza. Os indicadores caem. O resultado se perde.</p>
+          </div>
+        </div>
+        <div class="group rounded-3xl bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border p-8 transition-all hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-40 h-40 glow-yellow-soft pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div class="relative">
+            <div class="flex items-center justify-between mb-6">
+              <div class="w-12 h-12 rounded-2xl bg-orbit-bg border border-orbit-border flex items-center justify-center text-orbit-yellow">
+                <span class="material-symbols-rounded" style="font-size: 22px;">restart_alt</span>
+              </div>
+              <span class="text-[0.6rem] font-geist-mono text-zinc-600">03</span>
+            </div>
+            <h4 class="text-xl font-semibold text-white mb-2 tracking-tight">Você caça novo cliente</h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">Volta pra estaca zero. O ciclo recomeça. A recorrência nunca chega.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Stats &amp; Math</h3>
+      <div class="grid md:grid-cols-4 gap-4 mb-10">
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6">
+          <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Custo</p>
+          <p class="font-display text-4xl lg:text-5xl text-white mt-2">R$600</p>
+          <p class="text-xs text-zinc-500 mt-1">por cliente / mês</p>
+        </div>
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6">
+          <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Venda</p>
+          <p class="font-display text-4xl lg:text-5xl text-white mt-2">R$3.000</p>
+          <p class="text-xs text-zinc-500 mt-1">por cliente / mês</p>
+        </div>
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6">
+          <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Margem</p>
+          <p class="font-display text-4xl lg:text-5xl text-orbit-yellow mt-2">80%</p>
+          <p class="text-xs text-zinc-500 mt-1">por operação</p>
+        </div>
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6 relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-math-green/15 blur-2xl"></div>
+          <div class="relative">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">10 clientes <span class="text-math-green">· Copy B</span></p>
+            <p class="font-display text-4xl lg:text-5xl text-math-green mt-2">R$24.000</p>
+            <p class="text-xs text-zinc-500 mt-1">recorrentes / mês</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Timeline (Solução)</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 lg:p-10 mb-10">
+        <div class="grid md:grid-cols-3 gap-6 relative">
+          <div class="hidden md:block absolute top-6 left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-orbit-yellow/40 to-transparent"></div>
+          <div class="relative">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-orbit-yellow text-orbit-black flex items-center justify-center font-bold text-sm">1</div>
+              <span class="text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-500">Durante</span>
+            </div>
+            <h4 class="text-lg font-semibold text-white mb-2">Agentes trabalham junto</h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">Organizam dados, estruturam indicadores, aceleram entregas no projeto.</p>
+          </div>
+          <div class="relative">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-orbit-yellow text-orbit-black flex items-center justify-center font-bold text-sm">2</div>
+              <span class="text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-500">Depois</span>
+            </div>
+            <h4 class="text-lg font-semibold text-white mb-2">Os agentes não param</h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">Monitoram, cobram, alertam. 24/7. O projeto termina, a operação continua.</p>
+          </div>
+          <div class="relative">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-12 h-12 rounded-full bg-orbit-yellow text-orbit-black flex items-center justify-center font-bold text-sm">3</div>
+              <span class="text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-500">Resultado</span>
+            </div>
+            <h4 class="text-lg font-semibold text-white mb-2">Recorrência real</h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">O cliente paga pela operação contínua. Você ganha na recorrência.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Badges &amp; Pills</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 mb-10">
+        <div class="flex flex-wrap gap-3">
+          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orbit-yellow/10 border border-orbit-yellow/30 text-orbit-yellow text-[0.65rem] font-semibold uppercase tracking-widest">
+            <span class="w-1.5 h-1.5 rounded-full bg-orbit-yellow animate-pulse"></span>
+            ao vivo
+          </span>
+          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orbit-surface-2 border border-orbit-border text-zinc-300 text-[0.65rem] font-semibold uppercase tracking-widest">
+            white-label
+          </span>
+          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orbit-bg border border-orbit-yellow/40 text-orbit-yellow text-[0.65rem] font-semibold uppercase tracking-widest">
+            <span class="material-symbols-rounded text-xs">bolt</span>
+            novo
+          </span>
+          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-math-green/15 border border-math-green/40 text-math-green text-[0.65rem] font-semibold uppercase tracking-widest">
+            <span class="material-symbols-rounded text-xs">trending_up</span>
+            +80% margem
+          </span>
+          <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-orbit-border text-zinc-500 text-[0.65rem] font-geist-mono uppercase tracking-widest">
+            ?v=a
+          </span>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">FAQ Item</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border divide-y divide-orbit-border mb-10">
+        <details class="group p-6 lg:p-7 cursor-pointer" open>
+          <summary class="list-none flex items-center justify-between gap-6 cursor-pointer">
+            <span class="text-base lg:text-lg font-medium text-white">Em quanto tempo eu monto o canal?</span>
+            <span class="shrink-0 w-9 h-9 rounded-full bg-orbit-bg border border-orbit-border flex items-center justify-center text-zinc-400 group-open:bg-orbit-yellow group-open:text-orbit-black group-open:border-orbit-yellow transition-all">
+              <span class="material-symbols-rounded text-base group-open:hidden">add</span>
+              <span class="material-symbols-rounded text-base hidden group-open:inline-block">remove</span>
+            </span>
+          </summary>
+          <p class="text-sm text-zinc-400 leading-relaxed mt-4 pr-12">Setup do white-label leva em média 7 dias úteis. Depois disso, o canal já está pronto pra começar a vender — sua marca, sua URL, sua metodologia configurada.</p>
+        </details>
+        <details class="group p-6 lg:p-7 cursor-pointer">
+          <summary class="list-none flex items-center justify-between gap-6 cursor-pointer">
+            <span class="text-base lg:text-lg font-medium text-white">Preciso saber programar?</span>
+            <span class="shrink-0 w-9 h-9 rounded-full bg-orbit-bg border border-orbit-border flex items-center justify-center text-zinc-400 group-open:bg-orbit-yellow group-open:text-orbit-black group-open:border-orbit-yellow transition-all">
+              <span class="material-symbols-rounded text-base group-open:hidden">add</span>
+              <span class="material-symbols-rounded text-base hidden group-open:inline-block">remove</span>
+            </span>
+          </summary>
+          <p class="text-sm text-zinc-400 leading-relaxed mt-4 pr-12">Não. Toda configuração é via interface. Os agentes são configuráveis com sua metodologia sem escrever uma linha de código.</p>
+        </details>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Inputs</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 lg:p-10">
+        <div class="grid md:grid-cols-3 gap-6">
+          <label class="flex flex-col gap-2">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-zinc-400">E-mail</span>
+            <input type="email" placeholder="seu@email.com" class="bg-orbit-bg border border-orbit-border rounded-full px-5 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20 transition-all" />
+          </label>
+          <label class="flex flex-col gap-2">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-zinc-400">WhatsApp</span>
+            <input type="tel" placeholder="(11) 90000-0000" class="bg-orbit-bg border border-orbit-border rounded-full px-5 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20 transition-all" />
+          </label>
+          <label class="flex flex-col gap-2">
+            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-zinc-400">Empresa</span>
+            <input type="text" placeholder="Sua consultoria" class="bg-orbit-bg border border-orbit-border rounded-full px-5 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20 transition-all" />
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== PATTERNS · ORBITAL HUB ============== -->
+  <section id="patterns" class="relative border-t border-orbit-border overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[700px] glow-yellow pointer-events-none opacity-50"></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">04 · Patterns</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Orbital Hub</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Olívia ao centro coordena 12 agentes especializados. Padrão visual da seção <span class="text-zinc-300">Solução</span> (Copy A) e <span class="text-zinc-300">Como Funciona</span> (Copy B).</p>
+      </div>
+
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6 lg:p-12 relative">
+        <div class="text-center mb-8 lg:mb-12 relative z-10">
+          <span class="inline-block text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-orbit-yellow border border-orbit-yellow/30 bg-orbit-yellow/10 rounded-full px-4 py-1.5">dezenas de agentes especializados</span>
+          <h3 class="font-display uppercase font-medium tracking-tight text-3xl lg:text-5xl text-white mt-5 leading-tight">Seu time de IA coordenado pela <span class="text-orbit-yellow">Olívia</span></h3>
+          <p class="text-zinc-400 max-w-md mx-auto mt-4 text-sm lg:text-base">Cada agente domina uma área. A Olívia coordena todos, conecta os dados e entrega clareza.</p>
+        </div>
+
+        <div class="orbit-hub" id="orbitHub">
+          <!-- Center: Olívia -->
+          <div class="orbit-hub__center">
+            <div class="orbit-hub__glow"></div>
+            <div class="orbit-hub__photo">
+              <img src="https://orbitgestao.com.br/images/olivia.png" alt="Olívia" />
+            </div>
+            <div class="orbit-hub__name">Olívia</div>
+            <div class="orbit-hub__role">Coordenadora Geral</div>
+            <div class="orbit-hub__ring orbit-hub__ring--1"></div>
+            <div class="orbit-hub__ring orbit-hub__ring--2"></div>
+            <div class="orbit-hub__ring orbit-hub__ring--3"></div>
+          </div>
+
+          <svg class="orbit-hub__lines" id="orbitLines"></svg>
+
+          <!-- 12 nodes -->
+          <div class="orbit-hub__node" data-idx="0">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">explore</span></div>
+            <div class="orbit-hub__node-label">Estrategista</div>
+            <div class="orbit-hub__node-desc">SWOT, BSC e planejamento estratégico</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente Estrategista</div>
+              <p class="orbit-node-card__text">Analisa o cenário da empresa com SWOT, define OKRs e monta o planejamento estratégico. Cruza dados de todos os outros agentes para alinhar a direção.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>95%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:95%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">SWOT</span><span class="orbit-node-card__tag">BSC</span><span class="orbit-node-card__tag">OKRs</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="1">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">account_tree</span></div>
+            <div class="orbit-hub__node-label">Processos</div>
+            <div class="orbit-hub__node-desc">Mapeamento, playbooks e automação</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Processos</div>
+              <p class="orbit-node-card__text">Mapeia, documenta e gera instruções de trabalho automaticamente. Reduz retrabalho e garante qualidade em cada execução.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>90%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:90%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Playbooks</span><span class="orbit-node-card__tag">ISO</span><span class="orbit-node-card__tag">Automação</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="2">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">groups</span></div>
+            <div class="orbit-hub__node-label">Pessoas</div>
+            <div class="orbit-hub__node-desc">Cargos, desempenho e PDIs</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Pessoas</div>
+              <p class="orbit-node-card__text">Cria descrições de cargo, avaliações de desempenho e PDIs personalizados. Identifica gaps de competência e sugere trilhas de desenvolvimento.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>88%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:88%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">360°</span><span class="orbit-node-card__tag">PDI</span><span class="orbit-node-card__tag">Skills</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="3">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">school</span></div>
+            <div class="orbit-hub__node-label">Treinamento</div>
+            <div class="orbit-hub__node-desc">Microlearning e trilhas via WhatsApp</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Treinamento</div>
+              <p class="orbit-node-card__text">Treina equipes via WhatsApp com microlearning diário. Adapta conteúdo ao nível de cada colaborador e acompanha engajamento.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>92%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:92%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">WhatsApp</span><span class="orbit-node-card__tag">Micro</span><span class="orbit-node-card__tag">Quiz</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="4">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">bar_chart</span></div>
+            <div class="orbit-hub__node-label">Indicadores</div>
+            <div class="orbit-hub__node-desc">KPIs em tempo real e causa raiz</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Indicadores</div>
+              <p class="orbit-node-card__text">Monitora KPIs em tempo real, identifica desvios e sugere hipóteses de causa raiz com IA antes que o problema cresça.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>94%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:94%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">KPIs</span><span class="orbit-node-card__tag">Dashboard</span><span class="orbit-node-card__tag">Alertas</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="5">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">query_stats</span></div>
+            <div class="orbit-hub__node-label">Pesquisa</div>
+            <div class="orbit-hub__node-desc">Clima, formulários e insights</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Pesquisa</div>
+              <p class="orbit-node-card__text">Cria pesquisas de clima, satisfação e NPS. Analisa respostas e entrega insights acionáveis sobre a percepção das equipes.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>82%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:82%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">NPS</span><span class="orbit-node-card__tag">Clima</span><span class="orbit-node-card__tag">Insights</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="6">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">shield</span></div>
+            <div class="orbit-hub__node-label">Riscos</div>
+            <div class="orbit-hub__node-desc">Mitigação e prevenção contínua</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Riscos</div>
+              <p class="orbit-node-card__text">Identifica ameaças antes que virem crises. Monitora indicadores de risco e sugere planos de mitigação preventivos.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>91%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:91%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Prevenção</span><span class="orbit-node-card__tag">PDCA</span><span class="orbit-node-card__tag">Alertas</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="7">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">lightbulb</span></div>
+            <div class="orbit-hub__node-label">Oportunidades</div>
+            <div class="orbit-hub__node-desc">Mercado, parcerias e expansão</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Oportunidades</div>
+              <p class="orbit-node-card__text">Escaneia o mercado, identifica novas oportunidades e cruza com dados internos para sugerir ações de expansão e parcerias.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>87%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:87%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Mercado</span><span class="orbit-node-card__tag">Growth</span><span class="orbit-node-card__tag">Parcerias</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="8">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">warning</span></div>
+            <div class="orbit-hub__node-label">Problemas</div>
+            <div class="orbit-hub__node-desc">Não-conformidades e PDCA</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Problemas</div>
+              <p class="orbit-node-card__text">Registra não-conformidades, aplica PDCA automaticamente e acompanha a resolução até o fechamento com evidências.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>89%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:89%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">PDCA</span><span class="orbit-node-card__tag">5W2H</span><span class="orbit-node-card__tag">NC</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="9">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">description</span></div>
+            <div class="orbit-hub__node-label">Documentos</div>
+            <div class="orbit-hub__node-desc">Padronização e controle</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Documentos</div>
+              <p class="orbit-node-card__text">Padroniza, versiona e controla todos os documentos da empresa. Garante que todos trabalhem com a versão mais recente.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>80%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:80%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Versão</span><span class="orbit-node-card__tag">ISO</span><span class="orbit-node-card__tag">Padrão</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="10">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">handshake</span></div>
+            <div class="orbit-hub__node-label">Vendas</div>
+            <div class="orbit-hub__node-desc">CRM, funil e coaching comercial</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Vendas</div>
+              <p class="orbit-node-card__text">Gerencia o funil comercial, faz coaching da equipe de vendas e identifica oportunidades de upsell e cross-sell com IA.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>93%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:93%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">CRM</span><span class="orbit-node-card__tag">Funil</span><span class="orbit-node-card__tag">Coaching</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="11">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">videocam</span></div>
+            <div class="orbit-hub__node-label">Reuniões</div>
+            <div class="orbit-hub__node-desc">Transcrição e planos de ação</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Reuniões</div>
+              <p class="orbit-node-card__text">Transcreve reuniões, extrai decisões e gera planos de ação automaticamente. Nunca mais perca um follow-up.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>86%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:86%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Ata</span><span class="orbit-node-card__tag">Follow-up</span><span class="orbit-node-card__tag">IA</span></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-center text-xs font-geist-mono text-zinc-600 uppercase tracking-widest mt-6">passe o mouse em qualquer agente</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== LAYOUT ============== -->
+  <section id="layout" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">05 · Layout &amp; Spacing</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Padrões de layout</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Container max-width 1400px. Padding lateral 24px / 48px. Padding vertical de seção 80px → 112px. 3 padrões de layout cobrem 100% da LP.</p>
+      </div>
+
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6 lg:p-8 mb-10 overflow-hidden">
+        <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-3">Container · max-width 1400px</p>
+        <div class="relative h-12 rounded-full bg-orbit-bg border border-orbit-border flex items-center justify-center">
+          <div class="absolute inset-y-0 left-6 w-px bg-orbit-yellow/40"></div>
+          <div class="absolute inset-y-0 right-6 w-px bg-orbit-yellow/40"></div>
+          <span class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">px-6 lg:px-12</span>
+        </div>
+      </div>
+
+      <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-3">Grid 3 colunas (Problema · Oportunidade · Prova)</p>
+      <div class="grid md:grid-cols-3 gap-4 mb-10">
+        <div class="aspect-[4/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">col 1</div>
+        <div class="aspect-[4/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">col 2</div>
+        <div class="aspect-[4/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">col 3</div>
+      </div>
+
+      <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-3">Split 2 colunas (Hero · Solução · CTA Final)</p>
+      <div class="grid md:grid-cols-2 gap-6 mb-10">
+        <div class="aspect-[4/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">texto / título</div>
+        <div class="aspect-[4/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">vídeo / visual</div>
+      </div>
+
+      <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest mb-3">Bento (Prova)</p>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="md:col-span-2 aspect-[8/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">span-2 · white-label</div>
+        <div class="aspect-[4/3] md:aspect-auto rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">30 anos</div>
+        <div class="aspect-[4/3] md:aspect-auto rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">2.000+ empresas</div>
+        <div class="md:col-span-2 aspect-[8/3] rounded-2xl bg-orbit-surface-1 border border-dashed border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono text-zinc-600 uppercase tracking-widest">span-2 · 30+ canais ativos</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== MOTION ============== -->
+  <section id="motion" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">06 · Motion &amp; Interaction</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Motion gallery</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Movimento sóbrio, com propósito. Easings: <code>cubic-bezier(0.16, 1, 0.3, 1)</code> (entrada), <code>ease-out</code> (hover).</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 group cursor-pointer" onclick="this.querySelector('.demo').classList.remove('anim-rise'); void this.offsetWidth; this.querySelector('.demo').classList.add('anim-rise');">
+          <div class="h-32 flex items-end mb-4">
+            <div class="demo anim-rise w-full h-12 rounded-xl bg-orbit-yellow/15 border border-orbit-yellow/40 flex items-center justify-center text-[0.65rem] font-geist-mono uppercase tracking-widest text-orbit-yellow">elemento</div>
+          </div>
+          <p class="text-sm font-semibold text-white">Rise In</p>
+          <p class="text-xs text-zinc-500 mt-1">700ms · cubic-bezier(0.16,1,0.3,1)</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-2">.anim-rise · clique pra repetir</p>
+        </div>
+
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 group cursor-pointer" onclick="this.querySelector('.demo').classList.remove('anim-fade'); void this.offsetWidth; this.querySelector('.demo').classList.add('anim-fade');">
+          <div class="h-32 flex items-center mb-4">
+            <div class="demo anim-fade w-full h-12 rounded-xl bg-orbit-surface-2 border border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-400">elemento</div>
+          </div>
+          <p class="text-sm font-semibold text-white">Fade In</p>
+          <p class="text-xs text-zinc-500 mt-1">1200ms · ease-out</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-2">.anim-fade · clique pra repetir</p>
+        </div>
+
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8">
+          <div class="h-32 flex items-center justify-center mb-4">
+            <div class="anim-pulse-yellow w-12 h-12 rounded-full bg-orbit-yellow"></div>
+          </div>
+          <p class="text-sm font-semibold text-white">Pulse Yellow</p>
+          <p class="text-xs text-zinc-500 mt-1">2400ms · loop · ring de luz</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-2">.anim-pulse-yellow · CTA / play</p>
+        </div>
+
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8">
+          <div class="h-32 flex items-center mb-4">
+            <div class="w-full h-16 rounded-2xl bg-orbit-surface-2 border border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-400 transition-all hover:-translate-y-2 hover:shadow-2xl hover:border-orbit-yellow/40 cursor-pointer">passe o mouse</div>
+          </div>
+          <p class="text-sm font-semibold text-white">Hover Lift</p>
+          <p class="text-xs text-zinc-500 mt-1">300ms · -translate-y-2 · shadow-2xl</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-2">cards de Problema / Solução</p>
+        </div>
+
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8">
+          <div class="h-32 flex items-center mb-4">
+            <button class="group relative w-full h-12 rounded-full bg-orbit-yellow text-orbit-black font-bold text-[0.7rem] uppercase tracking-widest transition-all hover:scale-[1.02]">
+              <span class="absolute inset-0 rounded-full bg-orbit-yellow blur-xl opacity-0 group-hover:opacity-60 transition-opacity"></span>
+              <span class="relative">passe o mouse</span>
+            </button>
+          </div>
+          <p class="text-sm font-semibold text-white">Hover Glow</p>
+          <p class="text-xs text-zinc-500 mt-1">300ms · blur-xl no amarelo</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-2">CTAs primários</p>
+        </div>
+
+        <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8">
+          <div class="h-32 flex items-center mb-4">
+            <div class="anim-shimmer w-full h-12 rounded-xl bg-orbit-surface-2 border border-orbit-border flex items-center justify-center text-[0.65rem] font-geist-mono uppercase tracking-widest text-zinc-400">loading…</div>
+          </div>
+          <p class="text-sm font-semibold text-white">Shimmer</p>
+          <p class="text-xs text-zinc-500 mt-1">2500ms · loop</p>
+          <p class="text-[0.65rem] font-geist-mono text-zinc-600 mt-2">.anim-shimmer · skeleton / loading</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== ICONS ============== -->
+  <section id="icons" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-28">
+      <div class="flex flex-col gap-2 mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">07 · Icons</span>
+        <h2 class="text-3xl lg:text-4xl font-medium tracking-tight text-white">Material Symbols Rounded</h2>
+        <p class="text-zinc-500 max-w-2xl mt-2">Único icon set da LP. Variable font (FILL, weight, GRAD, opsz). Tamanho via <code>font-size</code>. Cor via <code>color</code>.</p>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Tamanhos</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 mb-10">
+        <div class="flex items-end gap-10 text-orbit-yellow">
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 14px;">play_arrow</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">14</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 18px;">play_arrow</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">18</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 22px;">play_arrow</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">22</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 28px;">play_arrow</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">28</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 36px;">play_arrow</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">36</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 48px;">play_arrow</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">48</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Pesos / Variações</h3>
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 mb-10">
+        <div class="flex flex-wrap items-end gap-12 text-orbit-yellow">
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded thin" style="font-size: 32px;">favorite</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">wght 300</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded" style="font-size: 32px;">favorite</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">wght 400</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded bold" style="font-size: 32px;">favorite</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">wght 600</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded" style="font-size: 32px;">favorite</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">FILL 0</span>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <span class="material-symbols-rounded filled" style="font-size: 32px;">favorite</span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-500">FILL 1</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-6">Set utilizado na LP</h3>
+      <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+        <!-- VSL / player -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded filled" style="font-size: 24px;">play_arrow</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">play_arrow</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">volume_up</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">volume_up</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">volume_off</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">volume_off</span>
+        </div>
+        <!-- CTA / movement -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">arrow_forward</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">arrow_forward</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">north_east</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">north_east</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">event</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">event</span>
+        </div>
+        <!-- Problema -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">check_circle</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">check_circle</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">trending_down</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">trending_down</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">restart_alt</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">restart_alt</span>
+        </div>
+        <!-- Solução / agentes -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">smart_toy</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">smart_toy</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">bolt</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">bolt</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">loop</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">loop</span>
+        </div>
+        <!-- Math -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">trending_up</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">trending_up</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">calculate</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">calculate</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">gps_fixed</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">gps_fixed</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">payments</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">payments</span>
+        </div>
+        <!-- Prova -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">group</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">group</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">workspace_premium</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">workspace_premium</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">apartment</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">apartment</span>
+        </div>
+        <!-- FAQ -->
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">add</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">add</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">remove</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">remove</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">close</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">close</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">palette</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">palette</span>
+        </div>
+        <div class="aspect-square rounded-2xl bg-orbit-surface-1 border border-orbit-border flex flex-col items-center justify-center gap-2 text-zinc-300 hover:border-orbit-yellow/50 hover:text-orbit-yellow transition-colors">
+          <span class="material-symbols-rounded" style="font-size: 24px;">expand_more</span>
+          <span class="text-[0.6rem] font-geist-mono text-zinc-500">expand_more</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== FOOTER ============== -->
+  <footer class="border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="../../logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" />
+        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-zinc-600">design system · v0.2 · INTERNAL</span>
+      </div>
+      <p class="text-xs text-zinc-600 font-geist-mono">canal.orbitgestao.com.br · ?s=&amp;v=a|b</p>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Orbital Hub layout + interactions ──────────────
+    (function() {
+      var hub = document.getElementById('orbitHub');
+      if (!hub) return;
+      var TOTAL = 12;
+      var nodes = hub.querySelectorAll('.orbit-hub__node');
+      var svg = document.getElementById('orbitLines');
+
+      function layout() {
+        var w = hub.offsetWidth;
+        var h = hub.offsetHeight;
+        var cx = w / 2;
+        var cy = h / 2;
+        var radius = Math.min(w, h) / 2 - 60;
+        if (w <= 480 && radius > 140) radius = 140;
+        else if (w <= 768 && radius > 180) radius = 180;
+        else if (radius > 360) radius = 360;
+        if (radius < 90) radius = 90;
+
+        svg.setAttribute('width', w);
+        svg.setAttribute('height', h);
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        svg.innerHTML = '';
+
+        var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = '<filter id="lineGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+        svg.appendChild(defs);
+
+        nodes.forEach(function(node, i) {
+          var angle = (i / TOTAL) * Math.PI * 2 - Math.PI / 2;
+          var nx = cx + Math.cos(angle) * radius;
+          var ny = cy + Math.sin(angle) * radius;
+
+          node.style.left = nx + 'px';
+          node.style.top = ny + 'px';
+
+          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+          line.setAttribute('x2', nx); line.setAttribute('y2', ny);
+          line.setAttribute('stroke', 'rgba(255,186,26,0.20)');
+          line.setAttribute('stroke-width', '1.5');
+          line.setAttribute('filter', 'url(#lineGlow)');
+          svg.appendChild(line);
+
+          var pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          pathEl.setAttribute('id', 'orbit-path-' + i);
+          pathEl.setAttribute('d', 'M' + nx + ',' + ny + ' L' + cx + ',' + cy);
+          pathEl.setAttribute('fill', 'none');
+          defs.appendChild(pathEl);
+
+          var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('r', '3.5');
+          circle.setAttribute('fill', '#FFCC4D');
+          circle.setAttribute('filter', 'url(#lineGlow)');
+
+          var anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+          anim.setAttribute('dur', '2.5s');
+          anim.setAttribute('repeatCount', 'indefinite');
+          anim.setAttribute('begin', (i * 0.2) + 's');
+          var mpath = document.createElementNS('http://www.w3.org/2000/svg', 'mpath');
+          mpath.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#orbit-path-' + i);
+          anim.appendChild(mpath);
+          circle.appendChild(anim);
+          svg.appendChild(circle);
+        });
+      }
+
+      var observer = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) {
+          hub.classList.add('orbit-visible');
+          layout();
+          observer.disconnect();
+        }
+      }, { threshold: 0.1 });
+      observer.observe(hub);
+
+      var resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+          if (hub.classList.contains('orbit-visible')) layout();
+        }, 150);
+      });
+
+      nodes.forEach(function(node) {
+        node.addEventListener('mouseenter', function() {
+          nodes.forEach(function(n) { n.classList.remove('orbit-node--active', 'orbit-node--dimmed'); });
+          node.classList.add('orbit-node--active');
+          nodes.forEach(function(n) { if (n !== node) n.classList.add('orbit-node--dimmed'); });
+        });
+        node.addEventListener('mouseleave', function() {
+          nodes.forEach(function(n) { n.classList.remove('orbit-node--active', 'orbit-node--dimmed'); });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,2730 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Orbit · O canal de consultoria com IA</title>
+  <meta name="description" content="Agentes de IA que trabalham com você durante o projeto e continuam executando no cliente depois. Recorrência real, sem entregar mais horas." />
+
+  <link rel="icon" type="image/png" href="brand/favicon.ico" />
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-W6H3729J');</script>
+  <!-- End Google Tag Manager -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'orbit-yellow': '#FFBA1A',
+            'orbit-yellow-hi': '#FFCC4D',
+            'orbit-yellow-lo': '#E5A30D',
+            'orbit-black': '#0C0C0C',
+            'orbit-bg': '#0A0A0A',
+            'orbit-surface-1': '#141414',
+            'orbit-surface-2': '#1F1F1F',
+            'orbit-border': '#2A2A2A',
+            'math-green': '#10B981',
+          },
+          fontFamily: {
+            geist: ['Geist', 'sans-serif'],
+            'geist-mono': ['Geist Mono', 'monospace'],
+            display: ['Oswald', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body { font-family: 'Geist', sans-serif; }
+
+    /* ── Material Symbols base ───────────────────────── */
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      user-select: none;
+      vertical-align: middle;
+      line-height: 1;
+      display: inline-block;
+    }
+    .material-symbols-rounded.filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-rounded.thin   { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    .material-symbols-rounded.bold   { font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24; }
+
+    /* ── Variant gating (A/B) ────────────────────────── */
+    body[data-v="a"] [data-v="b"] { display: none !important; }
+    body[data-v="b"] [data-v="a"] { display: none !important; }
+
+    /* ── Noise + glow ────────────────────────────────── */
+    .noise {
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+      background-size: 200px 200px;
+      opacity: 0.18;
+      mix-blend-mode: soft-light;
+    }
+    .glow-yellow {
+      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.22), rgba(255, 186, 26, 0) 70%);
+      filter: blur(60px);
+    }
+    .glow-yellow-soft {
+      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.12), rgba(255, 186, 26, 0) 70%);
+      filter: blur(80px);
+    }
+    .border-gradient { position: relative; }
+    .border-gradient::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02) 40%, rgba(255,186,26,0.18));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* ── Animations ──────────────────────────────────── */
+    @keyframes rise-in { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-in { 0% { opacity: 0; } 100% { opacity: 1; } }
+    @keyframes pulse-yellow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 186, 26, 0.45); }
+      50%      { box-shadow: 0 0 0 14px rgba(255, 186, 26, 0); }
+    }
+    .anim-rise { animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .anim-rise-2 { animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.12s; }
+    .anim-rise-3 { animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: 0.24s; }
+    .anim-fade { animation: fade-in 1.2s ease-out both; animation-delay: 0.4s; }
+    .anim-pulse-yellow { animation: pulse-yellow 2.4s ease-out infinite; }
+
+    ::selection { background: #FFBA1A; color: #0A0A0A; }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #0A0A0A; }
+    ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 6px; border: 2px solid #0A0A0A; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    code { font-family: 'Geist Mono', monospace; font-size: 0.85em; color: #FFBA1A; }
+
+    /* ════════════════════════════════════════════════════
+       ORBITAL HUB
+       ════════════════════════════════════════════════════ */
+    .orbit-hub { position: relative; width: 100%; max-width: 880px; margin: 0 auto; height: 720px; }
+    @media (min-width: 1024px) { .orbit-hub { height: 860px; } }
+
+    .orbit-hub__lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    .orbit-hub__center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; z-index: 3; }
+    .orbit-hub__glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,186,26,0.22) 0%, rgba(255,186,26,0.06) 50%, transparent 70%); animation: orbit-glow 3.5s ease-in-out infinite; pointer-events: none; }
+    @keyframes orbit-glow {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.15); }
+    }
+    .orbit-hub__photo { width: 140px; height: 140px; border-radius: 50%; border: 4px solid rgba(255,186,26,0.6); overflow: hidden; box-shadow: 0 0 40px rgba(255,186,26,0.35), 0 0 80px rgba(255,186,26,0.15); animation: orbit-photo-breathe 3.5s ease-in-out infinite; position: relative; z-index: 2; background: #1F1F1F; }
+    @keyframes orbit-photo-breathe {
+      0%, 100% { box-shadow: 0 0 40px rgba(255,186,26,0.35), 0 0 80px rgba(255,186,26,0.15); }
+      50%      { box-shadow: 0 0 50px rgba(255,186,26,0.55), 0 0 100px rgba(255,186,26,0.25); }
+    }
+    .orbit-hub__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .orbit-hub__name { color: #FFBA1A; font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 600; margin-top: 14px; letter-spacing: 1px; text-transform: uppercase; }
+    .orbit-hub__role { color: rgba(255,255,255,0.5); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; margin-top: 6px; }
+
+    .orbit-hub__ring { position: absolute; top: 50%; left: 50%; border-radius: 50%; border: 1.5px solid rgba(255,186,26,0.12); pointer-events: none; animation: orbit-ring 3.5s ease-in-out infinite; }
+    .orbit-hub__ring--1 { width: 180px; height: 180px; transform: translate(-50%, calc(-50% - 30px)); }
+    .orbit-hub__ring--2 { width: 220px; height: 220px; border-color: rgba(255,186,26,0.07); transform: translate(-50%, calc(-50% - 30px)); animation-delay: 0.5s; }
+    .orbit-hub__ring--3 { width: 264px; height: 264px; border-color: rgba(255,186,26,0.04); transform: translate(-50%, calc(-50% - 30px)); animation-delay: 1s; }
+    @keyframes orbit-ring { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+    .orbit-hub__node { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 2; cursor: pointer; transition: transform 0.3s ease; opacity: 0; scale: 0.5; }
+    .orbit-visible .orbit-hub__node { animation: orbit-node-in 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+    .orbit-visible .orbit-hub__node[data-idx="0"]  { animation-delay: 0.10s; }
+    .orbit-visible .orbit-hub__node[data-idx="1"]  { animation-delay: 0.15s; }
+    .orbit-visible .orbit-hub__node[data-idx="2"]  { animation-delay: 0.20s; }
+    .orbit-visible .orbit-hub__node[data-idx="3"]  { animation-delay: 0.25s; }
+    .orbit-visible .orbit-hub__node[data-idx="4"]  { animation-delay: 0.30s; }
+    .orbit-visible .orbit-hub__node[data-idx="5"]  { animation-delay: 0.35s; }
+    .orbit-visible .orbit-hub__node[data-idx="6"]  { animation-delay: 0.40s; }
+    .orbit-visible .orbit-hub__node[data-idx="7"]  { animation-delay: 0.45s; }
+    .orbit-visible .orbit-hub__node[data-idx="8"]  { animation-delay: 0.50s; }
+    .orbit-visible .orbit-hub__node[data-idx="9"]  { animation-delay: 0.55s; }
+    .orbit-visible .orbit-hub__node[data-idx="10"] { animation-delay: 0.60s; }
+    .orbit-visible .orbit-hub__node[data-idx="11"] { animation-delay: 0.65s; }
+    @keyframes orbit-node-in { to { opacity: 1; scale: 1; } }
+
+    .orbit-hub__node:hover { transform: translate(-50%, -50%) scale(1.12); }
+    .orbit-hub__node:hover .orbit-hub__node-icon { border-color: #FFBA1A; box-shadow: 0 0 24px rgba(255,186,26,0.5); background: linear-gradient(135deg, rgba(255,186,26,0.35), rgba(255,186,26,0.10)); }
+
+    .orbit-hub__node-icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, rgba(255,186,26,0.15), rgba(255,186,26,0.04)); border: 2px solid rgba(255,186,26,0.30); display: flex; align-items: center; justify-content: center; color: #FFBA1A; transition: all 0.3s ease; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    .orbit-hub__node-icon .material-symbols-rounded { font-size: 22px; }
+    .orbit-hub__node-label { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+    .orbit-hub__node-desc { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6); white-space: nowrap; text-shadow: 0 2px 10px rgba(0,0,0,0.8); margin-top: -2px; }
+
+    .orbit-hub__node.orbit-node--active { transform: translate(-50%, -50%) scale(1.18); z-index: 100; }
+    .orbit-hub__node.orbit-node--active .orbit-hub__node-icon { border-color: #FFBA1A; box-shadow: 0 0 30px rgba(255,186,26,0.6); background: linear-gradient(135deg, rgba(255,186,26,0.40), rgba(255,186,26,0.15)); }
+    .orbit-hub__node.orbit-node--dimmed { opacity: 0.30 !important; }
+
+    .orbit-node-card { position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) scale(0.92); width: 264px; background: rgba(20,20,20,0.96); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,186,26,0.25); border-radius: 16px; padding: 18px; opacity: 0; pointer-events: none; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 200; box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 40px rgba(255,186,26,0.08); text-align: left; }
+    .orbit-node--active .orbit-node-card { opacity: 1; pointer-events: auto; transform: translateX(-50%) scale(1); }
+    .orbit-node-card::before { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%) rotate(45deg); width: 10px; height: 10px; background: rgba(20,20,20,0.96); border-left: 1px solid rgba(255,186,26,0.25); border-top: 1px solid rgba(255,186,26,0.25); }
+
+    /* Smart flip: bottom-half agents open card upward */
+    .orbit-hub__node[data-idx="4"] .orbit-node-card,
+    .orbit-hub__node[data-idx="5"] .orbit-node-card,
+    .orbit-hub__node[data-idx="6"] .orbit-node-card,
+    .orbit-hub__node[data-idx="7"] .orbit-node-card,
+    .orbit-hub__node[data-idx="8"] .orbit-node-card { top: auto; bottom: calc(100% + 14px); }
+    .orbit-hub__node[data-idx="4"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="5"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="6"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="7"] .orbit-node-card::before,
+    .orbit-hub__node[data-idx="8"] .orbit-node-card::before { top: auto; bottom: -6px; border-left: none; border-top: none; border-right: 1px solid rgba(255,186,26,0.25); border-bottom: 1px solid rgba(255,186,26,0.25); }
+
+    .orbit-node-card__status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #10B981; background: rgba(16,185,129,0.10); border: 1px solid rgba(16,185,129,0.20); padding: 3px 10px; border-radius: 9999px; margin-bottom: 12px; }
+    .orbit-node-card__status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 8px #10B981; }
+    .orbit-node-card__title { color: #fff; font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .orbit-node-card__text { color: rgba(255,255,255,0.6); font-size: 0.8rem; line-height: 1.55; margin-bottom: 14px; }
+    .orbit-node-card__bar { margin-bottom: 12px; }
+    .orbit-node-card__bar-label { display: flex; justify-content: space-between; font-size: 0.65rem; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .orbit-node-card__bar-track { width: 100%; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .orbit-node-card__bar-fill { height: 100%; background: linear-gradient(90deg, #FFBA1A, #FFCC4D); border-radius: 2px; }
+    .orbit-node-card__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .orbit-node-card__tag { font-size: 0.65rem; font-family: 'Geist Mono', monospace; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; }
+
+    .orbit-hub__center { opacity: 0; scale: 0.3; }
+    .orbit-visible .orbit-hub__center { animation: orbit-center-in 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+    @keyframes orbit-center-in { to { opacity: 1; scale: 1; } }
+    .orbit-hub__lines { opacity: 0; }
+    .orbit-visible .orbit-hub__lines { animation: orbit-lines-in 0.8s ease 0.3s forwards; }
+    @keyframes orbit-lines-in { to { opacity: 1; } }
+
+    @media (max-width: 768px) {
+      .orbit-hub { height: 460px; max-width: 100%; }
+      .orbit-hub__glow { width: 130px; height: 130px; }
+      .orbit-hub__photo { width: 76px; height: 76px; border-width: 3px; }
+      .orbit-hub__name { font-size: 14px; margin-top: 8px; }
+      .orbit-hub__role { font-size: 9px; }
+      .orbit-hub__ring--1 { width: 110px; height: 110px; }
+      .orbit-hub__ring--2 { width: 140px; height: 140px; }
+      .orbit-hub__ring--3 { display: none; }
+      .orbit-hub__node-icon { width: 38px; height: 38px; }
+      .orbit-hub__node-icon .material-symbols-rounded { font-size: 16px; }
+      .orbit-hub__node-label { font-size: 10px; }
+      .orbit-hub__node-desc { display: none; }
+      .orbit-node-card { width: 220px; padding: 14px; }
+    }
+    @media (max-width: 480px) {
+      .orbit-hub { height: 380px; }
+      .orbit-hub__photo { width: 60px; height: 60px; }
+      .orbit-hub__glow { width: 100px; height: 100px; }
+      .orbit-hub__name { font-size: 12px; margin-top: 6px; }
+      .orbit-hub__role { font-size: 8px; }
+      .orbit-hub__ring--1 { width: 90px; height: 90px; }
+      .orbit-hub__ring--2 { display: none; }
+      .orbit-hub__node-icon { width: 32px; height: 32px; }
+      .orbit-hub__node-icon .material-symbols-rounded { font-size: 14px; }
+      .orbit-hub__node-label { font-size: 9px; }
+    }
+
+    /* ════════════════════════════════════════════════════
+       CYCLE (Problema A) — animated cycle visualization
+       ════════════════════════════════════════════════════ */
+    .cycle-row { display: flex; flex-direction: column; align-items: stretch; }
+    @media (min-width: 768px) {
+      .cycle-row { flex-direction: row; }
+    }
+
+    .cycle-card { flex: 1; }
+
+    .cycle-connector {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cycle-connector__line {
+      position: relative;
+      background: linear-gradient(to bottom, rgba(255,186,26,0.05), rgba(255,186,26,0.5), rgba(255,186,26,0.05));
+      width: 1.5px;
+      height: 100%;
+      border-radius: 999px;
+    }
+    .cycle-connector__dot {
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #FFBA1A;
+      box-shadow: 0 0 16px #FFBA1A, 0 0 32px rgba(255,186,26,0.4);
+      left: 50%;
+      transform: translateX(-50%);
+      animation: cycle-flow-v 2.4s linear infinite;
+    }
+
+    @media (max-width: 767px) {
+      .cycle-connector { height: 48px; width: 100%; }
+      .cycle-connector__line { width: 1.5px; height: 100%; }
+    }
+
+    @media (min-width: 768px) {
+      .cycle-connector { width: 48px; padding: 0 8px; }
+      .cycle-connector__line {
+        width: 100%;
+        height: 1.5px;
+        background: linear-gradient(to right, rgba(255,186,26,0.05), rgba(255,186,26,0.5), rgba(255,186,26,0.05));
+      }
+      .cycle-connector__dot {
+        top: 50%;
+        left: auto;
+        transform: translateY(-50%);
+        animation: cycle-flow-h 2.4s linear infinite;
+      }
+    }
+    @media (min-width: 1024px) {
+      .cycle-connector { width: 64px; padding: 0 12px; }
+    }
+
+    @keyframes cycle-flow-h {
+      0%   { left: -10px; opacity: 0; transform: translateY(-50%) scale(0.4); }
+      15%  { opacity: 1; transform: translateY(-50%) scale(1); }
+      85%  { opacity: 1; transform: translateY(-50%) scale(1); }
+      100% { left: calc(100% + 10px); opacity: 0; transform: translateY(-50%) scale(0.4); }
+    }
+    @keyframes cycle-flow-v {
+      0%   { top: -10px; opacity: 0; transform: translateX(-50%) scale(0.4); }
+      15%  { opacity: 1; transform: translateX(-50%) scale(1); }
+      85%  { opacity: 1; transform: translateX(-50%) scale(1); }
+      100% { top: calc(100% + 10px); opacity: 0; transform: translateX(-50%) scale(0.4); }
+    }
+
+    /* Per-card icon animations */
+    .cycle-card[data-step="1"] .cycle-icon  { animation: cycle-icon-pulse 2.4s ease-in-out infinite; }
+    .cycle-card[data-step="2"] .cycle-icon  { animation: cycle-icon-fall 2.4s ease-in-out infinite; }
+    .cycle-card[data-step="3"] .cycle-icon  { animation: cycle-icon-spin 4s linear infinite; }
+    @keyframes cycle-icon-pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.15); }
+    }
+    @keyframes cycle-icon-fall {
+      0%, 100% { transform: translateY(0); opacity: 1; }
+      50%      { transform: translateY(5px); opacity: 0.65; }
+    }
+    @keyframes cycle-icon-spin {
+      0%   { transform: rotate(0); }
+      100% { transform: rotate(-360deg); }
+    }
+
+    /* Card icon-wrap glow that pulses with the icon */
+    .cycle-icon-wrap {
+      position: relative;
+    }
+    .cycle-icon-wrap::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: inherit;
+      background: radial-gradient(closest-side, rgba(255,186,26,0.35), transparent 70%);
+      filter: blur(8px);
+      opacity: 0;
+      animation: cycle-glow 2.4s ease-in-out infinite;
+      z-index: -1;
+    }
+    .cycle-card[data-step="2"] .cycle-icon-wrap::after { animation-delay: 0.4s; }
+    .cycle-card[data-step="3"] .cycle-icon-wrap::after { animation-delay: 0.8s; }
+    @keyframes cycle-glow {
+      0%, 100% { opacity: 0.2; }
+      50%      { opacity: 0.7; }
+    }
+
+    /* Loop-back pill */
+    .cycle-loopback {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(90deg, rgba(255,186,26,0.04), rgba(255,186,26,0.10), rgba(255,186,26,0.04));
+      border: 1px dashed rgba(255, 186, 26, 0.35);
+      border-radius: 9999px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(255, 186, 26, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+    .cycle-loopback .cycle-spin {
+      animation: cycle-icon-spin 3s linear infinite;
+      display: inline-block;
+    }
+
+    /* Mega stat (70%) */
+    .stat-mega-num {
+      background: linear-gradient(135deg, #FFCC4D 0%, #FFBA1A 50%, #E5A30D 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 40px rgba(255, 186, 26, 0.4));
+      letter-spacing: -0.03em;
+    }
+
+    /* ════════════════════════════════════════════════════
+       TIMELINE (Solução A / Como Funciona B)
+       ════════════════════════════════════════════════════ */
+    .timeline-grid {
+      display: grid;
+      gap: 40px;
+      position: relative;
+    }
+    @media (min-width: 768px) {
+      .timeline-grid { grid-template-columns: 1fr 1fr 1fr; gap: 40px 32px; }
+    }
+
+    .timeline-track {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .timeline-track::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,186,26,0.4) 12%, rgba(255,186,26,0.4) 88%, transparent 100%);
+      border-radius: 999px;
+    }
+    .timeline-track__dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #FFBA1A;
+      box-shadow: 0 0 20px #FFBA1A, 0 0 40px rgba(255,186,26,0.5);
+    }
+    @media (min-width: 768px) {
+      .timeline-track { top: 36px; left: 5%; right: 5%; height: 2px; }
+      .timeline-track__dot {
+        top: 50%; transform: translate(-50%, -50%);
+        animation: timeline-flow-h 5s ease-in-out infinite;
+      }
+    }
+    @media (max-width: 767px) {
+      .timeline-track { top: 36px; bottom: 36px; left: 35px; width: 2px; }
+      .timeline-track::before {
+        background: linear-gradient(180deg, transparent 0%, rgba(255,186,26,0.4) 8%, rgba(255,186,26,0.4) 92%, transparent 100%);
+      }
+      .timeline-track__dot {
+        left: 50%; transform: translate(-50%, -50%);
+        animation: timeline-flow-v 5s ease-in-out infinite;
+      }
+    }
+    @keyframes timeline-flow-h {
+      0%   { left: 0%; opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+    @keyframes timeline-flow-v {
+      0%   { top: 0%; opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    .timeline-step { position: relative; z-index: 1; }
+    @media (max-width: 767px) {
+      .timeline-step { padding-left: 100px; min-height: 72px; }
+    }
+
+    .timeline-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFCC4D, #FFBA1A 50%, #E5A30D);
+      color: #0C0C0C;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(255,186,26,0.4), 0 0 60px rgba(255,186,26,0.15), inset 0 -2px 8px rgba(0,0,0,0.2);
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+    @media (max-width: 767px) {
+      .timeline-circle { position: absolute; left: 0; top: 0; }
+    }
+
+    .timeline-circle::before,
+    .timeline-circle::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(255,186,26,0.6);
+      pointer-events: none;
+    }
+    .timeline-step[data-step="1"] .timeline-circle::before { animation: timeline-ring 3.6s ease-out infinite; animation-delay: 0s; }
+    .timeline-step[data-step="1"] .timeline-circle::after  { animation: timeline-ring 3.6s ease-out infinite; animation-delay: 1.8s; }
+    .timeline-step[data-step="2"] .timeline-circle::before { animation: timeline-ring 3.6s ease-out infinite; animation-delay: 1.2s; }
+    .timeline-step[data-step="2"] .timeline-circle::after  { animation: timeline-ring 3.6s ease-out infinite; animation-delay: 3.0s; }
+    .timeline-step[data-step="3"] .timeline-circle::before { animation: timeline-ring 3.6s ease-out infinite; animation-delay: 2.4s; }
+    .timeline-step[data-step="3"] .timeline-circle::after  { animation: timeline-ring 3.6s ease-out infinite; animation-delay: 4.2s; }
+
+    @keyframes timeline-ring {
+      0%   { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.85); }
+    }
+
+    .timeline-step__head {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 767px) {
+      .timeline-step__head {
+        display: block;
+        margin-bottom: 14px;
+      }
+    }
+
+    .timeline-meta { display: flex; flex-direction: column; gap: 2px; }
+    .timeline-meta__phase {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: #FFBA1A;
+    }
+    .timeline-meta__num {
+      font-size: 0.6rem;
+      font-family: 'Geist Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .timeline-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 9999px;
+      background: rgba(255,186,26,0.08);
+      border: 1px solid rgba(255,186,26,0.25);
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #FFBA1A;
+    }
+
+    /* ════════════════════════════════════════════════════
+       PROVA / BENTO
+       ════════════════════════════════════════════════════ */
+    .bento-card {
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+    }
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,186,26,0) 0%, rgba(255,186,26,0) 50%, rgba(255,186,26,0.5) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+    }
+    .bento-card:hover::before {
+      opacity: 1;
+    }
+
+    /* Hero white-label card grid pattern */
+    .bento-hero__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,186,26,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,186,26,0.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 70% 60% at 80% 20%, #000 0%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 60% at 80% 20%, #000 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Floating mini-cards inside hero white-label card */
+    .bento-chip {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: rgba(20, 20, 20, 0.95);
+      border: 1px solid rgba(255,186,26,0.25);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #FAFAFA;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      animation: bento-float 6s ease-in-out infinite;
+    }
+    .bento-chip .material-symbols-rounded { color: #FFBA1A; font-size: 16px; }
+    @keyframes bento-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    /* Animated radial accent for stat cards */
+    .bento-stat__sweep {
+      position: absolute;
+      inset: -50%;
+      background: conic-gradient(from 180deg at 50% 50%, transparent 0deg, rgba(255,186,26,0.15) 60deg, transparent 120deg);
+      animation: bento-sweep 8s linear infinite;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .bento-card:hover .bento-stat__sweep { opacity: 1; }
+    @keyframes bento-sweep {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Marquee for active channels */
+    .bento-marquee {
+      display: flex;
+      gap: 14px;
+      animation: bento-marquee 22s linear infinite;
+      width: max-content;
+    }
+    @keyframes bento-marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .bento-marquee__item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px 6px 6px;
+      border-radius: 9999px;
+      background: rgba(20, 20, 20, 0.6);
+      border: 1px solid rgba(42, 42, 42, 1);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .bento-marquee__avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFCC4D, #E5A30D);
+      color: #0C0C0C;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .bento-marquee__name {
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.7rem;
+      color: #A3A3A3;
+      letter-spacing: 0.05em;
+    }
+    .bento-marquee__pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #FFBA1A;
+      box-shadow: 0 0 8px #FFBA1A;
+      animation: bento-pulse 2s ease-in-out infinite;
+    }
+    @keyframes bento-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.4; transform: scale(0.7); }
+    }
+    .bento-marquee-mask {
+      position: relative;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    }
+
+    /* Stat number reveal animation */
+    .bento-stat-num {
+      background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 50%, rgba(255,255,255,0.6) 100%);
+      -webkit-background-clip: text;
+              background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .bento-stat-num--yellow {
+      background: linear-gradient(180deg, #FFCC4D 0%, #FFBA1A 50%, #E5A30D 100%);
+      -webkit-background-clip: text;
+              background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ════════════════════════════════════════════════════
+       OPORTUNIDADE (Copy B)
+       ════════════════════════════════════════════════════ */
+    .opp-card {
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+    }
+    .opp-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,186,26,0) 0%, rgba(255,186,26,0) 50%, rgba(255,186,26,0.55) 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .opp-card:hover { transform: translateY(-6px); }
+    .opp-card:hover::before { opacity: 1; }
+
+    .opp-card.is-revealed { animation: opp-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+    .opp-card.is-revealed:nth-child(2) { animation-delay: 0.12s; }
+    .opp-card.is-revealed:nth-child(3) { animation-delay: 0.24s; }
+    @keyframes opp-rise {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SVG progress ring */
+    .opp-ring {
+      width: 96px;
+      height: 96px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .opp-ring svg { transform: rotate(-90deg); }
+    .opp-ring__track { fill: none; stroke: rgba(255,186,26,0.1); stroke-width: 5; }
+    .opp-ring__fill {
+      fill: none;
+      stroke: url(#oppGradient);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 264;
+      stroke-dashoffset: 264;
+      filter: drop-shadow(0 0 6px rgba(255,186,26,0.5));
+      transition: stroke-dashoffset 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+    }
+    .opp-card.is-revealed .opp-ring__fill { stroke-dashoffset: var(--ring-offset, 264); }
+    .opp-ring__center {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+    }
+    .opp-ring__center .material-symbols-rounded {
+      color: #FFBA1A;
+      font-size: 32px;
+      filter: drop-shadow(0 0 10px rgba(255,186,26,0.5));
+    }
+
+    /* 100-dot grid for stat 2 */
+    .opp-dots {
+      display: grid;
+      grid-template-columns: repeat(20, 1fr);
+      gap: 4px;
+      max-width: 240px;
+    }
+    .opp-dots span {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255,186,26,0.1);
+      transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    .opp-card.is-revealed .opp-dots span.active {
+      background: #FFBA1A;
+      box-shadow: 0 0 6px #FFBA1A;
+      animation: opp-dot-pop 0.5s ease-out backwards;
+    }
+    .opp-card.is-revealed .opp-dots span.pilot {
+      background: rgba(255,186,26,0.35);
+    }
+    @keyframes opp-dot-pop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+
+    /* Card 3 — sparks + bolt */
+    .opp-bolt-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      display: grid;
+      place-items: center;
+    }
+    .opp-bolt-wrap::before,
+    .opp-bolt-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(255,186,26,0.5);
+      animation: opp-bolt-ring 2.4s ease-out infinite;
+    }
+    .opp-bolt-wrap::after { animation-delay: 1.2s; }
+    @keyframes opp-bolt-ring {
+      0%   { opacity: 0.7; transform: scale(0.7); }
+      100% { opacity: 0; transform: scale(1.6); }
+    }
+    .opp-bolt-icon {
+      position: relative;
+      z-index: 2;
+      color: #FFBA1A;
+      filter: drop-shadow(0 0 16px rgba(255,186,26,0.8));
+      animation: opp-bolt-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes opp-bolt-pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.12); }
+    }
+
+    .opp-sparks {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: inherit;
+    }
+    .opp-spark {
+      position: absolute;
+      bottom: 0;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #FFBA1A;
+      box-shadow: 0 0 6px #FFBA1A, 0 0 12px rgba(255,186,26,0.4);
+      animation: opp-spark 5s ease-out infinite;
+    }
+    @keyframes opp-spark {
+      0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { opacity: 0; transform: translateY(-260px) scale(1.4); }
+    }
+
+    .opp-arrow-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 9999px;
+      background: rgba(255,186,26,0.12);
+      border: 1px solid rgba(255,186,26,0.4);
+      font-family: 'Geist Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #FFBA1A;
+    }
+    .opp-arrow-pill .material-symbols-rounded {
+      font-size: 16px;
+      animation: opp-arrow 1.6s ease-in-out infinite;
+    }
+    @keyframes opp-arrow {
+      0%, 100% { transform: translateX(0); }
+      50%      { transform: translateX(6px); }
+    }
+
+    .opp-mini-bar {
+      position: relative;
+      height: 6px;
+      border-radius: 9999px;
+      background: rgba(255,186,26,0.08);
+      overflow: hidden;
+    }
+    .opp-mini-bar__fill {
+      position: absolute;
+      inset: 0;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #E5A30D, #FFBA1A, #FFCC4D);
+      transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+    }
+    .opp-card.is-revealed .opp-mini-bar__fill { width: var(--bar-w, 100%); }
+
+    /* ════════════════════════════════════════════════════
+       CTA MODAL — Chat conversacional com a Olívia
+       ════════════════════════════════════════════════════ */
+    #cta-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    @media (min-width: 768px) {
+      #cta-modal { align-items: center; padding: 32px; }
+    }
+    #cta-modal.is-open { display: flex; opacity: 1; }
+
+    .modal-card {
+      width: 100%;
+      max-width: 560px;
+      height: 88vh;
+      max-height: 720px;
+      background: linear-gradient(180deg, #141414 0%, #0F0F0F 100%);
+      border: 1px solid rgba(42, 42, 42, 1);
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,186,26,0.08);
+      overflow: hidden;
+      transform: translateY(40px);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 768px) {
+      .modal-card { border-radius: 24px; height: min(88vh, 720px); }
+    }
+    #cta-modal.is-open .modal-card { transform: translateY(0); }
+
+    /* Header com avatar da Olívia */
+    .chat-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(42, 42, 42, 1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(20,20,20,0.6);
+      flex-shrink: 0;
+    }
+    .chat-header__avatar {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FFCC4D, #E5A30D);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .chat-header__avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      border-radius: 50%;
+    }
+    .chat-header__avatar::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #10B981;
+      border: 2px solid #141414;
+    }
+    .chat-header__info { flex: 1; min-width: 0; }
+    .chat-header__name {
+      font-weight: 600;
+      color: #FAFAFA;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+    }
+    .chat-header__status {
+      font-size: 0.7rem;
+      color: #10B981;
+      font-family: 'Geist Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+    .chat-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 9999px;
+      background: rgba(20,20,20,1);
+      border: 1px solid rgba(42,42,42,1);
+      color: #A3A3A3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .chat-close:hover {
+      background: #FFBA1A;
+      color: #0C0C0C;
+      border-color: #FFBA1A;
+    }
+
+    /* Progress bar */
+    .chat-progress {
+      height: 2px;
+      background: rgba(42,42,42,1);
+      flex-shrink: 0;
+    }
+    .chat-progress__fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #E5A30D, #FFBA1A, #FFCC4D);
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Thread (área das mensagens) */
+    .chat-thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+    .chat-thread::-webkit-scrollbar { width: 6px; }
+    .chat-thread::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 3px; }
+
+    .chat-msg {
+      max-width: 82%;
+      padding: 11px 14px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      animation: msg-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+    @keyframes msg-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .chat-msg--bot {
+      align-self: flex-start;
+      background: rgba(20,20,20,1);
+      border: 1px solid rgba(42,42,42,1);
+      color: #FAFAFA;
+      border-bottom-left-radius: 6px;
+    }
+    .chat-msg--user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #FFCC4D, #FFBA1A);
+      color: #0C0C0C;
+      font-weight: 500;
+      border-bottom-right-radius: 6px;
+    }
+
+    /* Typing indicator */
+    .chat-typing {
+      align-self: flex-start;
+      padding: 12px 16px;
+      background: rgba(20,20,20,1);
+      border: 1px solid rgba(42,42,42,1);
+      border-radius: 18px;
+      border-bottom-left-radius: 6px;
+      display: inline-flex;
+      gap: 4px;
+      animation: msg-in 0.3s ease backwards;
+    }
+    .chat-typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6B6B6B;
+      animation: typing-bounce 1.2s ease-in-out infinite;
+    }
+    .chat-typing span:nth-child(2) { animation-delay: 0.15s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes typing-bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30%           { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* Footer com input ou chips */
+    .chat-footer {
+      border-top: 1px solid rgba(42, 42, 42, 1);
+      padding: 14px 16px 16px;
+      flex-shrink: 0;
+      background: rgba(15,15,15,0.95);
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 12px 14px;
+      background: #0A0A0A;
+      border: 1px solid #2A2A2A;
+      border-radius: 9999px;
+      color: #FAFAFA;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      min-width: 0;
+    }
+    .chat-input::placeholder { color: #6B6B6B; }
+    .chat-input:focus {
+      outline: none;
+      border-color: #FFBA1A;
+      background: #0F0F0F;
+      box-shadow: 0 0 0 3px rgba(255,186,26,0.12);
+    }
+    .chat-send {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #FFBA1A;
+      color: #0C0C0C;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .chat-send:hover { background: #FFCC4D; transform: scale(1.05); }
+    .chat-send:disabled { background: #2A2A2A; color: #6B6B6B; cursor: not-allowed; transform: none; }
+
+    .chat-chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    @media (max-width: 480px) {
+      .chat-chips { grid-template-columns: 1fr; }
+    }
+    .chat-chip {
+      padding: 12px 14px;
+      background: #0A0A0A;
+      border: 1px solid #2A2A2A;
+      border-radius: 12px;
+      color: #FAFAFA;
+      font-size: 0.875rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      animation: msg-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+    .chat-chip:nth-child(1) { animation-delay: 0.05s; }
+    .chat-chip:nth-child(2) { animation-delay: 0.1s; }
+    .chat-chip:nth-child(3) { animation-delay: 0.15s; }
+    .chat-chip:nth-child(4) { animation-delay: 0.2s; }
+    .chat-chip:nth-child(5) { animation-delay: 0.25s; }
+    .chat-chip:hover {
+      border-color: rgba(255,186,26,0.5);
+      background: rgba(255,186,26,0.08);
+      color: #FAFAFA;
+    }
+    .chat-chip:active { transform: scale(0.98); }
+
+    .chat-success {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px 28px;
+    }
+    .chat-success__icon {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: rgba(255,186,26,0.12);
+      border: 1.5px solid rgba(255,186,26,0.4);
+      display: grid;
+      place-items: center;
+      margin-bottom: 22px;
+      animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .chat-success__icon .material-symbols-rounded {
+      color: #FFBA1A;
+      font-size: 38px;
+    }
+    @keyframes success-pop {
+      from { transform: scale(0) rotate(-30deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    body.modal-open { overflow: hidden; }
+
+    /* ── Mobile sticky CTA ───────────────────────────── */
+    #mobile-cta {
+      transform: translateY(120%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #mobile-cta.visible {
+      transform: translateY(0);
+    }
+
+    /* ── Hide unmute overlay after click ─────────────── */
+    #unmute-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="bg-orbit-bg text-zinc-100 font-geist min-h-screen antialiased" data-v="a">
+
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W6H3729J"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <!-- ============================================
+       HEADER
+       ============================================ -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-orbit-bg/80 border-b border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-5 lg:px-12 h-16 flex items-center justify-between gap-4">
+      <a href="#" class="flex items-center shrink-0">
+        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 lg:h-7 w-auto select-none" />
+      </a>
+      <a href="#agendar" class="inline-flex items-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-4 lg:px-5 py-2 lg:py-2.5 rounded-full text-[0.65rem] font-bold uppercase tracking-widest transition-all hover:scale-[1.03]">
+        <span class="hidden sm:inline" data-v="a">Quebrar o ciclo</span>
+        <span class="hidden sm:inline" data-v="b">Entender o modelo</span>
+        <span class="sm:hidden">Agendar</span>
+        <span class="material-symbols-rounded text-base">arrow_forward</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ============================================
+       HERO
+       ============================================ -->
+  <section id="hero" class="relative overflow-hidden">
+    <div class="absolute top-[-25%] left-1/2 -translate-x-1/2 w-[1200px] h-[800px] glow-yellow pointer-events-none"></div>
+    <div class="absolute inset-0 noise pointer-events-none"></div>
+
+    <div class="relative max-w-[1100px] mx-auto px-5 lg:px-12 pt-14 sm:pt-20 lg:pt-24 pb-16 lg:pb-24 text-center">
+
+      <p class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-orbit-yellow mb-8 anim-rise inline-flex items-center">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-orbit-yellow mr-2 anim-pulse-yellow"></span>
+        Orbit · Canal Parceiro
+      </p>
+
+      <h1 data-v="a" class="text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5rem] font-semibold tracking-tight leading-[1.05] text-white anim-rise max-w-4xl mx-auto text-balance">
+        Você entrega. O cliente <span class="text-orbit-yellow">não mantém</span>. O resultado se perde. <span class="text-orbit-yellow">Até agora.</span>
+      </h1>
+      <h1 data-v="b" class="text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[4.5rem] xl:text-[5rem] font-semibold tracking-tight leading-[1.05] text-white anim-rise max-w-4xl mx-auto text-balance">
+        <span class="text-orbit-yellow">R$600</span> de custo. <span class="text-orbit-yellow">R$3.000</span> de receita. <span class="text-orbit-yellow">80%</span> de margem. <span class="block mt-1 text-zinc-400 text-3xl sm:text-4xl lg:text-5xl">Todo mês.</span>
+      </h1>
+
+      <p data-v="a" class="mt-6 lg:mt-8 max-w-2xl mx-auto text-base sm:text-lg lg:text-xl text-zinc-400 leading-relaxed anim-rise-2">
+        Agentes de IA que trabalham com você durante o projeto e continuam executando no cliente depois. <span class="text-zinc-200">O ciclo se quebra. A recorrência começa.</span>
+      </p>
+      <p data-v="b" class="mt-6 lg:mt-8 max-w-2xl mx-auto text-base sm:text-lg lg:text-xl text-zinc-400 leading-relaxed anim-rise-2">
+        Agentes de IA que operam a gestão no cliente com a sua marca. <span class="text-zinc-200">Você vende consultoria recorrente sem entregar mais horas.</span>
+      </p>
+
+      <!-- VSL embed -->
+      <div class="mt-12 lg:mt-16 anim-fade">
+        <div class="relative aspect-video w-full max-w-[1080px] mx-auto rounded-2xl lg:rounded-[2rem] overflow-hidden border border-orbit-border bg-orbit-surface-1 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.7)] border-gradient">
+          <iframe id="vsl-frame"
+                  title="VSL Orbit"
+                  class="absolute inset-0 w-full h-full"
+                  frameborder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowfullscreen></iframe>
+
+          <button id="unmute-overlay" aria-label="Clique para ouvir" class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity hover:bg-black/50">
+            <div class="text-center px-4">
+              <div class="relative inline-flex">
+                <div class="absolute inset-0 bg-orbit-yellow rounded-full blur-2xl opacity-60"></div>
+                <div class="relative w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-full bg-orbit-yellow text-orbit-black flex items-center justify-center anim-pulse-yellow shadow-2xl">
+                  <span class="material-symbols-rounded filled" style="font-size: 32px;">volume_up</span>
+                </div>
+              </div>
+              <p class="mt-4 text-white font-bold uppercase tracking-widest text-xs sm:text-sm">Clique para ouvir</p>
+            </div>
+          </button>
+
+          <div class="absolute top-3 left-3 sm:top-5 sm:left-5 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[0.6rem] sm:text-[0.65rem] font-medium uppercase tracking-widest text-zinc-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-orbit-yellow animate-pulse"></span>
+            Ao vivo
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero CTA -->
+      <div class="mt-10 lg:mt-12 flex flex-col items-center text-center anim-rise-3">
+        <a href="#agendar" class="inline-flex items-center gap-3 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-8 lg:px-10 py-4 lg:py-5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_18px_40px_-12px_rgba(255,186,26,0.55)] anim-pulse-yellow">
+          <span data-v="a">Quero quebrar esse ciclo</span>
+          <span data-v="b">Quero entender o modelo</span>
+          <span class="material-symbols-rounded">arrow_forward</span>
+        </a>
+        <p class="mt-4 text-[0.65rem] sm:text-xs text-zinc-500 font-geist-mono uppercase tracking-widest">15min · sem compromisso</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================
+       PROBLEMA (A) — animated cycle
+       ============================================ -->
+  <section data-v="a" id="problema" class="relative border-t border-orbit-border overflow-hidden">
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 w-[900px] h-[600px] glow-yellow pointer-events-none opacity-30"></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-5 lg:px-12 py-20 lg:py-28">
+      <div class="text-center mb-12 lg:mb-20">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">O Problema</span>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1]">
+          O ciclo que <span class="text-orbit-yellow">todo consultor</span> conhece
+        </h2>
+        <p class="mt-5 text-zinc-500 text-sm lg:text-base font-geist-mono uppercase tracking-widest">entrega · não mantém · caça novo · <span class="text-orbit-yellow">se repete</span></p>
+      </div>
+
+      <!-- Animated cycle row -->
+      <div class="cycle-row mb-8 lg:mb-12">
+
+        <!-- Card 1 -->
+        <div class="cycle-card group" data-step="1">
+          <div class="rounded-3xl bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border p-7 lg:p-9 transition-all hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden h-full">
+            <div class="absolute -top-12 -right-12 w-40 h-40 glow-yellow-soft pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative">
+              <div class="flex items-start justify-between mb-6">
+                <div class="cycle-icon-wrap w-14 h-14 rounded-2xl bg-orbit-bg border border-orbit-yellow/30 flex items-center justify-center text-orbit-yellow">
+                  <span class="cycle-icon material-symbols-rounded filled" style="font-size: 28px;">check_circle</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[0.6rem] font-geist-mono text-orbit-yellow/60 uppercase tracking-widest">Etapa</span>
+                  <p class="font-display text-3xl text-orbit-yellow leading-none mt-1">01</p>
+                </div>
+              </div>
+              <h3 class="text-xl lg:text-2xl font-semibold text-white mb-3 tracking-tight">Você entrega o projeto</h3>
+              <p class="text-sm lg:text-base text-zinc-400 leading-relaxed">Diagnóstico, planejamento, dashboard. Tudo certo. <span class="text-zinc-200">O cliente sai feliz.</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 1 → 2 -->
+        <div class="cycle-connector" aria-hidden="true">
+          <div class="cycle-connector__line"></div>
+          <span class="cycle-connector__dot"></span>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="cycle-card group" data-step="2">
+          <div class="rounded-3xl bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border p-7 lg:p-9 transition-all hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden h-full">
+            <div class="absolute -top-12 -right-12 w-40 h-40 glow-yellow-soft pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative">
+              <div class="flex items-start justify-between mb-6">
+                <div class="cycle-icon-wrap w-14 h-14 rounded-2xl bg-orbit-bg border border-orbit-yellow/30 flex items-center justify-center text-orbit-yellow">
+                  <span class="cycle-icon material-symbols-rounded" style="font-size: 28px;">trending_down</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[0.6rem] font-geist-mono text-orbit-yellow/60 uppercase tracking-widest">Etapa</span>
+                  <p class="font-display text-3xl text-orbit-yellow leading-none mt-1">02</p>
+                </div>
+              </div>
+              <h3 class="text-xl lg:text-2xl font-semibold text-white mb-3 tracking-tight">O cliente não mantém</h3>
+              <p class="text-sm lg:text-base text-zinc-400 leading-relaxed">3 meses depois ninguém atualiza. Os indicadores caem. <span class="text-zinc-200">O resultado se perde.</span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 2 → 3 -->
+        <div class="cycle-connector" aria-hidden="true">
+          <div class="cycle-connector__line"></div>
+          <span class="cycle-connector__dot" style="animation-delay: 0.8s;"></span>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="cycle-card group" data-step="3">
+          <div class="rounded-3xl bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border p-7 lg:p-9 transition-all hover:-translate-y-1 hover:shadow-2xl relative overflow-hidden h-full">
+            <div class="absolute -top-12 -right-12 w-40 h-40 glow-yellow-soft pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative">
+              <div class="flex items-start justify-between mb-6">
+                <div class="cycle-icon-wrap w-14 h-14 rounded-2xl bg-orbit-bg border border-orbit-yellow/30 flex items-center justify-center text-orbit-yellow">
+                  <span class="cycle-icon material-symbols-rounded" style="font-size: 28px;">restart_alt</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[0.6rem] font-geist-mono text-orbit-yellow/60 uppercase tracking-widest">Etapa</span>
+                  <p class="font-display text-3xl text-orbit-yellow leading-none mt-1">03</p>
+                </div>
+              </div>
+              <h3 class="text-xl lg:text-2xl font-semibold text-white mb-3 tracking-tight">Você caça novo cliente</h3>
+              <p class="text-sm lg:text-base text-zinc-400 leading-relaxed">Volta pra estaca zero. O ciclo recomeça. <span class="text-zinc-200">A recorrência nunca chega.</span></p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Loop-back indicator -->
+      <div class="flex justify-center mb-12 lg:mb-16">
+        <div class="cycle-loopback">
+          <span class="material-symbols-rounded cycle-spin" style="font-size: 16px;">refresh</span>
+          E o ciclo recomeça. Mês após mês.
+        </div>
+      </div>
+
+      <!-- 70% mega stat with count-up -->
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-10 lg:p-16 text-center max-w-3xl mx-auto relative overflow-hidden">
+        <div class="absolute -top-32 -right-32 w-96 h-96 glow-yellow pointer-events-none opacity-60"></div>
+        <div class="absolute -bottom-32 -left-32 w-96 h-96 glow-yellow pointer-events-none opacity-30"></div>
+        <div class="relative">
+          <p class="stat-mega-num font-display text-7xl sm:text-8xl lg:text-[10rem] xl:text-[12rem] tracking-tight leading-none" data-counter="70" data-suffix="%">0%</p>
+          <p class="mt-6 lg:mt-8 text-base sm:text-lg lg:text-xl text-zinc-300 max-w-md mx-auto leading-relaxed">dos projetos de consultoria <span class="text-white font-medium">não sustentam resultados em 12 meses</span></p>
+          <p class="mt-4 text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">— McKinsey</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       OPORTUNIDADE (B)
+       ============================================ -->
+  <section data-v="b" id="oportunidade" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-5 lg:px-12 py-20 lg:py-28">
+      <div class="text-center mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">A Oportunidade</span>
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1]">
+          O mercado está se movendo.<br /><span class="text-orbit-yellow">Você está posicionado?</span>
+        </h2>
+      </div>
+
+      <!-- SVG gradient defs (shared by progress rings) -->
+      <svg width="0" height="0" class="absolute pointer-events-none">
+        <defs>
+          <linearGradient id="oppGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFCC4D"/>
+            <stop offset="50%" stop-color="#FFBA1A"/>
+            <stop offset="100%" stop-color="#E5A30D"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="grid md:grid-cols-3 gap-4 lg:gap-6" id="oppGrid">
+
+        <!-- Card 1 — 94% / Anthropic -->
+        <div class="opp-card rounded-3xl bg-orbit-surface-1 border border-orbit-border p-7 lg:p-9 overflow-hidden">
+          <div class="flex items-start justify-between gap-4 mb-7">
+            <div class="opp-ring" style="--ring-offset: calc(264 - (264 * 0.94));">
+              <svg viewBox="0 0 96 96" width="96" height="96">
+                <circle class="opp-ring__track" cx="48" cy="48" r="42"/>
+                <circle class="opp-ring__fill" cx="48" cy="48" r="42"/>
+              </svg>
+              <div class="opp-ring__center">
+                <span class="material-symbols-rounded">psychology</span>
+              </div>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">01 / 03</span>
+          </div>
+          <p class="font-display text-6xl sm:text-7xl text-orbit-yellow tracking-tight leading-none">
+            <span data-counter="94" data-suffix="%">0</span>
+          </p>
+          <p class="mt-5 text-base lg:text-lg text-zinc-200 leading-snug">das funções administrativas podem ser cobertas por IA.</p>
+          <div class="mt-5 flex items-center gap-3">
+            <div class="opp-mini-bar flex-1" style="--bar-w: 33%;"><div class="opp-mini-bar__fill"></div></div>
+            <span class="text-xs font-geist-mono text-orbit-yellow font-bold">só <span data-counter="33" data-suffix="%">0</span></span>
+          </div>
+          <p class="mt-2 text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">já implementaram</p>
+          <div class="mt-6 pt-5 border-t border-orbit-border/60">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">— Anthropic</p>
+          </div>
+        </div>
+
+        <!-- Card 2 — 11% / Deloitte -->
+        <div class="opp-card rounded-3xl bg-orbit-surface-1 border border-orbit-border p-7 lg:p-9 overflow-hidden">
+          <div class="flex items-start justify-between gap-4 mb-7">
+            <div class="opp-ring" style="--ring-offset: calc(264 - (264 * 0.11));">
+              <svg viewBox="0 0 96 96" width="96" height="96">
+                <circle class="opp-ring__track" cx="48" cy="48" r="42"/>
+                <circle class="opp-ring__fill" cx="48" cy="48" r="42"/>
+              </svg>
+              <div class="opp-ring__center">
+                <span class="material-symbols-rounded">rocket_launch</span>
+              </div>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">02 / 03</span>
+          </div>
+          <p class="font-display text-6xl sm:text-7xl text-orbit-yellow tracking-tight leading-none">
+            <span data-counter="11" data-suffix="%">0</span>
+          </p>
+          <p class="mt-5 text-base lg:text-lg text-zinc-200 leading-snug">apenas usam IA agêntica em produção.</p>
+          <div class="mt-5 opp-dots" id="oppDots" aria-hidden="true"></div>
+          <div class="mt-3 flex items-center gap-3 text-[0.65rem] font-geist-mono uppercase tracking-widest">
+            <span class="inline-flex items-center gap-1.5"><span class="block w-1.5 h-1.5 rounded-full bg-orbit-yellow"></span><span class="text-orbit-yellow">11% prod</span></span>
+            <span class="inline-flex items-center gap-1.5"><span class="block w-1.5 h-1.5 rounded-full bg-orbit-yellow/40"></span><span class="text-zinc-400">38% piloto</span></span>
+          </div>
+          <div class="mt-6 pt-5 border-t border-orbit-border/60">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">— Deloitte</p>
+          </div>
+        </div>
+
+        <!-- Card 3 — Conclusion / featured -->
+        <div class="opp-card rounded-3xl bg-gradient-to-br from-orbit-yellow/15 via-orbit-yellow/8 to-transparent border border-orbit-yellow/40 p-7 lg:p-9 relative overflow-hidden">
+          <div class="opp-sparks">
+            <div class="opp-spark" style="left: 12%; animation-delay: 0s;"></div>
+            <div class="opp-spark" style="left: 28%; animation-delay: 1.4s;"></div>
+            <div class="opp-spark" style="left: 48%; animation-delay: 2.6s;"></div>
+            <div class="opp-spark" style="left: 68%; animation-delay: 0.8s;"></div>
+            <div class="opp-spark" style="left: 84%; animation-delay: 3.2s;"></div>
+          </div>
+          <div class="absolute -top-16 -right-16 w-56 h-56 glow-yellow-soft pointer-events-none opacity-80"></div>
+
+          <div class="relative">
+            <span class="text-[0.6rem] font-geist-mono text-orbit-yellow/70 uppercase tracking-widest">03 / 03 — A jogada</span>
+
+            <div class="opp-bolt-wrap mt-5">
+              <span class="opp-bolt-icon material-symbols-rounded" style="font-size: 48px;">bolt</span>
+            </div>
+
+            <p class="mt-7 text-2xl lg:text-3xl text-white font-semibold leading-tight tracking-tight">
+              Quem ocupar esse <span class="text-orbit-yellow">gap primeiro</span> ganha o mercado.
+            </p>
+            <p class="mt-4 text-sm lg:text-base text-zinc-300 leading-relaxed">A janela está aberta. Em 18 meses, comoditiza.</p>
+
+            <div class="mt-7 opp-arrow-pill">
+              <span>sair na frente</span>
+              <span class="material-symbols-rounded">arrow_forward</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       SOLUÇÃO (A) / COMO FUNCIONA (B)
+       ============================================ -->
+  <section id="solucao" class="relative border-t border-orbit-border overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] glow-yellow pointer-events-none opacity-50"></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-5 lg:px-12 py-20 lg:py-28">
+      <div class="text-center mb-12 lg:mb-16">
+        <span data-v="a" class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">A Solução</span>
+        <span data-v="b" class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">Como Funciona</span>
+        <h2 data-v="a" class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1] max-w-4xl mx-auto">
+          E se os agentes de IA <span class="text-orbit-yellow">continuassem executando?</span>
+        </h2>
+        <h2 data-v="b" class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1] max-w-4xl mx-auto">
+          O modelo em <span class="text-orbit-yellow">3 passos</span>
+        </h2>
+      </div>
+
+      <!-- Timeline (3 passos) — mostra o modelo -->
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-7 sm:p-10 lg:p-14 relative overflow-hidden">
+        <div class="absolute -top-32 -left-32 w-[400px] h-[400px] rounded-full bg-orbit-yellow/[0.04] blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-32 -right-32 w-[400px] h-[400px] rounded-full bg-orbit-yellow/[0.04] blur-3xl pointer-events-none"></div>
+
+        <div class="timeline-grid">
+          <div class="timeline-track" aria-hidden="true">
+            <div class="timeline-track__dot"></div>
+          </div>
+
+          <div class="timeline-step" data-step="1">
+            <div class="timeline-step__head">
+              <div class="timeline-circle">1</div>
+              <div class="timeline-meta">
+                <span class="timeline-meta__phase" data-v="a">Durante</span>
+                <span class="timeline-meta__phase" data-v="b">Passo 1</span>
+                <span class="timeline-meta__num">FASE 01 / 03</span>
+              </div>
+            </div>
+            <h4 data-v="a" class="text-lg lg:text-xl font-semibold text-white mb-3 leading-snug">Agentes trabalham junto com você</h4>
+            <h4 data-v="b" class="text-lg lg:text-xl font-semibold text-white mb-3 leading-snug">Você configura os agentes com sua metodologia</h4>
+            <p data-v="a" class="text-sm lg:text-base text-zinc-400 leading-relaxed mb-4">Organizam dados, estruturam indicadores, aceleram entregas no projeto.</p>
+            <p data-v="b" class="text-sm lg:text-base text-zinc-400 leading-relaxed mb-4">White-label completo — sua marca, sua URL, sua metodologia.</p>
+            <span class="timeline-chip" data-v="a"><span class="material-symbols-rounded text-[14px]">groups</span> Lado a lado</span>
+            <span class="timeline-chip" data-v="b"><span class="material-symbols-rounded text-[14px]">tune</span> Setup em 7 dias</span>
+          </div>
+
+          <div class="timeline-step" data-step="2">
+            <div class="timeline-step__head">
+              <div class="timeline-circle">2</div>
+              <div class="timeline-meta">
+                <span class="timeline-meta__phase" data-v="a">Depois</span>
+                <span class="timeline-meta__phase" data-v="b">Passo 2</span>
+                <span class="timeline-meta__num">FASE 02 / 03</span>
+              </div>
+            </div>
+            <h4 data-v="a" class="text-lg lg:text-xl font-semibold text-white mb-3 leading-snug">Os agentes não param</h4>
+            <h4 data-v="b" class="text-lg lg:text-xl font-semibold text-white mb-3 leading-snug">Os agentes operam no cliente</h4>
+            <p data-v="a" class="text-sm lg:text-base text-zinc-400 leading-relaxed mb-4">O projeto termina. Monitoram, cobram, alertam. 24/7.</p>
+            <p data-v="b" class="text-sm lg:text-base text-zinc-400 leading-relaxed mb-4">Trabalham com você durante o projeto e continuam operando no cliente depois.</p>
+            <span class="timeline-chip"><span class="material-symbols-rounded text-[14px]">bolt</span> 24/7 no cliente</span>
+          </div>
+
+          <div class="timeline-step" data-step="3">
+            <div class="timeline-step__head">
+              <div class="timeline-circle">3</div>
+              <div class="timeline-meta">
+                <span class="timeline-meta__phase" data-v="a">Resultado</span>
+                <span class="timeline-meta__phase" data-v="b">Passo 3</span>
+                <span class="timeline-meta__num">FASE 03 / 03</span>
+              </div>
+            </div>
+            <h4 class="text-lg lg:text-xl font-semibold text-white mb-3 leading-snug">Recorrência real</h4>
+            <p data-v="a" class="text-sm lg:text-base text-zinc-400 leading-relaxed mb-4">O cliente paga pela operação contínua. Você ganha na recorrência.</p>
+            <p data-v="b" class="text-sm lg:text-base text-zinc-400 leading-relaxed mb-4">O cliente paga mensalidade. Você retém a margem.</p>
+            <span class="timeline-chip"><span class="material-symbols-rounded text-[14px]">payments</span> R$3.000/mês</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transição: explicação da Olívia -->
+      <div class="text-center my-14 lg:my-20 relative z-10">
+        <span class="inline-block text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">Quem coordena tudo isso?</span>
+        <h3 class="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-white mt-4 leading-[1.1]">Conheça a <span class="text-orbit-yellow">Olívia</span>.</h3>
+        <p class="text-zinc-400 max-w-2xl mx-auto mt-5 text-base lg:text-lg leading-relaxed">A Olívia é a <span class="text-white font-medium">coordenadora geral de IA da Orbit</span>. Ela orquestra dezenas de agentes especializados, conecta os dados de cada área e entrega clareza pra você e pro seu cliente — 24 horas por dia.</p>
+      </div>
+
+      <!-- Orbital Hub -->
+      <div class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-5 sm:p-8 lg:p-12 relative">
+        <div class="text-center mb-6 lg:mb-12 relative z-10">
+          <span class="inline-block text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-orbit-yellow border border-orbit-yellow/30 bg-orbit-yellow/10 rounded-full px-4 py-1.5">o time da Olívia</span>
+          <h4 class="font-semibold tracking-tight text-xl sm:text-2xl lg:text-3xl text-white mt-5 leading-snug">Cada agente, um <span class="text-orbit-yellow">especialista</span>. Todos sob a mesma batuta.</h4>
+          <p class="text-zinc-400 max-w-md mx-auto mt-4 text-sm lg:text-base">Estratégia, processos, pessoas, indicadores, vendas, riscos — a Olívia conecta todos os agentes pra trabalharem como um único time.</p>
+        </div>
+
+        <div class="orbit-hub" id="orbitHub">
+          <div class="orbit-hub__center">
+            <div class="orbit-hub__glow"></div>
+            <div class="orbit-hub__photo">
+              <img src="https://orbitgestao.com.br/images/olivia.png" alt="Olívia" />
+            </div>
+            <div class="orbit-hub__name">Olívia</div>
+            <div class="orbit-hub__role">Coordenadora Geral</div>
+            <div class="orbit-hub__ring orbit-hub__ring--1"></div>
+            <div class="orbit-hub__ring orbit-hub__ring--2"></div>
+            <div class="orbit-hub__ring orbit-hub__ring--3"></div>
+          </div>
+
+          <svg class="orbit-hub__lines" id="orbitLines"></svg>
+
+          <div class="orbit-hub__node" data-idx="0">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">explore</span></div>
+            <div class="orbit-hub__node-label">Estrategista</div>
+            <div class="orbit-hub__node-desc">SWOT, BSC e planejamento</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente Estrategista</div>
+              <p class="orbit-node-card__text">Analisa o cenário com SWOT, define OKRs e monta o planejamento. Cruza dados de todos os outros agentes.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>95%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:95%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">SWOT</span><span class="orbit-node-card__tag">BSC</span><span class="orbit-node-card__tag">OKRs</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="1">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">account_tree</span></div>
+            <div class="orbit-hub__node-label">Processos</div>
+            <div class="orbit-hub__node-desc">Mapeamento e automação</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Processos</div>
+              <p class="orbit-node-card__text">Mapeia, documenta e gera instruções de trabalho. Reduz retrabalho e garante qualidade na execução.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>90%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:90%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Playbooks</span><span class="orbit-node-card__tag">ISO</span><span class="orbit-node-card__tag">Automação</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="2">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">groups</span></div>
+            <div class="orbit-hub__node-label">Pessoas</div>
+            <div class="orbit-hub__node-desc">Cargos, desempenho e PDIs</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Pessoas</div>
+              <p class="orbit-node-card__text">Cria descrições de cargo, avaliações de desempenho e PDIs. Identifica gaps e sugere trilhas.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>88%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:88%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">360°</span><span class="orbit-node-card__tag">PDI</span><span class="orbit-node-card__tag">Skills</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="3">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">school</span></div>
+            <div class="orbit-hub__node-label">Treinamento</div>
+            <div class="orbit-hub__node-desc">Microlearning via WhatsApp</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Treinamento</div>
+              <p class="orbit-node-card__text">Treina equipes via WhatsApp com microlearning diário. Adapta conteúdo ao nível de cada colaborador.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>92%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:92%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">WhatsApp</span><span class="orbit-node-card__tag">Micro</span><span class="orbit-node-card__tag">Quiz</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="4">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">bar_chart</span></div>
+            <div class="orbit-hub__node-label">Indicadores</div>
+            <div class="orbit-hub__node-desc">KPIs em tempo real</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Indicadores</div>
+              <p class="orbit-node-card__text">Monitora KPIs em tempo real, identifica desvios e sugere causa raiz com IA antes do problema crescer.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>94%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:94%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">KPIs</span><span class="orbit-node-card__tag">Dashboard</span><span class="orbit-node-card__tag">Alertas</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="5">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">query_stats</span></div>
+            <div class="orbit-hub__node-label">Pesquisa</div>
+            <div class="orbit-hub__node-desc">Clima, formulários e insights</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Pesquisa</div>
+              <p class="orbit-node-card__text">Cria pesquisas de clima, satisfação e NPS. Analisa respostas e entrega insights acionáveis.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>82%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:82%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">NPS</span><span class="orbit-node-card__tag">Clima</span><span class="orbit-node-card__tag">Insights</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="6">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">shield</span></div>
+            <div class="orbit-hub__node-label">Riscos</div>
+            <div class="orbit-hub__node-desc">Mitigação e prevenção</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Riscos</div>
+              <p class="orbit-node-card__text">Identifica ameaças antes que virem crises. Monitora indicadores de risco e sugere planos de mitigação.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>91%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:91%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Prevenção</span><span class="orbit-node-card__tag">PDCA</span><span class="orbit-node-card__tag">Alertas</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="7">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">lightbulb</span></div>
+            <div class="orbit-hub__node-label">Oportunidades</div>
+            <div class="orbit-hub__node-desc">Mercado, parcerias, expansão</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Oportunidades</div>
+              <p class="orbit-node-card__text">Escaneia o mercado, identifica novas oportunidades e cruza com dados internos para sugerir ações.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>87%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:87%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Mercado</span><span class="orbit-node-card__tag">Growth</span><span class="orbit-node-card__tag">Parcerias</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="8">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">warning</span></div>
+            <div class="orbit-hub__node-label">Problemas</div>
+            <div class="orbit-hub__node-desc">Não-conformidades e PDCA</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Problemas</div>
+              <p class="orbit-node-card__text">Registra não-conformidades, aplica PDCA e acompanha a resolução até o fechamento com evidências.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>89%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:89%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">PDCA</span><span class="orbit-node-card__tag">5W2H</span><span class="orbit-node-card__tag">NC</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="9">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">description</span></div>
+            <div class="orbit-hub__node-label">Documentos</div>
+            <div class="orbit-hub__node-desc">Padronização e controle</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Documentos</div>
+              <p class="orbit-node-card__text">Padroniza, versiona e controla documentos. Garante que todos trabalhem com a versão mais recente.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>80%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:80%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Versão</span><span class="orbit-node-card__tag">ISO</span><span class="orbit-node-card__tag">Padrão</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="10">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">handshake</span></div>
+            <div class="orbit-hub__node-label">Vendas</div>
+            <div class="orbit-hub__node-desc">CRM, funil e coaching</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Vendas</div>
+              <p class="orbit-node-card__text">Gerencia o funil comercial, faz coaching da equipe e identifica oportunidades de upsell e cross-sell.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>93%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:93%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">CRM</span><span class="orbit-node-card__tag">Funil</span><span class="orbit-node-card__tag">Coaching</span></div>
+            </div>
+          </div>
+          <div class="orbit-hub__node" data-idx="11">
+            <div class="orbit-hub__node-icon"><span class="material-symbols-rounded">videocam</span></div>
+            <div class="orbit-hub__node-label">Reuniões</div>
+            <div class="orbit-hub__node-desc">Transcrição e plano de ação</div>
+            <div class="orbit-node-card">
+              <div class="orbit-node-card__status">Ativo 24/7</div>
+              <div class="orbit-node-card__title">Agente de Reuniões</div>
+              <p class="orbit-node-card__text">Transcreve reuniões, extrai decisões e gera planos de ação automaticamente. Nunca mais perca um follow-up.</p>
+              <div class="orbit-node-card__bar"><div class="orbit-node-card__bar-label"><span>Impacto</span><span>86%</span></div><div class="orbit-node-card__bar-track"><div class="orbit-node-card__bar-fill" style="width:86%"></div></div></div>
+              <div class="orbit-node-card__tags"><span class="orbit-node-card__tag">Ata</span><span class="orbit-node-card__tag">Follow-up</span><span class="orbit-node-card__tag">IA</span></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-center text-[0.65rem] sm:text-xs font-geist-mono text-zinc-600 uppercase tracking-widest mt-6">passe o mouse em qualquer agente</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================
+       MATEMÁTICA
+       ============================================ -->
+  <section id="matematica" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-5 lg:px-12 py-20 lg:py-28">
+      <div class="text-center mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">A Matemática</span>
+        <h2 data-v="a" class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1]">
+          A conta que <span class="text-orbit-yellow">muda o modelo</span>
+        </h2>
+        <h2 data-v="b" class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1]">
+          A matemática é <span class="text-math-green">simples</span>
+        </h2>
+      </div>
+
+      <!-- Variant A: simple flow -->
+      <div data-v="a" class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-8 lg:p-12">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 items-stretch">
+          <div class="text-center">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Custo</p>
+            <p class="font-display text-4xl sm:text-5xl lg:text-6xl text-white mt-3 leading-none">R$600</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Venda</p>
+            <p class="font-display text-4xl sm:text-5xl lg:text-6xl text-white mt-3 leading-none">R$3.000</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Margem</p>
+            <p class="font-display text-4xl sm:text-5xl lg:text-6xl text-orbit-yellow mt-3 leading-none">80%</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">10 clientes</p>
+            <p class="font-display text-4xl sm:text-5xl lg:text-6xl text-orbit-yellow mt-3 leading-none">R$24k</p>
+            <p class="text-[0.65rem] text-zinc-500 mt-1 font-geist-mono uppercase tracking-widest">por mês</p>
+          </div>
+        </div>
+        <p class="text-center text-base lg:text-lg text-zinc-400 mt-10 max-w-2xl mx-auto leading-relaxed">
+          Sem entregar mais horas. <span class="text-white font-medium">Os agentes fazem o trabalho pesado.</span>
+        </p>
+      </div>
+
+      <!-- Variant B: aggressive green -->
+      <div data-v="b" class="rounded-3xl bg-orbit-surface-1 border border-orbit-border p-6 sm:p-8 lg:p-12 relative overflow-hidden">
+        <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-math-green/15 blur-3xl pointer-events-none"></div>
+
+        <div class="relative space-y-4 lg:space-y-6">
+          <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+            <div class="rounded-2xl bg-orbit-bg border border-orbit-border p-5 sm:p-6 lg:p-8">
+              <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Seu custo</p>
+              <p class="font-display text-3xl sm:text-4xl lg:text-6xl text-white mt-3 leading-none">R$600<span class="text-lg sm:text-2xl lg:text-3xl text-zinc-500">/mês</span></p>
+              <p class="text-xs sm:text-sm text-zinc-500 mt-2">por cliente</p>
+            </div>
+            <div class="rounded-2xl bg-orbit-bg border border-orbit-border p-5 sm:p-6 lg:p-8">
+              <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Sua venda</p>
+              <p class="font-display text-3xl sm:text-4xl lg:text-6xl text-white mt-3 leading-none">R$3.000<span class="text-lg sm:text-2xl lg:text-3xl text-zinc-500">/mês</span></p>
+              <p class="text-xs sm:text-sm text-zinc-500 mt-2">média por cliente</p>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-math-green/10 border border-math-green/40 p-6 sm:p-8 text-center">
+            <p class="text-[0.65rem] font-geist-mono text-math-green uppercase tracking-widest">Sua margem</p>
+            <p class="font-display text-4xl sm:text-6xl lg:text-8xl text-math-green mt-3 leading-none tracking-tight">R$2.400 <span class="text-xl sm:text-3xl lg:text-4xl text-math-green/70">(80%)</span></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+            <div class="rounded-2xl bg-orbit-bg border border-orbit-border p-5 sm:p-6 lg:p-8 text-center">
+              <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">10 clientes</p>
+              <p class="font-display text-3xl sm:text-5xl lg:text-7xl text-math-green mt-3 leading-none">R$24k<span class="text-base sm:text-xl lg:text-2xl text-zinc-500">/mês</span></p>
+            </div>
+            <div class="rounded-2xl bg-orbit-bg border border-math-green/40 p-5 sm:p-6 lg:p-8 text-center relative">
+              <p class="text-[0.65rem] font-geist-mono text-math-green uppercase tracking-widest">20 clientes</p>
+              <p class="font-display text-3xl sm:text-5xl lg:text-7xl text-math-green mt-3 leading-none">R$48k<span class="text-base sm:text-xl lg:text-2xl text-math-green/60">/mês</span></p>
+            </div>
+          </div>
+
+          <p class="text-center text-base lg:text-lg text-zinc-400 mt-6 lg:mt-8 max-w-2xl mx-auto leading-relaxed">
+            Sem entregar mais horas. Sem contratar equipe. <span class="text-white font-medium">Os agentes fazem o trabalho pesado.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       PROVA (Bento)
+       ============================================ -->
+  <section id="prova" class="relative border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-5 lg:px-12 py-20 lg:py-28">
+      <div class="text-center mb-12 lg:mb-16">
+        <span class="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-zinc-500">Prova</span>
+        <h2 data-v="a" class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1] max-w-4xl mx-auto">
+          Você faz parte dessa história.<br /><span class="text-orbit-yellow">O próximo capítulo começa agora.</span>
+        </h2>
+        <h2 data-v="b" class="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-semibold tracking-tight text-white mt-4 leading-[1.1] max-w-4xl mx-auto">
+          30 anos de consultoria. 2.000+ empresas. <span class="text-orbit-yellow">Agora com IA.</span>
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4 lg:gap-6">
+        <!-- White-label hero (span 2 cols + 2 rows on md+) -->
+        <div class="bento-card md:col-span-2 md:row-span-2 rounded-3xl bg-gradient-to-br from-orbit-surface-1 via-orbit-surface-2 to-orbit-bg border border-orbit-border p-7 sm:p-8 lg:p-12 overflow-hidden flex flex-col justify-between min-h-[420px] lg:min-h-[520px]">
+          <div class="bento-hero__grid"></div>
+          <div class="absolute -top-32 -right-32 w-96 h-96 glow-yellow pointer-events-none opacity-60"></div>
+
+          <div class="relative">
+            <span class="inline-flex items-center gap-2 text-[0.65rem] font-geist-mono text-orbit-yellow uppercase tracking-widest">
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-orbit-yellow animate-pulse"></span>
+              White-label
+            </span>
+            <h3 class="font-semibold text-3xl sm:text-4xl lg:text-5xl text-white mt-3 leading-[1.1] tracking-tight">Sua marca.<br />Sua metodologia.<br /><span class="text-orbit-yellow">Seu canal.</span></h3>
+            <p class="mt-5 lg:mt-6 text-zinc-400 text-sm sm:text-base lg:text-lg max-w-md leading-relaxed">URL personalizada, identidade visual sua, processos da sua consultoria. Os clientes veem você — não a Orbit.</p>
+          </div>
+
+          <!-- Floating chips -->
+          <div class="hidden sm:block bento-chip" style="top: 22%; right: 8%; animation-delay: 0s;">
+            <span class="material-symbols-rounded">link</span>
+            sua-marca.com.br
+          </div>
+          <div class="hidden sm:block bento-chip" style="top: 44%; right: 18%; animation-delay: 1.2s;">
+            <span class="material-symbols-rounded">palette</span>
+            cores · logo · fontes
+          </div>
+          <div class="hidden sm:block bento-chip" style="top: 64%; right: 6%; animation-delay: 2.4s;">
+            <span class="material-symbols-rounded">tune</span>
+            metodologia própria
+          </div>
+
+          <div class="relative mt-6 lg:mt-8 flex items-center gap-3 z-10">
+            <div class="flex -space-x-2">
+              <div class="w-9 h-9 rounded-full bg-orbit-yellow border-2 border-orbit-bg flex items-center justify-center text-orbit-black"><span class="material-symbols-rounded" style="font-size: 18px;">verified</span></div>
+              <div class="w-9 h-9 rounded-full bg-orbit-surface-2 border-2 border-orbit-bg flex items-center justify-center text-orbit-yellow"><span class="material-symbols-rounded" style="font-size: 18px;">link</span></div>
+              <div class="w-9 h-9 rounded-full bg-orbit-surface-2 border-2 border-orbit-bg flex items-center justify-center text-orbit-yellow"><span class="material-symbols-rounded" style="font-size: 18px;">palette</span></div>
+            </div>
+            <p class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">tudo configurável</p>
+          </div>
+        </div>
+
+        <!-- Stat: 30+ anos -->
+        <div class="bento-card rounded-3xl bg-orbit-surface-1 border border-orbit-border p-7 lg:p-8 overflow-hidden">
+          <div class="bento-stat__sweep"></div>
+          <div class="relative flex items-start justify-between mb-4">
+            <div class="w-11 h-11 rounded-2xl bg-orbit-yellow/10 border border-orbit-yellow/30 flex items-center justify-center">
+              <span class="material-symbols-rounded text-orbit-yellow" style="font-size: 22px;">workspace_premium</span>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">01 / 03</span>
+          </div>
+          <p class="relative font-display text-6xl lg:text-7xl bento-stat-num tracking-tight leading-none">
+            <span data-counter="30">0</span><span class="text-3xl lg:text-4xl text-orbit-yellow">+</span>
+          </p>
+          <p class="relative mt-3 text-sm text-zinc-400 leading-relaxed">anos no mercado de gestão</p>
+          <div class="relative mt-5 h-1 rounded-full bg-orbit-bg overflow-hidden">
+            <div class="h-full rounded-full bg-gradient-to-r from-orbit-yellow-lo via-orbit-yellow to-orbit-yellow-hi" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- Stat: 2.000+ empresas -->
+        <div class="bento-card rounded-3xl bg-orbit-surface-1 border border-orbit-border p-7 lg:p-8 overflow-hidden">
+          <div class="bento-stat__sweep"></div>
+          <div class="relative flex items-start justify-between mb-4">
+            <div class="w-11 h-11 rounded-2xl bg-orbit-yellow/10 border border-orbit-yellow/30 flex items-center justify-center">
+              <span class="material-symbols-rounded text-orbit-yellow" style="font-size: 22px;">apartment</span>
+            </div>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">02 / 03</span>
+          </div>
+          <p class="relative font-display text-6xl lg:text-7xl bento-stat-num tracking-tight leading-none">
+            <span data-counter="2000" data-format="thousand">0</span><span class="text-3xl lg:text-4xl text-orbit-yellow">+</span>
+          </p>
+          <p class="relative mt-3 text-sm text-zinc-400 leading-relaxed">empresas atendidas</p>
+          <div class="relative mt-5 flex items-center gap-1.5">
+            <span class="block w-1 h-1 rounded-full bg-orbit-yellow"></span>
+            <span class="block w-1 h-1 rounded-full bg-orbit-yellow"></span>
+            <span class="block w-1 h-1 rounded-full bg-orbit-yellow"></span>
+            <span class="block w-1 h-1 rounded-full bg-orbit-yellow/60"></span>
+            <span class="block w-1 h-1 rounded-full bg-orbit-yellow/40"></span>
+            <span class="text-[0.6rem] font-geist-mono text-zinc-600 ml-2 uppercase tracking-widest">multi-setor</span>
+          </div>
+        </div>
+
+        <!-- 30+ canais ativos -->
+        <div class="bento-card md:col-span-3 rounded-3xl bg-orbit-surface-1 border border-orbit-border p-7 lg:p-10 overflow-hidden">
+          <div class="grid md:grid-cols-[auto_1fr_auto] items-center gap-6 lg:gap-10">
+            <div class="flex items-center gap-5">
+              <div class="w-14 h-14 lg:w-16 lg:h-16 rounded-2xl bg-orbit-yellow/10 border border-orbit-yellow/30 flex items-center justify-center shrink-0">
+                <span class="material-symbols-rounded text-orbit-yellow" style="font-size: 32px;">hub</span>
+              </div>
+              <div>
+                <p class="font-display text-5xl lg:text-7xl bento-stat-num--yellow tracking-tight leading-none">
+                  <span data-counter="30">0</span><span class="text-2xl lg:text-3xl">+</span>
+                </p>
+                <p class="mt-2 text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">canais ativos</p>
+              </div>
+            </div>
+
+            <!-- Marquee -->
+            <div class="bento-marquee-mask hidden md:block">
+              <div class="bento-marquee">
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">JM</div><span class="bento-marquee__name">consultoria.jm</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">RV</div><span class="bento-marquee__name">rv-gestao.com</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">AC</div><span class="bento-marquee__name">aliancagroup</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">PT</div><span class="bento-marquee__name">ptconsult.br</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">NX</div><span class="bento-marquee__name">nexa.gestao</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">VG</div><span class="bento-marquee__name">vgconsult</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">SR</div><span class="bento-marquee__name">studiorh</span><span class="bento-marquee__pulse"></span></div>
+                <!-- duplicate for seamless loop -->
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">JM</div><span class="bento-marquee__name">consultoria.jm</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">RV</div><span class="bento-marquee__name">rv-gestao.com</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">AC</div><span class="bento-marquee__name">aliancagroup</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">PT</div><span class="bento-marquee__name">ptconsult.br</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">NX</div><span class="bento-marquee__name">nexa.gestao</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">VG</div><span class="bento-marquee__name">vgconsult</span><span class="bento-marquee__pulse"></span></div>
+                <div class="bento-marquee__item"><div class="bento-marquee__avatar">SR</div><span class="bento-marquee__name">studiorh</span><span class="bento-marquee__pulse"></span></div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 shrink-0">
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-orbit-yellow/10 border border-orbit-yellow/30 text-orbit-yellow text-[0.65rem] font-semibold uppercase tracking-widest"><span class="inline-block w-1.5 h-1.5 rounded-full bg-orbit-yellow animate-pulse mr-2 align-middle"></span>ao vivo</span>
+              <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-orbit-surface-2 border border-orbit-border text-zinc-300 text-[0.65rem] font-semibold uppercase tracking-widest">+ crescendo</span>
+            </div>
+          </div>
+          <p class="mt-5 text-sm lg:text-base text-zinc-400 leading-snug max-w-2xl">Todos os canais com agentes operando <span class="text-white font-medium">24/7</span> nos clientes finais. Você não está montando do zero — está entrando num modelo que já roda.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       CTA FINAL
+       ============================================ -->
+  <section id="agendar" class="relative border-t border-orbit-border overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] glow-yellow pointer-events-none opacity-50"></div>
+    <div class="absolute inset-0 noise pointer-events-none"></div>
+
+    <div class="relative max-w-3xl mx-auto px-5 lg:px-12 py-24 lg:py-32 text-center">
+      <h2 data-v="a" class="text-4xl sm:text-5xl lg:text-7xl font-semibold tracking-tight text-white leading-[1.1]">
+        Pronto para <span class="text-orbit-yellow">quebrar o ciclo?</span>
+      </h2>
+      <h2 data-v="b" class="text-4xl sm:text-5xl lg:text-7xl font-semibold tracking-tight text-white leading-[1.1]">
+        Pronto para <span class="text-orbit-yellow">montar o seu modelo?</span>
+      </h2>
+
+      <div class="mt-10 flex justify-center">
+        <a href="#" id="cta-agendar" class="inline-flex items-center gap-3 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-8 sm:px-10 py-4 lg:py-5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_24px_60px_-12px_rgba(255,186,26,0.6)]">
+          Agendar minha conversa
+          <span class="material-symbols-rounded">arrow_forward</span>
+        </a>
+      </div>
+
+      <p data-v="a" class="mt-6 text-sm lg:text-base text-zinc-400 leading-relaxed">Sem compromisso. <span class="text-white">15 minutos</span> pra entender se faz sentido pra você.</p>
+      <p data-v="b" class="mt-6 text-sm lg:text-base text-zinc-400 leading-relaxed">15 minutos pra alinhar <span class="text-white">pricing, white-label e primeiros passos</span>.</p>
+    </div>
+  </section>
+
+  <!-- ============================================
+       FOOTER
+       ============================================ -->
+  <footer class="border-t border-orbit-border">
+    <div class="max-w-[1400px] mx-auto px-5 lg:px-12 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" />
+        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-zinc-600 hidden sm:inline">canal · orbitgestao.com.br</span>
+      </div>
+      <p class="text-[0.65rem] sm:text-xs text-zinc-600">© Orbit Gestão · Todos os direitos reservados</p>
+    </div>
+  </footer>
+
+  <!-- ============================================
+       STICKY MOBILE CTA
+       ============================================ -->
+  <div id="mobile-cta" class="md:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-orbit-bg/95 backdrop-blur-md border-t border-orbit-border">
+    <a href="#agendar" class="flex items-center justify-center gap-2 bg-orbit-yellow text-orbit-black px-6 py-4 rounded-full text-xs font-bold uppercase tracking-widest shadow-2xl">
+      <span data-v="a">Agendar conversa</span>
+      <span data-v="b">Agendar conversa</span>
+      <span class="material-symbols-rounded text-base">arrow_forward</span>
+    </a>
+  </div>
+
+  <!-- ============================================
+       CTA MODAL — Chat conversacional com a Olívia
+       ============================================ -->
+  <div id="cta-modal" role="dialog" aria-modal="true" aria-labelledby="chat-title" aria-hidden="true">
+    <div class="modal-card">
+      <!-- Header -->
+      <div class="chat-header">
+        <div class="chat-header__avatar">
+          <img src="https://orbitgestao.com.br/images/olivia.png" alt="Olívia" />
+        </div>
+        <div class="chat-header__info">
+          <div id="chat-title" class="chat-header__name">Olívia · Orbit</div>
+          <div class="chat-header__status">● online agora</div>
+        </div>
+        <button type="button" class="chat-close" id="modal-close-btn" aria-label="Fechar">
+          <span class="material-symbols-rounded text-base">close</span>
+        </button>
+      </div>
+
+      <!-- Progress -->
+      <div class="chat-progress"><div class="chat-progress__fill" id="chat-progress-fill"></div></div>
+
+      <!-- Thread (mensagens) -->
+      <div class="chat-thread" id="chat-thread" aria-live="polite"></div>
+
+      <!-- Footer (input ou chips) -->
+      <div class="chat-footer" id="chat-footer"></div>
+
+      <!-- Form oculto (lido pelo GTM) -->
+      <form id="lead-form" style="display:none" novalidate>
+        <input type="text"  name="name" />
+        <input type="email" name="email" />
+        <input type="tel"   name="phone" data-gtm="phone" />
+        <input type="text"  name="empresa" />
+        <input type="text"  name="cargo" />
+        <input type="text"  name="atuacao" />
+        <input type="text"  name="faturamento" />
+        <input type="text"  name="projetos" />
+        <input type="text"  name="prioridade" />
+        <input type="text"  name="variant" />
+        <input type="text"  name="segment" />
+        <input type="text"  name="page_url" />
+        <!-- Honeypot anti-spam (invisível pra humanos, atrai bots) -->
+        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================
+       SCRIPTS
+       ============================================ -->
+  <script>
+    // ─── Variant routing (50/50 sticky por visitante) ─────
+    // Regras:
+    // 1. Se ?v=a ou ?v=b vier na URL → usa esse valor (override manual / link direto).
+    // 2. Senão, lê localStorage 'orbit_v'. Se já tem → usa.
+    // 3. Senão, sorteia 50/50, grava em localStorage e atualiza a URL (sem reload).
+    // ─────────────────────────────────────────────────────
+    (function() {
+      var STORAGE_KEY = 'orbit_v';
+      var params = new URLSearchParams(window.location.search);
+      var urlV = params.get('v');
+      var variant;
+
+      if (urlV === 'a' || urlV === 'b') {
+        variant = urlV;
+        try { localStorage.setItem(STORAGE_KEY, variant); } catch (e) {}
+      } else {
+        var stored = null;
+        try { stored = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+        if (stored === 'a' || stored === 'b') {
+          variant = stored;
+        } else {
+          variant = (Math.random() < 0.5) ? 'a' : 'b';
+          try { localStorage.setItem(STORAGE_KEY, variant); } catch (e) {}
+        }
+        // Reflete no URL pra ficar consistente em compartilhamento e analytics
+        params.set('v', variant);
+        var newSearch = params.toString();
+        var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+        try { window.history.replaceState({}, '', newUrl); } catch (e) {}
+      }
+
+      document.body.setAttribute('data-v', variant);
+
+      // Segmento de origem (1/2/3) — pra tracking, não muda layout
+      var segment = params.get('s');
+      if (segment) document.body.setAttribute('data-s', segment);
+
+      // VSL Vimeo IDs
+      var VIMEO_IDS = {
+        a: '1188088507',  // VSL A — Igor + Christian
+        b: '1188086372'   // VSL B — Christian solo
+      };
+
+      var iframe = document.getElementById('vsl-frame');
+      var vimeoId = VIMEO_IDS[variant];
+      iframe.src = 'https://player.vimeo.com/video/' + vimeoId + '?autoplay=1&muted=1&controls=1&loop=0&dnt=1&playsinline=1';
+
+      // Expõe pra debug + pixels
+      window.__orbit = { variant: variant, segment: segment };
+      console.log('[Orbit LP] variant=' + variant + (segment ? ' · segment=' + segment : ''));
+
+      // ─── Vimeo Player SDK: unmute + milestones + (gating) ──
+      iframe.addEventListener('load', function() {
+        if (typeof Vimeo === 'undefined') return;
+
+        var player = new Vimeo.Player(iframe);
+        var fired = { 25: false, 50: false, 75: false, 100: false };
+
+        player.on('timeupdate', function(data) {
+          if (!data.duration) return;
+          var pct = (data.seconds / data.duration) * 100;
+          [25, 50, 75].forEach(function(m) {
+            if (!fired[m] && pct >= m) {
+              fired[m] = true;
+              trackVSLMilestone(m, variant);
+            }
+          });
+        });
+        player.on('ended', function() {
+          if (!fired[100]) {
+            fired[100] = true;
+            trackVSLMilestone(100, variant);
+          }
+        });
+
+        // Unmute overlay
+        var overlay = document.getElementById('unmute-overlay');
+        overlay.addEventListener('click', function() {
+          player.setMuted(false);
+          player.setVolume(1);
+          player.play();
+          overlay.classList.add('hidden');
+        });
+      });
+
+      function trackVSLMilestone(pct, variant) {
+        // TODO wire pixel: Meta Pixel / GA4 / postback
+        if (window.fbq) window.fbq('trackCustom', 'VSLProgress', { milestone: pct, variant: variant });
+        if (window.gtag) window.gtag('event', 'vsl_progress', { milestone: pct, variant: variant });
+        console.log('[VSL] milestone', pct + '%', '· variant', variant);
+      }
+    })();
+
+    // ─── Oportunidade: dot grid (11 prod + 38 piloto) ──────
+    (function() {
+      var grid = document.getElementById('oppDots');
+      if (!grid) return;
+      var html = '';
+      for (var i = 1; i <= 100; i++) {
+        var cls = '';
+        if (i <= 11) cls = 'active';
+        else if (i <= 49) cls = 'pilot';
+        var delay = (i * 6) + 'ms';
+        html += '<span class="' + cls + '" style="animation-delay:' + delay + '"></span>';
+      }
+      grid.innerHTML = html;
+    })();
+
+    // ─── Oportunidade: reveal cards on scroll ──────────────
+    (function() {
+      var cards = document.querySelectorAll('.opp-card');
+      if (!cards.length) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.25 });
+      cards.forEach(function(c) { observer.observe(c); });
+    })();
+
+    // ─── Count-up on scroll (data-counter) ─────────────────
+    (function() {
+      var counters = document.querySelectorAll('[data-counter]');
+      if (!counters.length) return;
+
+      function animate(el) {
+        var target = parseFloat(el.getAttribute('data-counter')) || 0;
+        var suffix = el.getAttribute('data-suffix') || '';
+        var prefix = el.getAttribute('data-prefix') || '';
+        var format = el.getAttribute('data-format') || '';
+        var duration = parseInt(el.getAttribute('data-duration'), 10) || 1800;
+        var start = performance.now();
+
+        function step(now) {
+          var t = Math.min(1, (now - start) / duration);
+          var eased = 1 - Math.pow(1 - t, 3);
+          var value = eased * target;
+          var rounded = (target % 1 === 0) ? Math.round(value) : value.toFixed(1);
+          var displayed = (format === 'thousand')
+            ? String(rounded).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+            : rounded;
+          el.textContent = prefix + displayed + suffix;
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            animate(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      counters.forEach(function(c) { observer.observe(c); });
+    })();
+
+    // ─── CTA Modal — Chat conversacional ───────────────────
+    (function() {
+      var modal = document.getElementById('cta-modal');
+      var form = document.getElementById('lead-form');
+      var thread = document.getElementById('chat-thread');
+      var footer = document.getElementById('chat-footer');
+      var progressFill = document.getElementById('chat-progress-fill');
+      var closeBtn = document.getElementById('modal-close-btn');
+      if (!modal || !form || !thread || !footer) return;
+
+      // Fluxo da conversa
+      var FLOW = [
+        { type: 'bot', text: 'Oi! Eu sou a <strong>Olívia</strong>, coordenadora de IA da Orbit. 👋' },
+        { type: 'bot', text: 'Vou te fazer umas perguntas rápidas pra agilizar a conversa de 15 min com o time. Leva 1 minutinho.' },
+        { type: 'input', field: 'name', inputType: 'text', prompt: 'Pra começar — qual seu nome completo?', placeholder: 'Seu nome completo' },
+        { type: 'input', field: 'email', inputType: 'email', prompt: '{name}, qual seu melhor e-mail?', placeholder: 'voce@empresa.com', validate: 'email' },
+        { type: 'input', field: 'phone', inputType: 'tel', prompt: 'E o WhatsApp pra alguém te chamar?', placeholder: '(11) 99999-9999', mask: 'phone-br', validate: 'phone' },
+        { type: 'input', field: 'empresa', inputType: 'text', prompt: 'Qual o nome da sua consultoria?', placeholder: 'Nome da empresa' },
+        { type: 'choice', field: 'cargo', prompt: 'Qual seu cargo?', options: [
+          { value: 'CEO/Diretor', label: 'CEO / Diretor' },
+          { value: 'Resp. Qualidade', label: 'Responsável pela qualidade' },
+          { value: 'Consultor', label: 'Consultor' },
+          { value: 'Outro', label: 'Outro' }
+        ]},
+        { type: 'choice', field: 'atuacao', prompt: 'Qual a principal atuação da sua consultoria?', options: [
+          { value: 'Gestão empresarial', label: 'Gestão empresarial' },
+          { value: 'Marketing e Vendas', label: 'Marketing e vendas' },
+          { value: 'Financeiro', label: 'Financeiro' },
+          { value: 'RH', label: 'RH' },
+          { value: 'Outro', label: 'Outro' }
+        ]},
+        { type: 'choice', field: 'faturamento', prompt: 'Qual o faturamento mensal da sua consultoria?', options: [
+          { value: 'Até R$30k/mês', label: 'Até R$ 30 mil/mês' },
+          { value: 'R$30k-R$100k/mês', label: 'R$ 30 mil – R$ 100 mil/mês' },
+          { value: 'R$100k-R$500k/mês', label: 'R$ 100 mil – R$ 500 mil/mês' },
+          { value: 'R$500k-R$1mi/mês', label: 'R$ 500 mil – R$ 1 mi/mês' },
+          { value: 'Acima de R$1mi/mês', label: 'Acima de R$ 1 mi/mês' }
+        ]},
+        { type: 'choice', field: 'projetos', prompt: 'Quantos projetos ativos rodando hoje?', options: [
+          { value: '1-2', label: '1–2 projetos' },
+          { value: '3-5', label: '3–5 projetos' },
+          { value: '6-10', label: '6–10 projetos' },
+          { value: '+10', label: 'Mais de 10 projetos' }
+        ]},
+        { type: 'choice', field: 'prioridade', prompt: 'Prioridade pra agregar tecnologia ao seu portfólio?', options: [
+          { value: 'Urgente', label: 'Urgente — preciso pra ontem' },
+          { value: '30 dias', label: 'Em breve — próximos 30 dias' },
+          { value: 'Pesquisando', label: 'Estou pesquisando ainda' },
+          { value: 'Conhecer', label: 'Só quero conhecer' }
+        ]},
+        { type: 'submit' }
+      ];
+
+      var step = 0;
+      var data = {};
+      var isClosing = false;
+
+      // Total de etapas com input/choice (pra progress bar)
+      var totalSteps = FLOW.filter(function(s) { return s.type === 'input' || s.type === 'choice'; }).length;
+      var stepsCompleted = 0;
+
+      function openModal() {
+        if (modal.classList.contains('is-open')) return;
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-open');
+        // Reset state
+        step = 0;
+        data = {};
+        stepsCompleted = 0;
+        thread.innerHTML = '';
+        footer.innerHTML = '';
+        updateProgress();
+        // Inicia fluxo
+        setTimeout(runStep, 350);
+      }
+      function closeModal() {
+        if (isClosing) return;
+        isClosing = true;
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-open');
+        setTimeout(function() { isClosing = false; }, 400);
+      }
+
+      function updateProgress() {
+        var pct = totalSteps ? Math.min(100, (stepsCompleted / totalSteps) * 100) : 0;
+        progressFill.style.width = pct + '%';
+      }
+
+      function scrollThread() {
+        thread.scrollTop = thread.scrollHeight;
+      }
+
+      function addBotMsg(html) {
+        var el = document.createElement('div');
+        el.className = 'chat-msg chat-msg--bot';
+        el.innerHTML = html;
+        thread.appendChild(el);
+        scrollThread();
+      }
+      function addUserMsg(text) {
+        var el = document.createElement('div');
+        el.className = 'chat-msg chat-msg--user';
+        el.textContent = text;
+        thread.appendChild(el);
+        scrollThread();
+      }
+      function addTyping() {
+        var el = document.createElement('div');
+        el.className = 'chat-typing';
+        el.id = 'chat-typing';
+        el.innerHTML = '<span></span><span></span><span></span>';
+        thread.appendChild(el);
+        scrollThread();
+      }
+      function removeTyping() {
+        var el = document.getElementById('chat-typing');
+        if (el) el.remove();
+      }
+
+      function applyMask(input, mask) {
+        if (mask !== 'phone-br') return;
+        input.addEventListener('input', function(e) {
+          var v = e.target.value.replace(/\D/g, '').slice(0, 11);
+          var f = '';
+          if (v.length > 0) f = '(' + v.slice(0, 2);
+          if (v.length >= 3) f += ') ' + v.slice(2, 7);
+          if (v.length >= 8) f += '-' + v.slice(7, 11);
+          e.target.value = f;
+        });
+      }
+
+      function validateValue(value, kind) {
+        if (kind === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        if (kind === 'phone') return value.replace(/\D/g, '').length >= 10;
+        return value.trim().length >= 2;
+      }
+
+      function interpolate(text) {
+        return text.replace(/\{(\w+)\}/g, function(_, key) {
+          if (key === 'name' && data.name) return data.name.split(' ')[0];
+          return data[key] || '';
+        });
+      }
+
+      function showInput(stepDef) {
+        footer.innerHTML = '';
+        var row = document.createElement('div');
+        row.className = 'chat-input-row';
+        var input = document.createElement('input');
+        input.type = stepDef.inputType || 'text';
+        input.className = 'chat-input';
+        input.placeholder = stepDef.placeholder || '';
+        if (stepDef.inputType === 'tel') input.setAttribute('inputmode', 'tel');
+        if (stepDef.inputType === 'email') input.setAttribute('inputmode', 'email');
+        input.autocomplete = stepDef.field === 'name' ? 'name' :
+                             stepDef.field === 'email' ? 'email' :
+                             stepDef.field === 'phone' ? 'tel' :
+                             stepDef.field === 'empresa' ? 'organization' : 'off';
+        if (stepDef.mask) applyMask(input, stepDef.mask);
+
+        var send = document.createElement('button');
+        send.type = 'button';
+        send.className = 'chat-send';
+        send.setAttribute('aria-label', 'Enviar');
+        send.innerHTML = '<span class="material-symbols-rounded text-base">arrow_upward</span>';
+
+        function submit() {
+          var val = input.value.trim();
+          if (!validateValue(val, stepDef.validate || 'text')) {
+            input.focus();
+            input.style.borderColor = '#b94a3a';
+            setTimeout(function() { input.style.borderColor = ''; }, 1200);
+            return;
+          }
+          data[stepDef.field] = val;
+          // grava no form oculto
+          var formField = form.querySelector('[name="' + stepDef.field + '"]');
+          if (formField) formField.value = val;
+          addUserMsg(val);
+          stepsCompleted++;
+          updateProgress();
+          footer.innerHTML = '';
+          step++;
+          runStep();
+        }
+        send.addEventListener('click', submit);
+        input.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
+
+        row.appendChild(input);
+        row.appendChild(send);
+        footer.appendChild(row);
+        setTimeout(function() { input.focus(); }, 50);
+      }
+
+      function showChoices(stepDef) {
+        footer.innerHTML = '';
+        var grid = document.createElement('div');
+        grid.className = 'chat-chips';
+        stepDef.options.forEach(function(opt) {
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'chat-chip';
+          chip.textContent = opt.label;
+          chip.addEventListener('click', function() {
+            data[stepDef.field] = opt.value;
+            var formField = form.querySelector('[name="' + stepDef.field + '"]');
+            if (formField) formField.value = opt.value;
+            addUserMsg(opt.label);
+            stepsCompleted++;
+            updateProgress();
+            footer.innerHTML = '';
+            step++;
+            runStep();
+          });
+          grid.appendChild(chip);
+        });
+        footer.appendChild(grid);
+      }
+
+      function runStep() {
+        if (step >= FLOW.length) return;
+        var current = FLOW[step];
+
+        if (current.type === 'bot') {
+          addTyping();
+          setTimeout(function() {
+            removeTyping();
+            addBotMsg(interpolate(current.text));
+            step++;
+            setTimeout(runStep, 600);
+          }, 700);
+          return;
+        }
+
+        if (current.type === 'input' || current.type === 'choice') {
+          addTyping();
+          setTimeout(function() {
+            removeTyping();
+            addBotMsg(interpolate(current.prompt));
+            setTimeout(function() {
+              if (current.type === 'input') showInput(current);
+              else showChoices(current);
+            }, 250);
+          }, 750);
+          return;
+        }
+
+        if (current.type === 'submit') {
+          // Preenche campos extras + dispara submit
+          var variant = (window.__orbit && window.__orbit.variant) || '';
+          var segment = (window.__orbit && window.__orbit.segment) || '';
+          form.querySelector('[name="variant"]').value = variant;
+          form.querySelector('[name="segment"]').value = segment;
+          form.querySelector('[name="page_url"]').value = window.location.href;
+
+          addTyping();
+          setTimeout(function() {
+            removeTyping();
+            addBotMsg('Perfeito! Vou enviar pro time agora — te redireciono pra próxima etapa em 1 segundo. ⚡');
+            setTimeout(function() {
+              // Coleta payload
+              var payload = {};
+              new FormData(form).forEach(function(v, k) { payload[k] = v; });
+
+              // Eventos GTM/Pixel
+              if (window.dataLayer) {
+                window.dataLayer.push({ event: 'lead_submit', variant: variant, segment: segment });
+              }
+              try {
+                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+              } catch (e) {}
+              if (window.fbq) window.fbq('track', 'Lead', { variant: variant });
+              if (window.gtag) window.gtag('event', 'generate_lead', { variant: variant });
+
+              // Persiste o lead pra página de obrigado ler
+              try { sessionStorage.setItem('orbit_lead', JSON.stringify(payload)); } catch (e) {}
+
+              // Envia pro webhook do n8n (fire-and-forget, não bloqueia o redirect)
+              try {
+                fetch('https://webhook.rodriguinhodomarketing.com.br/webhook/orbit-lead-vsl', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                  keepalive: true
+                }).catch(function(err) { console.warn('[Lead] webhook error:', err); });
+              } catch (e) {}
+
+              console.log('[Lead] payload:', payload);
+
+              // Redireciona pra página de obrigado
+              setTimeout(function() {
+                window.location.href = 'obrigado.html';
+              }, 800);
+            }, 600);
+          }, 700);
+          return;
+        }
+      }
+
+      // Reset visual ao reabrir
+      function resetVisual() {
+        thread.style.display = '';
+      }
+
+      // Triggers de abertura
+      document.addEventListener('click', function(e) {
+        var trigger = e.target.closest('a[href="#agendar"], a[href*="#agendar"], [data-cta-modal]');
+        if (!trigger) return;
+        e.preventDefault();
+        resetVisual();
+        openModal();
+      });
+
+      closeBtn.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+      });
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+
+      window.__ctaModal = { open: function() { resetVisual(); openModal(); }, close: closeModal };
+    })();
+
+    // ─── Sticky mobile CTA: show after scroll past hero ────
+    (function() {
+      var hero = document.getElementById('hero');
+      var mobileCta = document.getElementById('mobile-cta');
+      if (!hero || !mobileCta) return;
+
+      var threshold = hero.offsetTop + hero.offsetHeight - 200;
+      var ticking = false;
+
+      function check() {
+        if (window.scrollY > threshold) {
+          mobileCta.classList.add('visible');
+        } else {
+          mobileCta.classList.remove('visible');
+        }
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(check);
+          ticking = true;
+        }
+      }, { passive: true });
+    })();
+
+    // ─── Orbital Hub layout + interactions ─────────────────
+    (function() {
+      var hub = document.getElementById('orbitHub');
+      if (!hub) return;
+      var TOTAL = 12;
+      var nodes = hub.querySelectorAll('.orbit-hub__node');
+      var svg = document.getElementById('orbitLines');
+
+      function layout() {
+        var w = hub.offsetWidth;
+        var h = hub.offsetHeight;
+        var cx = w / 2;
+        var cy = h / 2;
+        var radius = Math.min(w, h) / 2 - 60;
+        if (w <= 480 && radius > 140) radius = 140;
+        else if (w <= 768 && radius > 180) radius = 180;
+        else if (radius > 360) radius = 360;
+        if (radius < 90) radius = 90;
+
+        svg.setAttribute('width', w);
+        svg.setAttribute('height', h);
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        svg.innerHTML = '';
+
+        var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = '<filter id="lineGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+        svg.appendChild(defs);
+
+        nodes.forEach(function(node, i) {
+          var angle = (i / TOTAL) * Math.PI * 2 - Math.PI / 2;
+          var nx = cx + Math.cos(angle) * radius;
+          var ny = cy + Math.sin(angle) * radius;
+
+          node.style.left = nx + 'px';
+          node.style.top = ny + 'px';
+
+          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+          line.setAttribute('x2', nx); line.setAttribute('y2', ny);
+          line.setAttribute('stroke', 'rgba(255,186,26,0.20)');
+          line.setAttribute('stroke-width', '1.5');
+          line.setAttribute('filter', 'url(#lineGlow)');
+          svg.appendChild(line);
+
+          var pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          pathEl.setAttribute('id', 'orbit-path-' + i);
+          pathEl.setAttribute('d', 'M' + nx + ',' + ny + ' L' + cx + ',' + cy);
+          pathEl.setAttribute('fill', 'none');
+          defs.appendChild(pathEl);
+
+          var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('r', '3.5');
+          circle.setAttribute('fill', '#FFCC4D');
+          circle.setAttribute('filter', 'url(#lineGlow)');
+
+          var anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+          anim.setAttribute('dur', '2.5s');
+          anim.setAttribute('repeatCount', 'indefinite');
+          anim.setAttribute('begin', (i * 0.2) + 's');
+          var mpath = document.createElementNS('http://www.w3.org/2000/svg', 'mpath');
+          mpath.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#orbit-path-' + i);
+          anim.appendChild(mpath);
+          circle.appendChild(anim);
+          svg.appendChild(circle);
+        });
+      }
+
+      var observer = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) {
+          hub.classList.add('orbit-visible');
+          layout();
+          observer.disconnect();
+        }
+      }, { threshold: 0.1 });
+      observer.observe(hub);
+
+      var resizeTimer;
+      window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+          if (hub.classList.contains('orbit-visible')) layout();
+        }, 150);
+      });
+
+      nodes.forEach(function(node) {
+        var activate = function() {
+          nodes.forEach(function(n) { n.classList.remove('orbit-node--active', 'orbit-node--dimmed'); });
+          node.classList.add('orbit-node--active');
+          nodes.forEach(function(n) { if (n !== node) n.classList.add('orbit-node--dimmed'); });
+        };
+        var deactivate = function() {
+          nodes.forEach(function(n) { n.classList.remove('orbit-node--active', 'orbit-node--dimmed'); });
+        };
+        node.addEventListener('mouseenter', activate);
+        node.addEventListener('mouseleave', deactivate);
+        node.addEventListener('click', function(e) { e.stopPropagation(); activate(); });
+      });
+      document.addEventListener('click', function() {
+        nodes.forEach(function(n) { n.classList.remove('orbit-node--active', 'orbit-node--dimmed'); });
+      });
+    })();
+  </script>
+</body>
+</html>
