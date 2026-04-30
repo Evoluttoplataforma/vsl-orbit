@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="theme-color" content="#FAFAFA" />
   <meta name="robots" content="noindex,nofollow" />
   <title>Orbit · Dashboard</title>
 
@@ -21,20 +21,32 @@
       theme: {
         extend: {
           colors: {
-            'orbit-yellow': '#FFBA1A',
-            'orbit-yellow-hi': '#FFCC4D',
-            'orbit-yellow-lo': '#E5A30D',
+            'orbit-yellow': '#F59E0B',
+            'orbit-yellow-hi': '#FBBF24',
+            'orbit-yellow-lo': '#D97706',
             'orbit-black': '#0C0C0C',
-            'orbit-bg': '#0A0A0A',
-            'orbit-surface-1': '#141414',
-            'orbit-surface-2': '#1F1F1F',
-            'orbit-border': '#2A2A2A',
-            'math-green': '#10B981',
+            'orbit-bg': '#FAFAFA',
+            'orbit-surface': '#FFFFFF',
+            'orbit-surface-2': '#F5F5F5',
+            'orbit-border': '#E5E5E5',
+            'orbit-text': '#0C0C0C',
+            'orbit-muted': '#71717A',
+            'orbit-dim': '#A1A1AA',
+            'math-green': '#059669',
+            'math-green-hi': '#10B981',
+            'orbit-red': '#DC2626',
+            'orbit-blue': '#2563EB',
           },
           fontFamily: {
             geist: ['Geist', 'sans-serif'],
             'geist-mono': ['Geist Mono', 'monospace'],
             display: ['Oswald', 'sans-serif'],
+          },
+          boxShadow: {
+            'card': '0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.06)',
+            'card-hover': '0 8px 24px -8px rgba(0,0,0,0.10), 0 2px 6px -2px rgba(0,0,0,0.06)',
+            'card-elev': '0 12px 32px -12px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06)',
+            'glow-yellow': '0 0 0 1px rgba(245,158,11,0.18), 0 8px 24px -8px rgba(245,158,11,0.30)',
           },
         },
       },
@@ -42,80 +54,69 @@
   </script>
 
   <style>
-    body { font-family: 'Geist', sans-serif; }
+    body { font-family: 'Geist', sans-serif; background: #FAFAFA; color: #0C0C0C; }
 
     .material-symbols-rounded {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
       user-select: none;
       vertical-align: middle;
       line-height: 1;
       display: inline-block;
     }
 
-    .glow-yellow {
-      background: radial-gradient(closest-side, rgba(255, 186, 26, 0.18), rgba(255, 186, 26, 0) 70%);
-      filter: blur(60px);
+    /* Background pattern subtle */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 0%, rgba(245,158,11,0.04), transparent 40%),
+        radial-gradient(circle at 80% 100%, rgba(5,150,105,0.03), transparent 40%);
+      pointer-events: none;
+      z-index: 0;
     }
+    #app, header { position: relative; z-index: 1; }
 
     /* KPI cards */
     .kpi {
       position: relative;
       overflow: hidden;
-      transition: transform 0.3s ease, border-color 0.3s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.06);
     }
-    .kpi:hover { transform: translateY(-2px); border-color: rgba(255,186,26,0.4); }
-    .kpi__sweep {
-      position: absolute;
-      top: -50%;
-      left: -10%;
-      width: 60%;
-      height: 200%;
-      background: linear-gradient(90deg, transparent, rgba(255,186,26,0.06), transparent);
-      transform: rotate(15deg);
-      pointer-events: none;
-    }
+    .kpi:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -12px rgba(0,0,0,0.12), 0 4px 12px -4px rgba(0,0,0,0.06); }
 
     .kpi-num {
       font-family: 'Oswald', sans-serif;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-weight: 600;
+      letter-spacing: -0.025em;
     }
 
     /* Score badges */
-    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Geist Mono', monospace; }
-    .badge--hot   { background: rgba(255,186,26,0.15); color: #FFBA1A; border: 1px solid rgba(255,186,26,0.4); }
-    .badge--warm  { background: rgba(255,255,255,0.08); color: #FAFAFA; border: 1px solid rgba(255,255,255,0.15); }
-    .badge--cold  { background: rgba(107,107,107,0.12); color: #A3A3A3; border: 1px solid rgba(107,107,107,0.3); }
-    .badge--a     { background: rgba(255,186,26,0.12); color: #FFBA1A; border: 1px solid rgba(255,186,26,0.3); }
-    .badge--b     { background: rgba(16,185,129,0.12); color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; font-family: 'Geist Mono', monospace; white-space: nowrap; }
+    .badge--hot   { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+    .badge--warm  { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    .badge--cold  { background: #E0E7FF; color: #3730A3; border: 1px solid #A5B4FC; }
+    .badge--a     { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+    .badge--b     { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+    .badge--neutral { background: #F4F4F5; color: #52525B; border: 1px solid #E4E4E7; }
+    .badge--urgent { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
 
-    /* Tab buttons */
+    /* Filter pills */
     .filter-pill {
       padding: 6px 14px;
       border-radius: 9999px;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.02em;
-      background: #141414;
-      border: 1px solid #2A2A2A;
-      color: #A3A3A3;
+      background: #FFFFFF;
+      border: 1px solid #E5E5E5;
+      color: #52525B;
       transition: all 0.2s ease;
       cursor: pointer;
     }
-    .filter-pill:hover { color: #FAFAFA; border-color: rgba(255,186,26,0.4); }
-    .filter-pill.is-active { background: #FFBA1A; color: #0C0C0C; border-color: #FFBA1A; }
-
-    /* Skeleton loaders */
-    .skel {
-      background: linear-gradient(90deg, #141414, #1F1F1F, #141414);
-      background-size: 200% 100%;
-      animation: skel 1.4s ease-in-out infinite;
-      border-radius: 6px;
-    }
-    @keyframes skel {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
+    .filter-pill:hover { color: #0C0C0C; border-color: #F59E0B; box-shadow: 0 2px 8px -2px rgba(245,158,11,0.2); }
+    .filter-pill.is-active { background: linear-gradient(135deg, #F59E0B, #FBBF24); color: #FFFFFF; border-color: #F59E0B; box-shadow: 0 4px 12px -2px rgba(245,158,11,0.4); }
 
     /* Login screen */
     #login-screen { display: none; }
@@ -131,40 +132,166 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: #6B6B6B;
+      color: #71717A;
       font-family: 'Geist Mono', monospace;
-      border-bottom: 1px solid #2A2A2A;
+      background: #FAFAFA;
+      border-bottom: 1px solid #E5E5E5;
       white-space: nowrap;
     }
     .data-table td {
       padding: 14px;
-      border-bottom: 1px solid #1F1F1F;
-      color: #FAFAFA;
+      border-bottom: 1px solid #F4F4F5;
+      color: #0C0C0C;
       vertical-align: middle;
     }
-    .data-table tbody tr:hover { background: rgba(255,186,26,0.03); }
+    .data-table tbody tr { cursor: pointer; transition: background 0.15s ease; }
+    .data-table tbody tr:hover { background: #FFFBEB; }
     .data-table .truncate-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Drawer */
+    .drawer-backdrop {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; z-index: 51;
+      width: 100%; max-width: 480px;
+      background: #FFFFFF; border-left: 1px solid #E5E5E5;
+      transform: translateX(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      overflow-y: auto; overflow-x: hidden;
+      box-shadow: -24px 0 48px -12px rgba(0,0,0,0.10);
+    }
+    .drawer.is-open { transform: translateX(0); }
+
+    /* Insights cards */
+    .insight {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+    }
+    .insight:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -12px rgba(0,0,0,0.12); }
+    .insight::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      background: radial-gradient(closest-side, rgba(245,158,11,0.10), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Heatmap */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: 36px repeat(24, 1fr);
+      gap: 3px;
+      font-size: 0.55rem;
+    }
+    .heatmap-cell {
+      aspect-ratio: 1; min-width: 12px;
+      border-radius: 4px;
+      transition: transform 0.15s ease;
+    }
+    .heatmap-cell:hover { transform: scale(1.2); outline: 2px solid #F59E0B; }
+    .heatmap-label {
+      font-family: 'Geist Mono', monospace;
+      color: #A1A1AA;
+      text-align: right;
+      padding-right: 6px;
+      font-size: 0.6rem;
+      align-self: center;
+      font-weight: 600;
+    }
+
+    /* Hot lead cards */
+    .hot-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 12px -4px rgba(245,158,11,0.20);
+    }
+    .hot-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px -8px rgba(245,158,11,0.35);
+    }
+
+    /* Drawer field rows */
+    .field-row { padding: 12px 0; border-bottom: 1px solid #F4F4F5; }
+    .field-row:last-child { border-bottom: none; }
+    .field-label { font-family: 'Geist Mono', monospace; font-size: 0.6rem; color: #A1A1AA; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+    .field-value { color: #0C0C0C; font-size: 0.875rem; word-break: break-word; }
+
+    /* Search input */
+    .search-input {
+      width: 100%;
+      background: #FFFFFF;
+      border: 1px solid #E5E5E5;
+      border-radius: 9999px;
+      padding: 8px 14px 8px 40px;
+      font-size: 0.825rem;
+      color: #0C0C0C;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: #F59E0B;
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+    }
+    .search-input::placeholder { color: #A1A1AA; }
+
+    /* Card containers — base */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid #E5E5E5;
+      border-radius: 1rem;
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.06);
+    }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .data-table th:nth-child(3), .data-table td:nth-child(3),
+      .data-table th:nth-child(4), .data-table td:nth-child(4),
+      .data-table th:nth-child(8), .data-table td:nth-child(8) {
+        display: none;
+      }
+      .heatmap-grid {
+        grid-template-columns: 28px repeat(24, 1fr);
+        gap: 2px;
+      }
+      .heatmap-cell { min-width: 8px; }
+    }
+
+    /* A vs B progress bars */
+    .progress-track {
+      height: 6px;
+      background: #F4F4F5;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill { height: 100%; border-radius: 9999px; transition: width 0.7s cubic-bezier(.4,0,.2,1); }
   </style>
 </head>
 
-<body class="bg-orbit-bg text-zinc-100 min-h-screen antialiased">
+<body class="min-h-screen antialiased">
 
   <!-- LOGIN -->
   <div id="login-screen" class="fixed inset-0 z-50 items-center justify-center p-6 bg-orbit-bg">
-    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] glow-yellow pointer-events-none"></div>
+    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 50% 40%, rgba(245,158,11,0.12), transparent 50%)"></div>
     <div class="relative w-full max-w-sm">
       <div class="text-center mb-8">
-        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-7 w-auto mx-auto mb-6" />
-        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.25em] text-orbit-yellow">Acesso restrito</span>
-        <h1 class="text-2xl font-semibold text-white tracking-tight mt-2">Dashboard Orbit</h1>
+        <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-7 w-auto mx-auto mb-6" style="filter:invert(1) brightness(0.2)" />
+        <span class="text-[0.65rem] font-geist-mono uppercase tracking-[0.25em] text-orbit-yellow-lo">Acesso restrito</span>
+        <h1 class="text-2xl font-semibold text-orbit-text tracking-tight mt-2">Dashboard Orbit</h1>
       </div>
-      <form id="login-form" class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-6 space-y-4">
+      <form id="login-form" class="card p-6 space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-zinc-300 mb-2">Senha</label>
-          <input type="password" id="login-key" placeholder="••••••••" class="w-full px-4 py-3 bg-orbit-bg border border-orbit-border rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20" autofocus />
-          <p id="login-error" class="hidden mt-2 text-xs text-red-400">Senha incorreta.</p>
+          <label class="block text-xs font-semibold text-orbit-text mb-2">Senha</label>
+          <input type="password" id="login-key" placeholder="••••••••" class="w-full px-4 py-3 bg-white border border-orbit-border rounded-xl text-orbit-text placeholder-zinc-400 focus:outline-none focus:border-orbit-yellow focus:ring-2 focus:ring-orbit-yellow/20" autofocus />
+          <p id="login-error" class="hidden mt-2 text-xs text-orbit-red">Senha incorreta.</p>
         </div>
-        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-5 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02]">
+        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-orbit-yellow text-white hover:bg-orbit-yellow-hi px-5 py-3 rounded-full text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02] shadow-[0_8px_24px_-8px_rgba(245,158,11,0.5)]">
           Entrar
           <span class="material-symbols-rounded text-base">arrow_forward</span>
         </button>
@@ -177,43 +304,47 @@
 
     <!-- HEADER -->
     <header class="sticky top-0 z-30 backdrop-blur-md bg-orbit-bg/85 border-b border-orbit-border">
-      <div class="max-w-[1400px] mx-auto px-5 lg:px-10 h-16 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <a href="/" class="flex items-center"><img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" /></a>
-          <span class="hidden sm:inline-block text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-zinc-500 border-l border-orbit-border pl-3">Dashboard · Leads</span>
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-10 h-16 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <a href="/" class="flex items-center shrink-0"><img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 w-auto" style="filter:invert(1) brightness(0.2)" /></a>
+          <span class="hidden sm:inline-block text-[0.65rem] font-geist-mono uppercase tracking-[0.2em] text-orbit-muted border-l border-orbit-border pl-3 truncate">Dashboard · Leads</span>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="refresh-btn" class="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white transition px-3 py-2 rounded-full bg-orbit-surface-1 hover:bg-orbit-surface-2 border border-orbit-border">
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="live-dot" class="hidden sm:inline-flex items-center gap-1.5 text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">
+            <span class="w-1.5 h-1.5 rounded-full bg-math-green animate-pulse"></span>live
+          </span>
+          <button id="refresh-btn" class="inline-flex items-center gap-1.5 text-xs text-orbit-muted hover:text-orbit-text transition px-3 py-2 rounded-full bg-white hover:bg-orbit-surface-2 border border-orbit-border">
             <span class="material-symbols-rounded text-base">refresh</span>
             <span class="hidden sm:inline">Atualizar</span>
           </button>
-          <span id="last-update" class="hidden sm:inline-block text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest"></span>
+          <span id="last-update" class="hidden md:inline-block text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest"></span>
         </div>
       </div>
     </header>
 
     <!-- FILTERS -->
-    <section class="border-b border-orbit-border bg-orbit-bg/60">
-      <div class="max-w-[1400px] mx-auto px-5 lg:px-10 py-4 flex flex-wrap items-center gap-3 lg:gap-5">
-        <div class="flex items-center gap-2">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Período</span>
+    <section class="border-b border-orbit-border bg-white/60">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-10 py-3 sm:py-4 flex flex-wrap items-center gap-3 lg:gap-5">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Período</span>
           <div class="flex flex-wrap gap-1.5" data-filter-group="range">
+            <button class="filter-pill" data-value="1">24h</button>
             <button class="filter-pill" data-value="7">7d</button>
             <button class="filter-pill is-active" data-value="30">30d</button>
             <button class="filter-pill" data-value="90">90d</button>
             <button class="filter-pill" data-value="all">Tudo</button>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Variant</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Variant</span>
           <div class="flex gap-1.5" data-filter-group="variant">
             <button class="filter-pill is-active" data-value="all">Todas</button>
             <button class="filter-pill" data-value="a">A</button>
             <button class="filter-pill" data-value="b">B</button>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Score</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Score</span>
           <div class="flex gap-1.5" data-filter-group="score">
             <button class="filter-pill is-active" data-value="all">Todos</button>
             <button class="filter-pill" data-value="Hot">Hot</button>
@@ -221,8 +352,8 @@
             <button class="filter-pill" data-value="Cold">Cold</button>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-zinc-500">Segmento</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Segmento</span>
           <div class="flex gap-1.5" data-filter-group="segment">
             <button class="filter-pill is-active" data-value="all">Todos</button>
             <button class="filter-pill" data-value="1">S1</button>
@@ -233,161 +364,231 @@
       </div>
     </section>
 
-    <main class="max-w-[1400px] mx-auto px-5 lg:px-10 py-8 lg:py-10 space-y-8 lg:space-y-10">
+    <main class="max-w-[1400px] mx-auto px-4 sm:px-5 lg:px-10 py-5 sm:py-6 lg:py-10 space-y-5 sm:space-y-6 lg:space-y-10">
+
+      <!-- HOT LEADS STRIP -->
+      <section id="hot-strip-wrap" class="hidden">
+        <div class="flex items-baseline justify-between mb-3 gap-3 flex-wrap">
+          <h2 class="text-base sm:text-lg font-semibold text-orbit-text tracking-tight inline-flex items-center gap-2">
+            <span class="material-symbols-rounded text-orbit-yellow" style="font-size:22px;font-variation-settings:'FILL' 1, 'wght' 600">local_fire_department</span>
+            Hot leads pra contatar agora
+          </h2>
+          <span id="hot-strip-count" class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest"></span>
+        </div>
+        <div id="hot-strip" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"></div>
+      </section>
+
+      <!-- INSIGHTS ROW -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-5">
+        <div class="insight card p-5">
+          <p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Variant vencedora</p>
+          <p id="insight-winner" class="text-xl lg:text-2xl font-semibold text-orbit-text">—</p>
+          <p id="insight-winner-detail" class="text-xs text-orbit-muted mt-1">aguardando dados</p>
+        </div>
+        <div class="insight card p-5">
+          <p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Segmento mais quente</p>
+          <p id="insight-segment" class="text-xl lg:text-2xl font-semibold text-orbit-text">—</p>
+          <p id="insight-segment-detail" class="text-xs text-orbit-muted mt-1">aguardando dados</p>
+        </div>
+        <div class="insight card p-5">
+          <p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Pico de leads</p>
+          <p id="insight-peak" class="text-xl lg:text-2xl font-semibold text-orbit-text">—</p>
+          <p id="insight-peak-detail" class="text-xs text-orbit-muted mt-1">aguardando dados</p>
+        </div>
+      </section>
 
       <!-- KPIs -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
-        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="kpi__sweep"></div>
-          <div class="relative flex items-start justify-between mb-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
-              <span class="material-symbols-rounded text-zinc-400" style="font-size: 18px;">groups</span>
+        <div class="kpi card p-5 lg:p-6">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+              <span class="material-symbols-rounded text-orbit-muted" style="font-size:20px">groups</span>
             </div>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">total</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest">total</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-white" id="kpi-total">—</p>
-          <p class="text-xs text-zinc-500 mt-1">leads no período</p>
+          <p class="kpi-num text-4xl lg:text-5xl text-orbit-text" id="kpi-total">—</p>
+          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-total-delta" class="font-semibold">—</span> nas últimas 24h</p>
         </div>
 
-        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-yellow/30 p-5 lg:p-6">
-          <div class="kpi__sweep"></div>
-          <div class="relative flex items-start justify-between mb-3">
-            <div class="w-9 h-9 rounded-xl bg-orbit-yellow/15 border border-orbit-yellow/30 flex items-center justify-center">
-              <span class="material-symbols-rounded text-orbit-yellow" style="font-size: 18px;">local_fire_department</span>
+        <div class="kpi card p-5 lg:p-6" style="background:linear-gradient(135deg,#FFFBEB 0%,#FFFFFF 60%);border-color:#FCD34D">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#FCD34D,#F59E0B)">
+              <span class="material-symbols-rounded text-white" style="font-size:20px;font-variation-settings:'FILL' 1">local_fire_department</span>
             </div>
-            <span class="text-[0.6rem] font-geist-mono text-orbit-yellow/80 uppercase tracking-widest">hot</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono uppercase tracking-widest" style="color:#92400E">hot</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-orbit-yellow" id="kpi-hot">—</p>
-          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-hot-pct">—</span>% do total</p>
+          <p class="kpi-num text-4xl lg:text-5xl" id="kpi-hot" style="color:#B45309">—</p>
+          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-hot-pct" class="font-semibold">—</span>% do total</p>
         </div>
 
-        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="kpi__sweep"></div>
-          <div class="relative flex items-start justify-between mb-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
-              <span class="material-symbols-rounded text-zinc-400" style="font-size: 18px;">thermostat</span>
+        <div class="kpi card p-5 lg:p-6">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+              <span class="material-symbols-rounded text-orbit-muted" style="font-size:20px">thermostat</span>
             </div>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">warm</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest">warm</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-white" id="kpi-warm">—</p>
-          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-warm-pct">—</span>% do total</p>
+          <p class="kpi-num text-4xl lg:text-5xl text-orbit-text" id="kpi-warm">—</p>
+          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-warm-pct" class="font-semibold">—</span>% do total</p>
         </div>
 
-        <div class="kpi rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="kpi__sweep"></div>
-          <div class="relative flex items-start justify-between mb-3">
-            <div class="w-9 h-9 rounded-xl bg-zinc-500/10 border border-zinc-700 flex items-center justify-center">
-              <span class="material-symbols-rounded text-zinc-500" style="font-size: 18px;">ac_unit</span>
+        <div class="kpi card p-5 lg:p-6">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+              <span class="material-symbols-rounded text-orbit-muted" style="font-size:20px">ac_unit</span>
             </div>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-600 uppercase tracking-widest">cold</span>
+            <span class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-dim uppercase tracking-widest">cold</span>
           </div>
-          <p class="kpi-num text-4xl lg:text-5xl text-zinc-400" id="kpi-cold">—</p>
-          <p class="text-xs text-zinc-500 mt-1"><span id="kpi-cold-pct">—</span>% do total</p>
+          <p class="kpi-num text-4xl lg:text-5xl text-orbit-muted" id="kpi-cold">—</p>
+          <p class="text-xs text-orbit-muted mt-1"><span id="kpi-cold-pct" class="font-semibold">—</span>% do total</p>
         </div>
       </section>
 
-      <!-- A vs B -->
+      <!-- A vs B + MATRIX -->
       <section>
-        <div class="flex items-baseline gap-3 mb-4">
-          <h2 class="text-lg lg:text-xl font-semibold text-white tracking-tight">Variant A <span class="text-zinc-500 font-normal">vs</span> B</h2>
-          <span class="text-[0.65rem] font-geist-mono text-zinc-500 uppercase tracking-widest">comparativo</span>
+        <div class="flex items-baseline gap-3 mb-4 flex-wrap">
+          <h2 class="text-lg lg:text-xl font-semibold text-orbit-text tracking-tight">Variant A <span class="text-orbit-muted font-normal">vs</span> B</h2>
+          <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">comparativo + por segmento</span>
         </div>
-        <div class="grid md:grid-cols-2 gap-3 lg:gap-5">
+        <div class="grid md:grid-cols-2 gap-3 lg:gap-5 mb-4">
           <!-- A -->
-          <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-            <div class="flex items-center justify-between mb-4">
+          <div class="card p-5 lg:p-6">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
               <span class="badge badge--a">Variant A · Dor + Evolução</span>
-              <span class="text-[0.6rem] font-geist-mono text-zinc-600">Igor + Christian</span>
+              <span class="text-[0.6rem] font-geist-mono text-orbit-dim">Igor + Christian</span>
             </div>
             <div class="grid grid-cols-3 gap-4">
               <div>
-                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Leads</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="va-total">—</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Leads</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="va-total">—</p>
               </div>
               <div>
-                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% Hot</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-orbit-yellow mt-1" id="va-hot-pct">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">% Hot</p>
+                <p class="kpi-num text-3xl lg:text-4xl mt-1" id="va-hot-pct" style="color:#B45309">—%</p>
               </div>
               <div>
-                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Share</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="va-share">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Share</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="va-share">—%</p>
               </div>
             </div>
-            <div class="mt-4 h-1.5 bg-orbit-bg rounded-full overflow-hidden">
-              <div class="h-full bg-orbit-yellow rounded-full transition-all duration-700" id="va-bar" style="width: 0%"></div>
+            <div class="mt-4 progress-track">
+              <div class="progress-fill" id="va-bar" style="width:0%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div>
             </div>
           </div>
           <!-- B -->
-          <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-            <div class="flex items-center justify-between mb-4">
+          <div class="card p-5 lg:p-6">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
               <span class="badge badge--b">Variant B · Oportunidade + Math</span>
-              <span class="text-[0.6rem] font-geist-mono text-zinc-600">Christian solo</span>
+              <span class="text-[0.6rem] font-geist-mono text-orbit-dim">Christian solo</span>
             </div>
             <div class="grid grid-cols-3 gap-4">
               <div>
-                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Leads</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="vb-total">—</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Leads</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="vb-total">—</p>
               </div>
               <div>
-                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">% Hot</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-math-green mt-1" id="vb-hot-pct">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">% Hot</p>
+                <p class="kpi-num text-3xl lg:text-4xl mt-1" id="vb-hot-pct" style="color:#065F46">—%</p>
               </div>
               <div>
-                <p class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">Share</p>
-                <p class="kpi-num text-3xl lg:text-4xl text-white mt-1" id="vb-share">—%</p>
+                <p class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">Share</p>
+                <p class="kpi-num text-3xl lg:text-4xl text-orbit-text mt-1" id="vb-share">—%</p>
               </div>
             </div>
-            <div class="mt-4 h-1.5 bg-orbit-bg rounded-full overflow-hidden">
-              <div class="h-full bg-math-green rounded-full transition-all duration-700" id="vb-bar" style="width: 0%"></div>
+            <div class="mt-4 progress-track">
+              <div class="progress-fill" id="vb-bar" style="width:0%;background:linear-gradient(90deg,#059669,#10B981)"></div>
             </div>
           </div>
         </div>
-        <p id="winner-msg" class="mt-4 text-sm text-zinc-400"></p>
+        <p id="winner-msg" class="text-sm text-orbit-muted mb-5"></p>
+
+        <!-- Matrix variant × segment -->
+        <div class="card p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-semibold text-orbit-text">Matriz Variant × Segmento</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">% hot por célula</span>
+          </div>
+          <div class="overflow-x-auto -mx-2 px-2">
+            <table class="w-full text-sm" id="matrix-table">
+              <thead>
+                <tr class="text-[0.55rem] sm:text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">
+                  <th class="text-left py-2 pr-4">Segmento</th>
+                  <th class="text-center py-2 px-2"><span class="badge badge--a">A</span></th>
+                  <th class="text-center py-2 px-2"><span class="badge badge--b">B</span></th>
+                  <th class="text-right py-2 pl-4">Vencedor</th>
+                </tr>
+              </thead>
+              <tbody id="matrix-body"></tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
-      <!-- Charts -->
+      <!-- CHARTS -->
       <section class="grid lg:grid-cols-2 gap-3 lg:gap-5">
-        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="flex items-baseline justify-between mb-4">
-            <h3 class="font-semibold text-white">Leads por dia</h3>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">A vs B</span>
+        <div class="card p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-semibold text-orbit-text">Leads por dia</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">A vs B</span>
           </div>
-          <div class="relative h-64"><canvas id="chart-timeline"></canvas></div>
+          <div class="relative h-64 sm:h-72"><canvas id="chart-timeline"></canvas></div>
         </div>
-        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="flex items-baseline justify-between mb-4">
-            <h3 class="font-semibold text-white">Score por variant</h3>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">distribuição</span>
+        <div class="card p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-semibold text-orbit-text">Score por variant</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">distribuição</span>
           </div>
-          <div class="relative h-64"><canvas id="chart-score-variant"></canvas></div>
+          <div class="relative h-64 sm:h-72"><canvas id="chart-score-variant"></canvas></div>
         </div>
-        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="flex items-baseline justify-between mb-4">
-            <h3 class="font-semibold text-white">Top fontes</h3>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">utm_source</span>
+        <div class="card p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-semibold text-orbit-text">Prioridade declarada</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">urgência sales</span>
           </div>
-          <div class="relative h-64"><canvas id="chart-source"></canvas></div>
+          <div class="relative h-64 sm:h-72"><canvas id="chart-priority"></canvas></div>
         </div>
-        <div class="rounded-2xl bg-orbit-surface-1 border border-orbit-border p-5 lg:p-6">
-          <div class="flex items-baseline justify-between mb-4">
-            <h3 class="font-semibold text-white">Faturamento dos leads</h3>
-            <span class="text-[0.6rem] font-geist-mono text-zinc-500 uppercase tracking-widest">faixa</span>
+        <div class="card p-5 lg:p-6">
+          <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-semibold text-orbit-text">Faturamento dos leads</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">faixa</span>
           </div>
-          <div class="relative h-64"><canvas id="chart-revenue"></canvas></div>
+          <div class="relative h-64 sm:h-72"><canvas id="chart-revenue"></canvas></div>
+        </div>
+        <div class="card p-5 lg:p-6 lg:col-span-2">
+          <div class="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+            <h3 class="font-semibold text-orbit-text">Heatmap de leads por hora</h3>
+            <span class="text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-muted uppercase tracking-widest">dia × hora · use pra horário de ads</span>
+          </div>
+          <div id="heatmap-host" class="overflow-x-auto -mx-2 px-2"></div>
+          <div class="flex items-center justify-end gap-2 mt-3 text-[0.55rem] sm:text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest">
+            <span>menos</span>
+            <span class="w-3 h-3 rounded-sm" style="background:#F4F4F5"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#FEF3C7"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#FCD34D"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#F59E0B"></span>
+            <span class="w-3 h-3 rounded-sm" style="background:#B45309"></span>
+            <span>mais</span>
+          </div>
         </div>
       </section>
 
-      <!-- Lead Table -->
-      <section class="rounded-2xl bg-orbit-surface-1 border border-orbit-border overflow-hidden">
-        <div class="p-5 lg:p-6 flex items-center justify-between gap-4 border-b border-orbit-border">
+      <!-- LEAD TABLE -->
+      <section class="card overflow-hidden">
+        <div class="p-4 sm:p-5 lg:p-6 flex flex-wrap items-center justify-between gap-4 border-b border-orbit-border">
           <div>
-            <h3 class="font-semibold text-white">Leads recentes</h3>
-            <p class="text-xs text-zinc-500 mt-0.5"><span id="table-count">0</span> registros · ordenados por mais recente</p>
+            <h3 class="font-semibold text-orbit-text">Leads recentes</h3>
+            <p class="text-xs text-orbit-muted mt-0.5"><span id="table-count">0</span> de <span id="table-total">0</span> registros · clique pra ver detalhes</p>
           </div>
-          <button id="export-csv" class="inline-flex items-center gap-1.5 text-xs text-zinc-300 hover:text-orbit-yellow transition px-3 py-2 rounded-full bg-orbit-bg hover:bg-orbit-surface-2 border border-orbit-border">
-            <span class="material-symbols-rounded text-base">download</span>
-            <span>Export CSV</span>
-          </button>
+          <div class="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-none w-full sm:w-auto">
+            <div class="relative flex-1 sm:flex-none sm:w-72">
+              <span class="material-symbols-rounded absolute left-3 top-1/2 -translate-y-1/2 text-orbit-dim" style="font-size:18px">search</span>
+              <input id="search-input" type="text" class="search-input" placeholder="Buscar nome, email, empresa..." />
+            </div>
+            <button id="export-csv" class="inline-flex items-center gap-1.5 text-xs text-orbit-muted hover:text-orbit-yellow-lo transition px-3 py-2 rounded-full bg-white hover:bg-orbit-surface-2 border border-orbit-border whitespace-nowrap">
+              <span class="material-symbols-rounded text-base">download</span>
+              <span class="hidden sm:inline">Export CSV</span>
+            </button>
+          </div>
         </div>
         <div class="overflow-x-auto">
           <table class="data-table">
@@ -405,43 +606,71 @@
               </tr>
             </thead>
             <tbody id="leads-tbody">
-              <tr><td colspan="9" class="text-center py-12 text-zinc-500">Carregando...</td></tr>
+              <tr><td colspan="9" class="text-center py-12 text-orbit-muted">Carregando...</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <p class="text-center text-[0.65rem] font-geist-mono text-zinc-700 uppercase tracking-widest pt-6">
+      <p class="text-center text-[0.6rem] sm:text-[0.65rem] font-geist-mono text-orbit-dim uppercase tracking-widest pt-4 sm:pt-6">
         dashboard orbit · dados em tempo real do google sheets
       </p>
     </main>
   </div>
 
+  <!-- DRAWER -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer" id="drawer">
+    <div class="sticky top-0 bg-white/95 backdrop-blur-md border-b border-orbit-border px-5 sm:px-6 py-4 flex items-center justify-between z-10">
+      <div class="flex items-center gap-2">
+        <span class="text-[0.6rem] font-geist-mono uppercase tracking-widest text-orbit-muted">Lead</span>
+        <span id="drawer-id" class="text-[0.6rem] font-geist-mono text-orbit-dim"></span>
+      </div>
+      <button id="drawer-close" class="w-8 h-8 rounded-full bg-orbit-surface-2 border border-orbit-border flex items-center justify-center text-orbit-muted hover:text-orbit-text hover:border-orbit-yellow transition">
+        <span class="material-symbols-rounded" style="font-size:18px">close</span>
+      </button>
+    </div>
+    <div class="px-5 sm:px-6 py-6" id="drawer-body"></div>
+  </aside>
+
   <script>
-    // ═══════════════════════════════════════════════════════
-    // CONFIG
-    // ═══════════════════════════════════════════════════════
     var CONFIG = {
       SHEET_ID:    '1XcvNpThEypgFh_q93T4oCTY-9_9pQ0kSywzdqQLy2bk',
       SHEET_NAME:  'Página1',
-      ACCESS_KEY:  'orbit2026',  // ?key=orbit2026 OU senha de login
-      AUTO_REFRESH_MS: 60000     // refetch a cada 60s
+      ACCESS_KEY:  'orbit2026',
+      AUTO_REFRESH_MS: 60000
     };
 
-    // ═══════════════════════════════════════════════════════
-    // ACCESS CONTROL
-    // ═══════════════════════════════════════════════════════
+    var SEGMENT_LABELS = {
+      '1': 'Power Users Evo',
+      '2': 'Light Users Evo',
+      '3': 'Pipedrive',
+      '': 'Direto / sem segmento'
+    };
+
+    // Chart palette (light theme)
+    var PALETTE = {
+      a: '#F59E0B',
+      aLight: 'rgba(245,158,11,0.18)',
+      aBorder: 'rgba(245,158,11,0.55)',
+      b: '#059669',
+      bLight: 'rgba(5,150,105,0.18)',
+      bBorder: 'rgba(5,150,105,0.55)',
+      grid: 'rgba(0,0,0,0.05)',
+      tick: '#71717A',
+      text: '#0C0C0C'
+    };
+
+    // ─── ACCESS CONTROL ───
     (function() {
       var params = new URLSearchParams(window.location.search);
       var urlKey = params.get('key');
       var stored = localStorage.getItem('orbit_dash_key');
-
       function unlock() {
         document.body.classList.remove('is-locked');
         try { localStorage.setItem('orbit_dash_key', CONFIG.ACCESS_KEY); } catch (e) {}
         boot();
       }
-
       if (urlKey === CONFIG.ACCESS_KEY || stored === CONFIG.ACCESS_KEY) {
         unlock();
       } else {
@@ -455,18 +684,14 @@
       }
     })();
 
-    // ═══════════════════════════════════════════════════════
-    // STATE
-    // ═══════════════════════════════════════════════════════
     var state = {
       leads: [],
       filters: { range: '30', variant: 'all', score: 'all', segment: 'all' },
+      search: '',
       charts: {}
     };
 
-    // ═══════════════════════════════════════════════════════
-    // FETCH FROM GVIZ
-    // ═══════════════════════════════════════════════════════
+    // ─── FETCH ───
     async function fetchLeads() {
       var url = 'https://docs.google.com/spreadsheets/d/' + CONFIG.SHEET_ID
               + '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(CONFIG.SHEET_NAME)
@@ -475,7 +700,6 @@
         var res = await fetch(url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         var text = await res.text();
-        // Remove leading /*O_o*/ comment and isolate the JSON object
         var start = text.indexOf('{');
         var end = text.lastIndexOf('}');
         if (start === -1 || end === -1) throw new Error('gviz response unparseable');
@@ -490,19 +714,18 @@
           });
           return obj;
         }).filter(function(r) { return r.email || r.name; });
-
-        // Parse timestamp
-        rows.forEach(function(r) {
+        rows.forEach(function(r, idx) {
+          r.__id = idx;
           if (r.timestamp && typeof r.timestamp === 'string') {
-            var t = new Date(r.timestamp);
-            r.ts = isNaN(t) ? null : t;
-          } else if (r.timestamp && r.timestamp.toString().indexOf('Date(') === 0) {
-            // gviz date format
-            var m = r.timestamp.toString().match(/Date\((\d+),(\d+),(\d+),?(\d*),?(\d*),?(\d*)\)/);
-            if (m) r.ts = new Date(+m[1], +m[2], +m[3], +m[4]||0, +m[5]||0, +m[6]||0);
+            if (r.timestamp.indexOf('Date(') === 0) {
+              var m = r.timestamp.match(/Date\((\d+),(\d+),(\d+),?(\d*),?(\d*),?(\d*)\)/);
+              if (m) r.ts = new Date(+m[1], +m[2], +m[3], +m[4]||0, +m[5]||0, +m[6]||0);
+            } else {
+              var t = new Date(r.timestamp);
+              r.ts = isNaN(t) ? null : t;
+            }
           }
         });
-
         return rows;
       } catch (e) {
         console.error('[Dashboard] fetch error:', e);
@@ -510,9 +733,7 @@
       }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // FILTERS
-    // ═══════════════════════════════════════════════════════
+    // ─── FILTERS + SEARCH ───
     function applyFilters(leads) {
       var f = state.filters;
       var now = Date.now();
@@ -528,18 +749,23 @@
         return true;
       });
     }
+    function applySearch(leads) {
+      var q = state.search.trim().toLowerCase();
+      if (!q) return leads;
+      return leads.filter(function(l) {
+        return ((l.name || '') + ' ' + (l.email || '') + ' ' + (l.empresa || '')).toLowerCase().indexOf(q) !== -1;
+      });
+    }
 
-    // ═══════════════════════════════════════════════════════
-    // RENDER — KPIs
-    // ═══════════════════════════════════════════════════════
+    // ─── KPIs ───
     function renderKPIs(leads) {
       var total = leads.length;
       var hot   = leads.filter(function(l) { return l.score === 'Hot'; }).length;
       var warm  = leads.filter(function(l) { return l.score === 'Warm'; }).length;
       var cold  = leads.filter(function(l) { return l.score === 'Cold'; }).length;
-
       function pct(n) { return total ? Math.round((n / total) * 100) : 0; }
-
+      var now = Date.now();
+      var last24h = leads.filter(function(l) { return l.ts && (now - l.ts.getTime()) < 86400000; }).length;
       document.getElementById('kpi-total').textContent = total;
       document.getElementById('kpi-hot').textContent = hot;
       document.getElementById('kpi-warm').textContent = warm;
@@ -547,23 +773,22 @@
       document.getElementById('kpi-hot-pct').textContent = pct(hot);
       document.getElementById('kpi-warm-pct').textContent = pct(warm);
       document.getElementById('kpi-cold-pct').textContent = pct(cold);
+      var deltaEl = document.getElementById('kpi-total-delta');
+      deltaEl.textContent = (last24h > 0 ? '+' : '') + last24h;
+      deltaEl.style.color = last24h > 0 ? '#059669' : '#A1A1AA';
     }
 
-    // ═══════════════════════════════════════════════════════
-    // RENDER — A vs B
-    // ═══════════════════════════════════════════════════════
+    // ─── A vs B ───
     function renderAB(leads) {
       var a = leads.filter(function(l) { return (l.variant || '').toLowerCase() === 'a'; });
       var b = leads.filter(function(l) { return (l.variant || '').toLowerCase() === 'b'; });
       var aHot = a.filter(function(l) { return l.score === 'Hot'; }).length;
       var bHot = b.filter(function(l) { return l.score === 'Hot'; }).length;
       var total = a.length + b.length;
-
       var aHotPct = a.length ? Math.round((aHot / a.length) * 100) : 0;
       var bHotPct = b.length ? Math.round((bHot / b.length) * 100) : 0;
       var aShare  = total ? Math.round((a.length / total) * 100) : 0;
       var bShare  = total ? Math.round((b.length / total) * 100) : 0;
-
       document.getElementById('va-total').textContent = a.length;
       document.getElementById('vb-total').textContent = b.length;
       document.getElementById('va-hot-pct').textContent = aHotPct + '%';
@@ -572,51 +797,183 @@
       document.getElementById('vb-share').textContent = bShare + '%';
       document.getElementById('va-bar').style.width = aShare + '%';
       document.getElementById('vb-bar').style.width = bShare + '%';
-
       var msg = document.getElementById('winner-msg');
-      if (a.length === 0 && b.length === 0) {
-        msg.innerHTML = 'Sem leads suficientes pra comparar.';
+      var minSample = 30;
+      if (a.length === 0 && b.length === 0) msg.innerHTML = 'Sem leads suficientes pra comparar.';
+      else if (total < minSample) msg.innerHTML = '<span class="text-orbit-muted">Amostra ainda pequena</span> (' + total + '/' + minSample + ' leads pra ler com confiança).';
+      else if (aHotPct > bHotPct) msg.innerHTML = '<strong style="color:#B45309">Variant A converte mais Hots</strong> — diferença de <strong>' + (aHotPct - bHotPct) + 'pp</strong>.';
+      else if (bHotPct > aHotPct) msg.innerHTML = '<strong style="color:#065F46">Variant B converte mais Hots</strong> — diferença de <strong>' + (bHotPct - aHotPct) + 'pp</strong>.';
+      else msg.innerHTML = '<strong>Empate técnico</strong> entre as duas variantes — siga rodando pra ter mais sinal.';
+    }
+
+    // ─── Matrix ───
+    function renderMatrix(leads) {
+      var segments = ['1', '2', '3', ''];
+      var body = document.getElementById('matrix-body');
+      body.innerHTML = segments.map(function(seg) {
+        var rows = leads.filter(function(l) { return String(l.segment || '') === seg; });
+        var aRows = rows.filter(function(l) { return (l.variant||'').toLowerCase() === 'a'; });
+        var bRows = rows.filter(function(l) { return (l.variant||'').toLowerCase() === 'b'; });
+        var aHot = aRows.filter(function(l) { return l.score === 'Hot'; }).length;
+        var bHot = bRows.filter(function(l) { return l.score === 'Hot'; }).length;
+        var aHotPct = aRows.length ? Math.round((aHot / aRows.length) * 100) : null;
+        var bHotPct = bRows.length ? Math.round((bHot / bRows.length) * 100) : null;
+        var winner = '<span class="text-orbit-dim text-xs">—</span>';
+        if (aHotPct != null && bHotPct != null) {
+          if (aHotPct > bHotPct) winner = '<span class="badge badge--a">A · +' + (aHotPct - bHotPct) + 'pp</span>';
+          else if (bHotPct > aHotPct) winner = '<span class="badge badge--b">B · +' + (bHotPct - aHotPct) + 'pp</span>';
+          else winner = '<span class="badge badge--neutral">empate</span>';
+        }
+        function cell(rs, hot, pct) {
+          if (!rs.length) return '<span class="text-orbit-dim">sem dados</span>';
+          return '<span class="text-orbit-text font-semibold">' + rs.length + '</span> <span class="text-orbit-muted text-xs">leads</span> · <span class="font-semibold" style="color:#B45309">' + pct + '%</span> <span class="text-orbit-muted text-xs">hot</span>';
+        }
+        var label = seg ? ('S' + seg) : 'Direto';
+        var sub = SEGMENT_LABELS[seg] || '—';
+        return '<tr class="border-t border-orbit-border/60">' +
+          '<td class="py-3 pr-4"><div class="text-orbit-text font-medium">' + label + '</div><div class="text-orbit-muted text-xs">' + sub + '</div></td>' +
+          '<td class="text-center py-3 px-2 text-sm">' + cell(aRows, aHot, aHotPct) + '</td>' +
+          '<td class="text-center py-3 px-2 text-sm">' + cell(bRows, bHot, bHotPct) + '</td>' +
+          '<td class="text-right py-3 pl-4">' + winner + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    // ─── Insights ───
+    function renderInsights(leads) {
+      var a = leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'a'; });
+      var b = leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'b'; });
+      var aHotPct = a.length ? Math.round((a.filter(function(l){return l.score==='Hot';}).length / a.length) * 100) : 0;
+      var bHotPct = b.length ? Math.round((b.filter(function(l){return l.score==='Hot';}).length / b.length) * 100) : 0;
+      var winnerEl = document.getElementById('insight-winner');
+      var winnerDetail = document.getElementById('insight-winner-detail');
+      if (a.length + b.length < 10) {
+        winnerEl.innerHTML = '<span class="text-orbit-dim">—</span>';
+        winnerDetail.textContent = 'precisa de pelo menos 10 leads';
       } else if (aHotPct > bHotPct) {
-        msg.innerHTML = '🔥 <strong class="text-orbit-yellow">Variant A converte mais Hots</strong> — diferença de ' + (aHotPct - bHotPct) + 'pp.';
+        winnerEl.innerHTML = '<span style="color:#B45309">Variant A</span>';
+        winnerDetail.textContent = aHotPct + '% Hot · +' + (aHotPct - bHotPct) + 'pp vs B';
       } else if (bHotPct > aHotPct) {
-        msg.innerHTML = '🔥 <strong class="text-math-green">Variant B converte mais Hots</strong> — diferença de ' + (bHotPct - aHotPct) + 'pp.';
+        winnerEl.innerHTML = '<span style="color:#065F46">Variant B</span>';
+        winnerDetail.textContent = bHotPct + '% Hot · +' + (bHotPct - aHotPct) + 'pp vs A';
       } else {
-        msg.innerHTML = '⚖️ <strong>Empate técnico</strong> entre as duas variantes — siga rodando pra ter mais sinal.';
+        winnerEl.innerHTML = '<span class="text-orbit-text">Empate</span>';
+        winnerDetail.textContent = 'ambas com ' + aHotPct + '% Hot';
+      }
+
+      var segCounts = { '1': { tot: 0, hot: 0 }, '2': { tot: 0, hot: 0 }, '3': { tot: 0, hot: 0 } };
+      leads.forEach(function(l) {
+        var s = String(l.segment || '');
+        if (segCounts[s]) {
+          segCounts[s].tot++;
+          if (l.score === 'Hot') segCounts[s].hot++;
+        }
+      });
+      var bestSeg = null, bestPct = -1;
+      Object.keys(segCounts).forEach(function(s) {
+        if (segCounts[s].tot >= 3) {
+          var p = (segCounts[s].hot / segCounts[s].tot) * 100;
+          if (p > bestPct) { bestPct = p; bestSeg = s; }
+        }
+      });
+      var segEl = document.getElementById('insight-segment');
+      var segDetail = document.getElementById('insight-segment-detail');
+      if (bestSeg) {
+        segEl.innerHTML = '<span class="text-orbit-text">S' + bestSeg + '</span> <span class="text-orbit-dim text-base font-normal">·</span> <span style="color:#B45309" class="text-lg">' + Math.round(bestPct) + '%</span>';
+        segDetail.textContent = SEGMENT_LABELS[bestSeg] + ' · ' + segCounts[bestSeg].hot + ' hot/' + segCounts[bestSeg].tot;
+      } else {
+        segEl.innerHTML = '<span class="text-orbit-dim">—</span>';
+        segDetail.textContent = 'precisa de 3+ leads por segmento';
+      }
+
+      var hourCounts = new Array(24).fill(0);
+      leads.forEach(function(l) { if (l.ts) hourCounts[l.ts.getHours()]++; });
+      var maxH = -1, maxCount = 0;
+      hourCounts.forEach(function(c, h) { if (c > maxCount) { maxCount = c; maxH = h; } });
+      var peakEl = document.getElementById('insight-peak');
+      var peakDetail = document.getElementById('insight-peak-detail');
+      if (maxH >= 0 && maxCount > 0) {
+        peakEl.innerHTML = '<span class="text-orbit-text">' + (maxH < 10 ? '0' + maxH : maxH) + 'h</span> <span class="text-orbit-dim text-base font-normal">·</span> <span style="color:#B45309" class="text-lg">' + maxCount + '</span>';
+        peakDetail.textContent = 'horário com mais leads — boa pra concentrar ad spend';
+      } else {
+        peakEl.innerHTML = '<span class="text-orbit-dim">—</span>';
+        peakDetail.textContent = 'aguardando dados';
       }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // CHARTS
-    // ═══════════════════════════════════════════════════════
-    var CHART_DEFAULTS = {
-      legend: { labels: { color: '#A3A3A3', font: { family: 'Geist', size: 11 } } },
-      grid: { color: 'rgba(42,42,42,0.6)' },
-      tickColor: '#6B6B6B'
-    };
+    // ─── Hot strip ───
+    function renderHotStrip(leads) {
+      var wrap = document.getElementById('hot-strip-wrap');
+      var grid = document.getElementById('hot-strip');
+      var hots = leads.filter(function(l) { return l.score === 'Hot'; })
+                      .sort(function(a, b) { return (b.ts ? b.ts.getTime() : 0) - (a.ts ? a.ts.getTime() : 0); })
+                      .slice(0, 3);
+      if (!hots.length) { wrap.classList.add('hidden'); return; }
+      wrap.classList.remove('hidden');
+      var totalHot = leads.filter(function(l){return l.score==='Hot';}).length;
+      document.getElementById('hot-strip-count').textContent = totalHot + ' total · mostrando 3 mais recentes';
+      grid.innerHTML = hots.map(function(l) {
+        var when = l.ts ? formatDate(l.ts) : '—';
+        var phone = l.phone ? String(l.phone).replace(/\D/g, '') : '';
+        var msg = encodeURIComponent('Oi ' + (l.name || '').split(' ')[0] + '! Aqui é da Orbit. Você acabou de assistir nossa apresentação e marcou interesse — bora conversar?');
+        var waLink = phone ? 'https://wa.me/55' + phone + '?text=' + msg : '#';
+        return '<div class="hot-card rounded-2xl p-5 border" style="background:linear-gradient(135deg,#FFFBEB,#FFFFFF);border-color:#FCD34D" data-lead-id="' + l.__id + '">' +
+          '<div class="flex items-start justify-between mb-3 gap-2">' +
+            '<span class="badge badge--hot">' + when + '</span>' +
+            '<span class="badge badge--' + ((l.variant||'').toLowerCase() === 'a' ? 'a' : 'b') + '">' + ((l.variant||'').toUpperCase() || '?') + '</span>' +
+          '</div>' +
+          '<p class="text-orbit-text font-semibold truncate">' + escapeHTML(l.name || '—') + '</p>' +
+          '<p class="text-orbit-muted text-xs truncate mt-0.5">' + escapeHTML(l.empresa || '') + (l.cargo ? ' · ' + escapeHTML(l.cargo) : '') + '</p>' +
+          '<p class="text-orbit-muted text-xs mt-1">' + escapeHTML((l.faturamento || '').replace('/mês', '')) + (l.prioridade ? ' · ' + escapeHTML(l.prioridade) : '') + '</p>' +
+          (phone ? '<a class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-orbit-yellow to-orbit-yellow-hi hover:from-orbit-yellow-lo hover:to-orbit-yellow px-3 py-1.5 rounded-full transition shadow-[0_4px_12px_-4px_rgba(245,158,11,0.5)]" href="' + waLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><span class="material-symbols-rounded" style="font-size:14px">chat</span>WhatsApp</a>' : '') +
+        '</div>';
+      }).join('');
+      grid.querySelectorAll('[data-lead-id]').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var id = parseInt(card.getAttribute('data-lead-id'), 10);
+          var lead = state.leads.find(function(l) { return l.__id === id; });
+          if (lead) openDrawer(lead);
+        });
+      });
+    }
 
+    // ─── CHARTS ───
     function chartOpts(extra) {
       var base = {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 700, easing: 'easeOutCubic' },
         plugins: {
-          legend: { labels: CHART_DEFAULTS.legend.labels },
+          legend: { labels: { color: PALETTE.tick, font: { family: 'Geist', size: 11, weight: '500' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, padding: 16 } },
           tooltip: {
-            backgroundColor: '#0A0A0A',
-            borderColor: '#2A2A2A',
+            backgroundColor: '#FFFFFF',
+            borderColor: '#E5E5E5',
             borderWidth: 1,
-            titleColor: '#FAFAFA',
-            bodyColor: '#A3A3A3',
-            padding: 12
+            titleColor: PALETTE.text,
+            bodyColor: '#52525B',
+            titleFont: { family: 'Geist', weight: '600' },
+            bodyFont: { family: 'Geist Mono', size: 11 },
+            padding: 12,
+            cornerRadius: 10,
+            displayColors: true,
+            boxPadding: 6
           }
         },
         scales: {
-          x: { grid: { color: CHART_DEFAULTS.grid.color }, ticks: { color: CHART_DEFAULTS.tickColor, font: { family: 'Geist Mono', size: 10 } } },
-          y: { grid: { color: CHART_DEFAULTS.grid.color }, ticks: { color: CHART_DEFAULTS.tickColor, font: { family: 'Geist Mono', size: 10 }, precision: 0 } }
+          x: { grid: { color: PALETTE.grid, drawTicks: false }, border: { display: false }, ticks: { color: PALETTE.tick, font: { family: 'Geist Mono', size: 10 }, padding: 8 } },
+          y: { grid: { color: PALETTE.grid, drawTicks: false }, border: { display: false }, ticks: { color: PALETTE.tick, font: { family: 'Geist Mono', size: 10 }, precision: 0, padding: 8 } }
         }
       };
-      return Object.assign(base, extra || {});
+      return mergeDeep(base, extra || {});
     }
-
+    function mergeDeep(a, b) {
+      var out = Array.isArray(a) ? a.slice() : Object.assign({}, a);
+      for (var k in b) {
+        if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) out[k] = mergeDeep(a[k] || {}, b[k]);
+        else out[k] = b[k];
+      }
+      return out;
+    }
     function destroyChart(name) {
       if (state.charts[name]) {
         state.charts[name].destroy();
@@ -624,29 +981,53 @@
       }
     }
 
+    function gradientFill(ctx, hexFrom, alphaFrom, alphaTo) {
+      var g = ctx.createLinearGradient(0, 0, 0, 280);
+      g.addColorStop(0, hexFrom + Math.round(alphaFrom * 255).toString(16).padStart(2, '0'));
+      g.addColorStop(1, hexFrom + Math.round(alphaTo * 255).toString(16).padStart(2, '0'));
+      return g;
+    }
+
     function renderTimelineChart(leads) {
       destroyChart('timeline');
+      var rangeDays = state.filters.range === 'all' ? 30 : parseInt(state.filters.range, 10);
+      if (rangeDays < 7) rangeDays = 7;
+      var keys = [];
       var byDay = {};
+      var today = new Date();
+      today.setHours(0,0,0,0);
+      for (var i = rangeDays - 1; i >= 0; i--) {
+        var d = new Date(today.getTime() - i * 86400000);
+        var key = d.toISOString().slice(0, 10);
+        keys.push(key);
+        byDay[key] = { a: 0, b: 0 };
+      }
       leads.forEach(function(l) {
         if (!l.ts) return;
         var key = l.ts.toISOString().slice(0, 10);
+        if (!byDay[key]) return;
         var v = (l.variant || '').toLowerCase();
-        if (!byDay[key]) byDay[key] = { a: 0, b: 0 };
         if (v === 'a') byDay[key].a++;
         else if (v === 'b') byDay[key].b++;
       });
-      var keys = Object.keys(byDay).sort();
-      var ctx = document.getElementById('chart-timeline').getContext('2d');
+      var canvas = document.getElementById('chart-timeline');
+      var ctx = canvas.getContext('2d');
+      var gradA = ctx.createLinearGradient(0, 0, 0, 280);
+      gradA.addColorStop(0, 'rgba(245,158,11,0.35)');
+      gradA.addColorStop(1, 'rgba(245,158,11,0.02)');
+      var gradB = ctx.createLinearGradient(0, 0, 0, 280);
+      gradB.addColorStop(0, 'rgba(5,150,105,0.30)');
+      gradB.addColorStop(1, 'rgba(5,150,105,0.02)');
       state.charts.timeline = new Chart(ctx, {
         type: 'line',
         data: {
           labels: keys.map(function(k) { return k.slice(5); }),
           datasets: [
-            { label: 'Variant A', data: keys.map(function(k) { return byDay[k].a; }), borderColor: '#FFBA1A', backgroundColor: 'rgba(255,186,26,0.12)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#FFBA1A' },
-            { label: 'Variant B', data: keys.map(function(k) { return byDay[k].b; }), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.12)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#10B981' }
+            { label: 'Variant A', data: keys.map(function(k) { return byDay[k].a; }), borderColor: PALETTE.a, backgroundColor: gradA, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: PALETTE.a, pointHoverBorderColor: '#FFFFFF', pointHoverBorderWidth: 2, borderWidth: 2.5 },
+            { label: 'Variant B', data: keys.map(function(k) { return byDay[k].b; }), borderColor: PALETTE.b, backgroundColor: gradB, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: PALETTE.b, pointHoverBorderColor: '#FFFFFF', pointHoverBorderWidth: 2, borderWidth: 2.5 }
           ]
         },
-        options: chartOpts()
+        options: chartOpts({ interaction: { mode: 'index', intersect: false } })
       });
     }
 
@@ -659,35 +1040,66 @@
         return leads.filter(function(l) { return (l.variant||'').toLowerCase() === 'b' && l.score === s; }).length;
       });
       var ctx = document.getElementById('chart-score-variant').getContext('2d');
+      var gradA = ctx.createLinearGradient(0, 0, 0, 250);
+      gradA.addColorStop(0, '#FBBF24'); gradA.addColorStop(1, '#F59E0B');
+      var gradB = ctx.createLinearGradient(0, 0, 0, 250);
+      gradB.addColorStop(0, '#10B981'); gradB.addColorStop(1, '#059669');
       state.charts.scoreVariant = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: ['Hot', 'Warm', 'Cold'],
           datasets: [
-            { label: 'A', data: dataA, backgroundColor: '#FFBA1A', borderRadius: 6 },
-            { label: 'B', data: dataB, backgroundColor: '#10B981', borderRadius: 6 }
+            { label: 'A', data: dataA, backgroundColor: gradA, borderRadius: 8, borderSkipped: false, maxBarThickness: 40 },
+            { label: 'B', data: dataB, backgroundColor: gradB, borderRadius: 8, borderSkipped: false, maxBarThickness: 40 }
           ]
         },
         options: chartOpts()
       });
     }
 
-    function renderSourceChart(leads) {
-      destroyChart('source');
+    function renderPriorityChart(leads) {
+      destroyChart('priority');
+      var ORDER = ['Urgente', '30 dias', '60 dias', '90+ dias'];
       var counts = {};
+      ORDER.forEach(function(k) { counts[k] = 0; });
       leads.forEach(function(l) {
-        var s = (l.utm_source || '').trim() || 'direct';
-        counts[s] = (counts[s] || 0) + 1;
+        var p = String(l.prioridade || '').trim();
+        if (counts.hasOwnProperty(p)) counts[p]++;
       });
-      var entries = Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
-      var ctx = document.getElementById('chart-source').getContext('2d');
-      state.charts.source = new Chart(ctx, {
-        type: 'bar',
+      var data = ORDER.map(function(k) { return counts[k]; });
+      var total = data.reduce(function(s, n) { return s + n; }, 0);
+      var ctx = document.getElementById('chart-priority').getContext('2d');
+      state.charts.priority = new Chart(ctx, {
+        type: 'doughnut',
         data: {
-          labels: entries.map(function(e) { return e[0]; }),
-          datasets: [{ label: 'Leads', data: entries.map(function(e) { return e[1]; }), backgroundColor: '#FFBA1A', borderRadius: 6 }]
+          labels: ORDER,
+          datasets: [{
+            data: data,
+            backgroundColor: ['#DC2626', '#F59E0B', '#FBBF24', '#A1A1AA'],
+            borderColor: '#FFFFFF',
+            borderWidth: 3,
+            hoverOffset: 8
+          }]
         },
-        options: chartOpts({ indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0A0A0A', borderColor: '#2A2A2A', borderWidth: 1 } } })
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          animation: { duration: 700 },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: PALETTE.tick, font: { family: 'Geist', size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, padding: 12 } },
+            tooltip: {
+              backgroundColor: '#FFFFFF', borderColor: '#E5E5E5', borderWidth: 1,
+              titleColor: PALETTE.text, bodyColor: '#52525B', padding: 12, cornerRadius: 10,
+              callbacks: {
+                label: function(c) {
+                  var pct = total ? Math.round((c.parsed / total) * 100) : 0;
+                  return c.label + ': ' + c.parsed + ' (' + pct + '%)';
+                }
+              }
+            }
+          }
+        }
       });
     }
 
@@ -700,60 +1112,184 @@
         if (counts.hasOwnProperty(l.faturamento)) counts[l.faturamento]++;
       });
       var ctx = document.getElementById('chart-revenue').getContext('2d');
+      var grad = ctx.createLinearGradient(0, 0, 0, 250);
+      grad.addColorStop(0, '#FBBF24'); grad.addColorStop(1, '#F59E0B');
       state.charts.revenue = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: ORDER.map(function(k) { return k.replace('/mês', '').replace('Acima de ', '+'); }),
-          datasets: [{ label: 'Leads', data: ORDER.map(function(k) { return counts[k]; }), backgroundColor: ['#6B6B6B','#A3A3A3','#FFCC4D','#FFBA1A','#E5A30D'], borderRadius: 6 }]
+          datasets: [{
+            label: 'Leads',
+            data: ORDER.map(function(k) { return counts[k]; }),
+            backgroundColor: ['#E4E4E7', '#A1A1AA', '#FCD34D', '#F59E0B', '#B45309'],
+            borderRadius: 8,
+            borderSkipped: false,
+            maxBarThickness: 56
+          }]
         },
-        options: chartOpts({ plugins: { legend: { display: false }, tooltip: { backgroundColor: '#0A0A0A', borderColor: '#2A2A2A', borderWidth: 1 } } })
+        options: chartOpts({ plugins: { legend: { display: false } } })
       });
     }
 
-    // ═══════════════════════════════════════════════════════
-    // TABLE
-    // ═══════════════════════════════════════════════════════
-    function renderTable(leads) {
+    // ─── HEATMAP ───
+    function renderHeatmap(leads) {
+      var DAYS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+      var grid = new Array(7).fill(0).map(function() { return new Array(24).fill(0); });
+      leads.forEach(function(l) {
+        if (!l.ts) return;
+        grid[l.ts.getDay()][l.ts.getHours()]++;
+      });
+      var max = 0;
+      grid.forEach(function(row) { row.forEach(function(c) { if (c > max) max = c; }); });
+      function color(c) {
+        if (max === 0 || c === 0) return '#F4F4F5';
+        var pct = c / max;
+        if (pct < 0.25) return '#FEF3C7';
+        if (pct < 0.5) return '#FCD34D';
+        if (pct < 0.75) return '#F59E0B';
+        return '#B45309';
+      }
+      var host = document.getElementById('heatmap-host');
+      var html = '<div style="min-width:600px">';
+      html += '<div class="heatmap-grid mb-1"><div></div>';
+      for (var h = 0; h < 24; h++) {
+        html += '<div class="heatmap-label" style="text-align:center;padding-right:0">' + (h % 3 === 0 ? (h < 10 ? '0' + h : h) + 'h' : '') + '</div>';
+      }
+      html += '</div>';
+      for (var d = 0; d < 7; d++) {
+        html += '<div class="heatmap-grid mb-1"><div class="heatmap-label">' + DAYS[d] + '</div>';
+        for (var hh = 0; hh < 24; hh++) {
+          var c = grid[d][hh];
+          html += '<div class="heatmap-cell" style="background:' + color(c) + '" title="' + DAYS[d] + ' ' + (hh < 10 ? '0' + hh : hh) + 'h: ' + c + ' lead' + (c === 1 ? '' : 's') + '"></div>';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+      host.innerHTML = html;
+    }
+
+    // ─── TABLE ───
+    function renderTable(leads, totalCount) {
       var tbody = document.getElementById('leads-tbody');
       var sorted = leads.slice().sort(function(a, b) {
         return (b.ts ? b.ts.getTime() : 0) - (a.ts ? a.ts.getTime() : 0);
       });
       document.getElementById('table-count').textContent = sorted.length;
-
+      document.getElementById('table-total').textContent = totalCount;
       if (!sorted.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-zinc-500">Nenhum lead encontrado pros filtros atuais.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-16 text-orbit-muted">' +
+          '<div class="flex flex-col items-center gap-3">' +
+          '<span class="material-symbols-rounded text-orbit-dim" style="font-size:48px">inbox</span>' +
+          '<span>Nenhum lead encontrado pros filtros atuais.</span>' +
+          '</div></td></tr>';
         return;
       }
-
       tbody.innerHTML = sorted.map(function(l) {
         var when = l.ts ? formatDate(l.ts) : '—';
-        var scoreBadge = l.score === 'Hot' ? '<span class="badge badge--hot">🔥 Hot</span>'
+        var scoreBadge = l.score === 'Hot' ? '<span class="badge badge--hot">Hot</span>'
                       : l.score === 'Warm' ? '<span class="badge badge--warm">Warm</span>'
                       : '<span class="badge badge--cold">Cold</span>';
         var variantBadge = (l.variant || '').toLowerCase() === 'a' ? '<span class="badge badge--a">A</span>'
                          : (l.variant || '').toLowerCase() === 'b' ? '<span class="badge badge--b">B</span>'
-                         : '<span class="text-zinc-600">—</span>';
-        var source = (l.utm_source || '').trim() || '<span class="text-zinc-600">direct</span>';
-        var phoneHref = l.phone ? '<a class="text-orbit-yellow hover:underline" href="https://wa.me/55' + escapeHTML(l.phone) + '" target="_blank" rel="noopener">📱</a>' : '';
-        var emailHref = l.email ? '<a class="text-zinc-300 hover:text-orbit-yellow ml-2" href="mailto:' + escapeHTML(l.email) + '">✉️</a>' : '';
-
-        return '<tr>' +
-          '<td class="text-zinc-400 font-geist-mono text-xs">' + when + '</td>' +
-          '<td><div class="text-white font-medium">' + escapeHTML(l.name || '—') + '</div><div class="text-zinc-500 text-xs">' + escapeHTML(l.email || '') + '</div></td>' +
+                         : '<span class="text-orbit-dim">—</span>';
+        var source = (l.utm_source || '').trim() || '<span class="text-orbit-dim">direct</span>';
+        var phone = l.phone ? String(l.phone).replace(/\D/g, '') : '';
+        var phoneHref = phone ? '<a class="text-orbit-yellow-lo hover:text-orbit-yellow" href="https://wa.me/55' + phone + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="WhatsApp"><span class="material-symbols-rounded" style="font-size:18px">chat</span></a>' : '';
+        var emailHref = l.email ? '<a class="text-orbit-muted hover:text-orbit-yellow-lo ml-2" href="mailto:' + escapeHTML(l.email) + '" onclick="event.stopPropagation()" title="Email"><span class="material-symbols-rounded" style="font-size:18px">mail</span></a>' : '';
+        return '<tr data-lead-id="' + l.__id + '">' +
+          '<td class="text-orbit-muted font-geist-mono text-xs">' + when + '</td>' +
+          '<td><div class="text-orbit-text font-medium">' + escapeHTML(l.name || '—') + '</div><div class="text-orbit-muted text-xs">' + escapeHTML(l.email || '') + '</div></td>' +
           '<td class="truncate-cell">' + escapeHTML(l.empresa || '—') + '</td>' +
-          '<td class="text-zinc-400 text-xs">' + escapeHTML(l.cargo || '—') + '</td>' +
-          '<td class="text-zinc-400 text-xs">' + escapeHTML((l.faturamento || '—').replace('/mês', '')) + '</td>' +
+          '<td class="text-orbit-muted text-xs">' + escapeHTML(l.cargo || '—') + '</td>' +
+          '<td class="text-orbit-muted text-xs">' + escapeHTML((l.faturamento || '—').replace('/mês', '')) + '</td>' +
           '<td>' + scoreBadge + '</td>' +
           '<td>' + variantBadge + '</td>' +
-          '<td class="text-xs text-zinc-400">' + source + '</td>' +
-          '<td>' + phoneHref + emailHref + '</td>' +
+          '<td class="text-xs text-orbit-muted">' + source + '</td>' +
+          '<td class="flex items-center">' + phoneHref + emailHref + '</td>' +
         '</tr>';
       }).join('');
+      tbody.querySelectorAll('tr[data-lead-id]').forEach(function(row) {
+        row.addEventListener('click', function() {
+          var id = parseInt(row.getAttribute('data-lead-id'), 10);
+          var lead = state.leads.find(function(l) { return l.__id === id; });
+          if (lead) openDrawer(lead);
+        });
+      });
     }
 
-    // ═══════════════════════════════════════════════════════
-    // EXPORT CSV
-    // ═══════════════════════════════════════════════════════
+    // ─── DRAWER ───
+    function openDrawer(lead) {
+      document.getElementById('drawer-id').textContent = '#' + (lead.__id + 1);
+      var phone = lead.phone ? String(lead.phone).replace(/\D/g, '') : '';
+      var firstName = (lead.name || '').split(' ')[0] || '';
+      var msgGeneric = encodeURIComponent('Oi ' + firstName + '! Aqui é da Orbit. Você acabou de assistir nossa apresentação e marcou interesse — bora conversar?');
+      var msgUrgent = encodeURIComponent('Oi ' + firstName + '! Aqui é da Orbit. Vi que você marcou que precisa começar com urgência. Tenho 15 minutos hoje pra entender o que você quer construir e mostrar como faríamos. Topa?');
+      var msgMath = encodeURIComponent('Oi ' + firstName + '! Aqui é da Orbit. Vi que sua empresa fatura ' + (lead.faturamento || '') + ' e você marcou interesse em montar um modelo de receita recorrente. Posso te mostrar a matemática em 15min hoje?');
+      function field(label, value) {
+        if (!value && value !== 0) return '';
+        return '<div class="field-row"><div class="field-label">' + label + '</div><div class="field-value">' + escapeHTML(String(value)) + '</div></div>';
+      }
+      function badgeFor(score) {
+        if (score === 'Hot') return '<span class="badge badge--hot">Hot</span>';
+        if (score === 'Warm') return '<span class="badge badge--warm">Warm</span>';
+        return '<span class="badge badge--cold">Cold</span>';
+      }
+      var variantBadge = (lead.variant||'').toLowerCase() === 'a' ? '<span class="badge badge--a">A · Dor + Evolução</span>'
+                       : (lead.variant||'').toLowerCase() === 'b' ? '<span class="badge badge--b">B · Oportunidade + Math</span>' : '';
+      var segmentLabel = SEGMENT_LABELS[String(lead.segment || '')] || 'Sem segmento';
+      var body = '';
+      body += '<div class="mb-5">';
+      body += '<div class="flex items-center gap-2 flex-wrap mb-3">' + badgeFor(lead.score) + variantBadge + '<span class="badge badge--neutral">' + escapeHTML(segmentLabel) + '</span>';
+      if (lead.prioridade === 'Urgente') body += '<span class="badge badge--urgent">⚡ urgente</span>';
+      body += '</div>';
+      body += '<h2 class="text-2xl font-semibold text-orbit-text tracking-tight">' + escapeHTML(lead.name || '—') + '</h2>';
+      body += '<p class="text-orbit-muted mt-1">' + escapeHTML(lead.empresa || '') + (lead.cargo ? ' <span class="text-orbit-dim">·</span> ' + escapeHTML(lead.cargo) : '') + '</p>';
+      body += '<p class="text-orbit-dim text-xs mt-1 font-geist-mono">' + (lead.ts ? formatDateFull(lead.ts) : '—') + '</p>';
+      body += '</div>';
+      if (phone) {
+        body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-2">Templates de WhatsApp</p>';
+        body += '<div class="space-y-2">';
+        body += '<a href="https://wa.me/55' + phone + '?text=' + msgGeneric + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-orbit-yellow to-orbit-yellow-hi text-white text-xs font-bold transition shadow-[0_4px_12px_-4px_rgba(245,158,11,0.5)] hover:shadow-[0_8px_20px_-4px_rgba(245,158,11,0.6)]"><span class="material-symbols-rounded" style="font-size:16px">chat</span>Abertura genérica</a>';
+        if (lead.prioridade === 'Urgente') {
+          body += '<a href="https://wa.me/55' + phone + '?text=' + msgUrgent + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orbit-surface-2 hover:bg-zinc-200 text-orbit-text text-xs font-semibold transition border border-orbit-border"><span class="material-symbols-rounded" style="font-size:16px">bolt</span>Foco em urgência</a>';
+        }
+        if (['R$100k-R$500k/mês','R$500k-R$1mi/mês','Acima de R$1mi/mês'].indexOf(lead.faturamento) !== -1) {
+          body += '<a href="https://wa.me/55' + phone + '?text=' + msgMath + '" target="_blank" rel="noopener" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orbit-surface-2 hover:bg-zinc-200 text-orbit-text text-xs font-semibold transition border border-orbit-border"><span class="material-symbols-rounded" style="font-size:16px">calculate</span>Foco em matemática</a>';
+        }
+        body += '</div></div>';
+      }
+      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-1">Contato</p>';
+      body += field('Email', lead.email);
+      body += field('Telefone', lead.phone);
+      body += '</div>';
+      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-1">Qualificação</p>';
+      body += field('Cargo', lead.cargo);
+      body += field('Atuação', lead.atuacao);
+      body += field('Faturamento', lead.faturamento);
+      body += field('Projetos atuais', lead.projetos);
+      body += field('Prioridade', lead.prioridade);
+      body += '</div>';
+      body += '<div class="mb-5"><p class="text-[0.6rem] font-geist-mono text-orbit-muted uppercase tracking-widest mb-1">Origem</p>';
+      body += field('Variant', (lead.variant||'').toUpperCase());
+      body += field('Segmento', lead.segment ? ('S' + lead.segment + ' · ' + (SEGMENT_LABELS[String(lead.segment)] || '')) : 'Direto');
+      body += field('UTM source', lead.utm_source);
+      body += field('UTM campaign', lead.utm_campaign);
+      body += field('UTM content', lead.utm_content);
+      body += field('UTM term', lead.utm_term);
+      body += field('Page URL', lead.page_url);
+      body += '</div>';
+      document.getElementById('drawer-body').innerHTML = body;
+      document.getElementById('drawer').classList.add('is-open');
+      document.getElementById('drawer-backdrop').classList.add('is-open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+      document.getElementById('drawer').classList.remove('is-open');
+      document.getElementById('drawer-backdrop').classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+
+    // ─── CSV ───
     function exportCSV(leads) {
       if (!leads.length) return alert('Nenhum lead pra exportar com os filtros atuais.');
       var cols = ['timestamp','name','email','phone','empresa','cargo','atuacao','faturamento','projetos','prioridade','variant','segment','score','utm_source','utm_campaign','utm_content','utm_term'];
@@ -761,9 +1297,7 @@
       var lines = leads.map(function(l) {
         return cols.map(function(c) {
           var v = l[c] != null ? String(l[c]) : '';
-          if (v.indexOf(',') !== -1 || v.indexOf('"') !== -1 || v.indexOf('\n') !== -1) {
-            v = '"' + v.replace(/"/g, '""') + '"';
-          }
+          if (v.indexOf(',') !== -1 || v.indexOf('"') !== -1 || v.indexOf('\n') !== -1) v = '"' + v.replace(/"/g, '""') + '"';
           return v;
         }).join(',');
       });
@@ -775,9 +1309,7 @@
       a.click();
     }
 
-    // ═══════════════════════════════════════════════════════
-    // UTILS
-    // ═══════════════════════════════════════════════════════
+    // ─── UTILS ───
     function escapeHTML(s) {
       return String(s).replace(/[&<>"']/g, function(c) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -788,27 +1320,35 @@
       var same = d.toDateString() === new Date().toDateString();
       var time = pad(d.getHours()) + ':' + pad(d.getMinutes());
       if (same) return 'hoje · ' + time;
+      var yest = new Date(); yest.setDate(yest.getDate() - 1);
+      if (d.toDateString() === yest.toDateString()) return 'ontem · ' + time;
       return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' · ' + time;
     }
+    function formatDateFull(d) {
+      var pad = function(n) { return n < 10 ? '0' + n : n; };
+      return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() + ' · ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
 
-    // ═══════════════════════════════════════════════════════
-    // MAIN
-    // ═══════════════════════════════════════════════════════
+    // ─── MAIN ───
     var rendering = false;
     function render() {
       if (rendering) return;
       rendering = true;
       var filtered = applyFilters(state.leads);
+      var searched = applySearch(filtered);
       renderKPIs(filtered);
+      renderInsights(filtered);
+      renderHotStrip(filtered);
       renderAB(filtered);
+      renderMatrix(filtered);
       renderTimelineChart(filtered);
       renderScoreVariantChart(filtered);
-      renderSourceChart(filtered);
+      renderPriorityChart(filtered);
       renderRevenueChart(filtered);
-      renderTable(filtered);
+      renderHeatmap(filtered);
+      renderTable(searched, filtered.length);
       rendering = false;
     }
-
     async function refresh() {
       var btn = document.getElementById('refresh-btn');
       btn.classList.add('opacity-50');
@@ -824,7 +1364,6 @@
       var pad = function(n) { return n < 10 ? '0' + n : n; };
       document.getElementById('last-update').textContent = 'atualizado ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
     }
-
     function setupFilters() {
       document.querySelectorAll('[data-filter-group]').forEach(function(group) {
         var key = group.getAttribute('data-filter-group');
@@ -838,12 +1377,31 @@
         });
       });
     }
-
+    function setupSearch() {
+      var input = document.getElementById('search-input');
+      var t;
+      input.addEventListener('input', function() {
+        clearTimeout(t);
+        t = setTimeout(function() {
+          state.search = input.value;
+          var filtered = applyFilters(state.leads);
+          var searched = applySearch(filtered);
+          renderTable(searched, filtered.length);
+        }, 150);
+      });
+    }
+    function setupDrawer() {
+      document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+      document.getElementById('drawer-backdrop').addEventListener('click', closeDrawer);
+      document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeDrawer(); });
+    }
     function boot() {
       setupFilters();
+      setupSearch();
+      setupDrawer();
       document.getElementById('refresh-btn').addEventListener('click', refresh);
       document.getElementById('export-csv').addEventListener('click', function() {
-        exportCSV(applyFilters(state.leads));
+        exportCSV(applySearch(applyFilters(state.leads)));
       });
       refresh();
       setInterval(refresh, CONFIG.AUTO_REFRESH_MS);
