@@ -160,7 +160,11 @@ async function createInPipedrive(lead, env) {
   const dealBody = { title: dealTitle, pipeline_id: pipelineId };
   if (personId) dealBody.person_id = personId;
   if (orgId)    dealBody.org_id = orgId;
-  if (labelIds.length) dealBody.label_ids = labelIds;
+  // Pipedrive v1: contas antigas usam `label` (singular, integer);
+  // contas com multi-label usam `label_ids` (array). Tentamos label
+  // primeiro pois é a forma mais compatível.
+  if (labelIds.length === 1) dealBody.label = labelIds[0];
+  else if (labelIds.length > 1) dealBody.label_ids = labelIds;
 
   const dealRes = await pdFetch('/deals', token, {
     method: 'POST',
