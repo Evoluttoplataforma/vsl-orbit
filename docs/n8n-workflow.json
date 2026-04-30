@@ -1,5 +1,5 @@
 {
-  "name": "Orbit LP — Form to Sheets",
+  "name": "Orbit LP — Form to Sheets + Pipedrive",
   "nodes": [
     {
       "parameters": {
@@ -40,7 +40,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const body = $input.item.json.body || $input.item.json;\nconst onlyDigits = (v) => String(v || '').replace(/\\D/g, '');\n\nconst HIGH_REVENUE = ['R$100k-R$500k/mês', 'R$500k-R$1mi/mês', 'Acima de R$1mi/mês'];\nconst HIGH_PRIORITY = ['Urgente', '30 dias'];\n\nconst faturamento = String(body.faturamento || '');\nconst prioridade  = String(body.prioridade  || '');\nconst hasRevenue  = HIGH_REVENUE.includes(faturamento);\nconst hasPriority = HIGH_PRIORITY.includes(prioridade);\n\nlet score = 'Cold';\nif (hasRevenue && hasPriority) score = 'Hot';\nelse if (hasRevenue || hasPriority) score = 'Warm';\n\nreturn [{\n  json: {\n    timestamp:    new Date().toISOString(),\n    name:         String(body.name || '').trim(),\n    email:        String(body.email || '').trim().toLowerCase(),\n    phone:        onlyDigits(body.phone),\n    empresa:      String(body.empresa || '').trim(),\n    cargo:        String(body.cargo || ''),\n    atuacao:      String(body.atuacao || ''),\n    faturamento,\n    projetos:     String(body.projetos || ''),\n    prioridade,\n    variant:      String(body.variant || ''),\n    segment:      String(body.segment || ''),\n    page_url:     String(body.page_url || ''),\n    score,\n    utm_campaign: String(body.utm_campaign || ''),\n    utm_content:  String(body.utm_content  || ''),\n    utm_term:     String(body.utm_term     || ''),\n    utm_source:   String(body.utm_source   || '')\n  }\n}];"
+        "jsCode": "const body = $input.item.json.body || $input.item.json;\nconst onlyDigits = (v) => String(v || '').replace(/\\D/g, '');\n\nconst HIGH_REVENUE = ['R$100k-R$500k/mês', 'R$500k-R$1mi/mês', 'Acima de R$1mi/mês'];\nconst HIGH_PRIORITY = ['Urgente', '30 dias'];\n\nconst faturamento = String(body.faturamento || '');\nconst prioridade  = String(body.prioridade  || '');\nconst hasRevenue  = HIGH_REVENUE.includes(faturamento);\nconst hasPriority = HIGH_PRIORITY.includes(prioridade);\n\nlet score = 'Cold';\nif (hasRevenue && hasPriority) score = 'Hot';\nelse if (hasRevenue || hasPriority) score = 'Warm';\n\nreturn [{\n  json: {\n    timestamp:    new Date().toISOString(),\n    name:         String(body.name || '').trim(),\n    email:        String(body.email || '').trim().toLowerCase(),\n    phone:        onlyDigits(body.phone),\n    empresa:      String(body.empresa || '').trim(),\n    cargo:        String(body.cargo || ''),\n    atuacao:      String(body.atuacao || ''),\n    faturamento,\n    projetos:     String(body.projetos || ''),\n    prioridade,\n    variant:      String(body.variant || ''),\n    segment:      String(body.segment || ''),\n    page_url:     String(body.page_url || ''),\n    score,\n    utm_campaign: String(body.utm_campaign || ''),\n    utm_content:  String(body.utm_content  || ''),\n    utm_term:     String(body.utm_term     || ''),\n    utm_source:   String(body.utm_source   || ''),\n    utm_medium:   String(body.utm_medium   || ''),\n    session_id:   String(body.session_id   || ''),\n    landing_page: String(body.landing_page || ''),\n    origin_page:  String(body.origin_page  || ''),\n    gclid:        String(body.gclid  || ''),\n    fbclid:       String(body.fbclid || ''),\n    ttclid:       String(body.ttclid || ''),\n    msclkid:      String(body.msclkid || ''),\n    first_name:   String(body.first_name || ''),\n    last_name:    String(body.last_name  || '')\n  }\n}];"
       },
       "id": "normalize-node",
       "name": "Normalize + Score",
@@ -73,6 +73,112 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [880, 220]
+    },
+    {
+      "parameters": {
+        "resource": "organization",
+        "operation": "create",
+        "name": "={{ $('Normalize + Score').item.json.empresa || ($('Normalize + Score').item.json.name + ' — sem empresa informada') }}",
+        "additionalFields": {}
+      },
+      "id": "pd-org",
+      "name": "Pipedrive · Organization",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [1100, 220],
+      "continueOnFail": true,
+      "credentials": {
+        "pipedriveApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Pipedrive (Orbit)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "person",
+        "operation": "create",
+        "name": "={{ $('Normalize + Score').item.json.name }}",
+        "additionalFields": {
+          "email": [
+            {
+              "value": "={{ $('Normalize + Score').item.json.email }}",
+              "primary": true,
+              "label": "work"
+            }
+          ],
+          "phone": [
+            {
+              "value": "={{ $('Normalize + Score').item.json.phone }}",
+              "primary": true,
+              "label": "work"
+            }
+          ],
+          "org_id": "={{ $json.data && $json.data.id }}"
+        }
+      },
+      "id": "pd-person",
+      "name": "Pipedrive · Person",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [1320, 220],
+      "continueOnFail": true,
+      "credentials": {
+        "pipedriveApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Pipedrive (Orbit)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "deal",
+        "operation": "create",
+        "title": "=Orbit Canal — {{ $('Normalize + Score').item.json.name }}{{ $('Normalize + Score').item.json.empresa ? ' · ' + $('Normalize + Score').item.json.empresa : '' }}",
+        "additionalFields": {
+          "person_id": "={{ $json.data && $json.data.id }}",
+          "org_id": "={{ $('Pipedrive · Organization').item.json.data && $('Pipedrive · Organization').item.json.data.id }}",
+          "pipeline_id": 35,
+          "label_ids": []
+        }
+      },
+      "id": "pd-deal",
+      "name": "Pipedrive · Deal",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [1540, 220],
+      "continueOnFail": true,
+      "credentials": {
+        "pipedriveApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Pipedrive (Orbit)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "note",
+        "operation": "create",
+        "content": "=<b>Lead capturado pela LP Orbit Canal</b><br><br><b>Score:</b> {{ $('Normalize + Score').item.json.score }}<br><br><b>Contato</b><br>Nome: {{ $('Normalize + Score').item.json.name }}<br>Email: {{ $('Normalize + Score').item.json.email }}<br>Telefone: {{ $('Normalize + Score').item.json.phone }}<br><br><b>Empresa</b><br>Empresa: {{ $('Normalize + Score').item.json.empresa }}<br>Cargo: {{ $('Normalize + Score').item.json.cargo }}<br>Atuação: {{ $('Normalize + Score').item.json.atuacao }}<br>Faturamento: {{ $('Normalize + Score').item.json.faturamento }}<br>Projetos atuais: {{ $('Normalize + Score').item.json.projetos }}<br>Prioridade: {{ $('Normalize + Score').item.json.prioridade }}<br><br><b>A/B + Segmento</b><br>Variant: {{ $('Normalize + Score').item.json.variant }}<br>Segmento: {{ $('Normalize + Score').item.json.segment || 'direto' }}<br><br><b>Atribuição</b><br>UTM source: {{ $('Normalize + Score').item.json.utm_source }}<br>UTM medium: {{ $('Normalize + Score').item.json.utm_medium }}<br>UTM campaign: {{ $('Normalize + Score').item.json.utm_campaign }}<br>UTM content: {{ $('Normalize + Score').item.json.utm_content }}<br>UTM term: {{ $('Normalize + Score').item.json.utm_term }}<br>gclid: {{ $('Normalize + Score').item.json.gclid }}<br>fbclid: {{ $('Normalize + Score').item.json.fbclid }}<br>Landing page: {{ $('Normalize + Score').item.json.landing_page }}<br>Origin page: {{ $('Normalize + Score').item.json.origin_page }}<br><br><b>Sessão</b><br>Session ID: {{ $('Normalize + Score').item.json.session_id }}<br>Page URL: {{ $('Normalize + Score').item.json.page_url }}<br>Capturado em: {{ $('Normalize + Score').item.json.timestamp }}",
+        "additionalFields": {
+          "deal_id": "={{ $json.data && $json.data.id }}",
+          "person_id": "={{ $('Pipedrive · Person').item.json.data && $('Pipedrive · Person').item.json.data.id }}",
+          "org_id": "={{ $('Pipedrive · Organization').item.json.data && $('Pipedrive · Organization').item.json.data.id }}",
+          "pinned_to_deal_flag": true
+        }
+      },
+      "id": "pd-note",
+      "name": "Pipedrive · Note",
+      "type": "n8n-nodes-base.pipedrive",
+      "typeVersion": 1,
+      "position": [1760, 220],
+      "continueOnFail": true,
+      "credentials": {
+        "pipedriveApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Pipedrive (Orbit)"
+        }
+      }
     }
   ],
   "connections": {
@@ -87,6 +193,18 @@
     },
     "Normalize + Score": {
       "main": [[{ "node": "Append to Sheet", "type": "main", "index": 0 }]]
+    },
+    "Append to Sheet": {
+      "main": [[{ "node": "Pipedrive · Organization", "type": "main", "index": 0 }]]
+    },
+    "Pipedrive · Organization": {
+      "main": [[{ "node": "Pipedrive · Person", "type": "main", "index": 0 }]]
+    },
+    "Pipedrive · Person": {
+      "main": [[{ "node": "Pipedrive · Deal", "type": "main", "index": 0 }]]
+    },
+    "Pipedrive · Deal": {
+      "main": [[{ "node": "Pipedrive · Note", "type": "main", "index": 0 }]]
     }
   },
   "settings": { "executionOrder": "v1" }
