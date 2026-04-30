@@ -2758,7 +2758,9 @@
     // ── Configuração ─────────────────────────────────────────────────
     var DOMAIN      = '.orbitgestao.com.br';
     var MAX_AGE     = 63072000; // 2 anos
-    var WEBHOOK_URL = 'https://webhook.rodriguinhodomarketing.com.br/webhook/orbit-lead-vsl';
+    // Cloudflare Pages Function — /functions/api/lead.js
+    // Faz Sheet (Apps Script) + Pipedrive (Org/Person/Deal/Note) em paralelo.
+    var WEBHOOK_URL = '/api/lead';
 
     var utms   = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'];
     var clicks = ['gclid','gbraid','wbraid','fbclid','ttclid','gad_campaignid','gad_source','msclkid','li_fat_id','twclid','sck'];
