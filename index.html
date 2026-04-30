@@ -2570,12 +2570,15 @@
                 sessionStorage.setItem('orbit_lead', JSON.stringify(snapshot));
               } catch (e) {}
 
-              // Dispara o submit — o tracking script captura, monta payload completo
-              // (com UTMs/click IDs/session/atribuição) e envia pro webhook.
-              // Também faz dataLayer.push({ event: 'form_submit', ... }).
+              // Chama direto a função global do tracking script (evita
+              // ativar o auto-event "Form Submission" do GTM, que duplica).
+              // Ela monta o payload completo (UTMs/click IDs/session/atribuição),
+              // faz dataLayer.push({ event: 'form_submit' }) e fetch pro webhook.
               try {
-                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-              } catch (e) {}
+                if (typeof window.__orbitSubmitLead === 'function') {
+                  window.__orbitSubmitLead();
+                }
+              } catch (e) { console.warn('[Lead] submit fn error:', e); }
 
               // Redireciona pra página de obrigado
               setTimeout(function() {
@@ -3045,66 +3048,97 @@
     })();
 
     // ── 12. Form Submit Handler ──────────────────────────────────────
+    // Exposto como função global pra ser chamado direto pelo chat —
+    // evitamos dispatchEvent('submit') que ativaria o auto-event do GTM
+    // ("Envio de formulário"/Form Submission) e geraria evento duplicado.
     var form = document.getElementById('lead-form');
-    if (form) {
-      var formPageStart = Date.now();
+    var formPageStart = Date.now();
 
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
+    window.__orbitSubmitLead = function() {
+      if (!form) return;
 
-        // Lead data
-        var nameField  = form.querySelector('input[name="name"]');
-        var emailField = form.querySelector('input[name="email"]');
-        var phoneField = form.querySelector('input[name="phone"]');
+      var nameField  = form.querySelector('input[name="name"]');
+      var emailField = form.querySelector('input[name="email"]');
+      var phoneField = form.querySelector('input[name="phone"]');
 
-        var leadName  = nameField  ? nameField.value.trim()  : '';
-        var leadEmail = emailField ? emailField.value.trim().toLowerCase() : '';
-        var leadPhone = phoneField ? phoneField.value.trim().replace(/\D/g, '') : '';
+      var leadName  = nameField  ? nameField.value.trim()  : '';
+      var leadEmail = emailField ? emailField.value.trim().toLowerCase() : '';
+      var leadPhone = phoneField ? phoneField.value.trim().replace(/\D/g, '') : '';
 
-        var nameParts = leadName.split(' ');
-        var firstName = nameParts[0] || '';
-        var lastName  = nameParts.slice(1).join(' ') || '';
+      var nameParts = leadName.split(' ');
+      var firstName = nameParts[0] || '';
+      var lastName  = nameParts.slice(1).join(' ') || '';
+      var timeOnPage = Math.round((Date.now() - formPageStart) / 1000);
 
-        // Evento form_submit no dataLayer
-        window.dataLayer.push({
-          event:                  'form_submit',
-          session_id:              sessionId,
-          lead_name:               leadName,
-          lead_email:              leadEmail,
-          lead_phone:              leadPhone,
-          lead_first_name:         firstName,
-          lead_last_name:          lastName,
-          time_on_page_at_submit:  Math.round((Date.now() - formPageStart) / 1000)
-        });
-
-        // Monta payload completo
-        var formData = new FormData(form);
-        var payload = {};
-        formData.forEach(function(value, key) {
-          if (value) payload[key] = value;
-        });
-
-        payload.first_name   = firstName;
-        payload.last_name    = lastName;
-        payload.session_id   = sessionId;
-        payload.page_url     = window.location.href;
-        payload.page_path    = window.location.pathname;
-        payload.referrer     = document.referrer || '';
-        payload.submitted_at = new Date().toISOString();
-
-        // Fire-and-forget pro webhook (keepalive sobrevive ao redirect)
-        try {
-          fetch(WEBHOOK_URL, {
-            method:    'POST',
-            headers:   { 'Content-Type': 'application/json' },
-            body:      JSON.stringify(payload),
-            keepalive: true
-          }).catch(function(err) { console.warn('[Lead] webhook error:', err); });
-        } catch(err) {
-          console.warn('[Lead] fetch threw:', err);
-        }
+      window.dataLayer.push({
+        event:                  'form_submit',
+        session_id:              sessionId,
+        lead_name:               leadName,
+        lead_email:              leadEmail,
+        lead_phone:              leadPhone,
+        lead_first_name:         firstName,
+        lead_last_name:          lastName,
+        time_on_page_at_submit:  timeOnPage
       });
-    }
+
+      var formData = new FormData(form);
+      var payload = {};
+      formData.forEach(function(value, key) {
+        if (value) payload[key] = value;
+      });
+      payload.first_name   = firstName;
+      payload.last_name    = lastName;
+      payload.session_id   = sessionId;
+      payload.page_url     = window.location.href;
+      payload.page_path    = window.location.pathname;
+      payload.referrer     = document.referrer || '';
+      payload.submitted_at = new Date().toISOString();
+
+      try {
+        fetch(WEBHOOK_URL, {
+          method:    'POST',
+          headers:   { 'Content-Type': 'application/json' },
+          body:      JSON.stringify(payload),
+          keepalive: true
+        }).then(function(response) {
+          if (response.ok) {
+            window.dataLayer.push({
+              event:           'form_submit_success',
+              session_id:       sessionId,
+              lead_name:        leadName,
+              lead_email:       leadEmail,
+              lead_phone:       leadPhone,
+              lead_first_name:  firstName,
+              lead_last_name:   lastName,
+              http_status:      response.status
+            });
+          } else {
+            window.dataLayer.push({
+              event:        'form_submit_error',
+              session_id:    sessionId,
+              http_status:   response.status,
+              error_reason: 'http_' + response.status
+            });
+          }
+        }).catch(function(err) {
+          window.dataLayer.push({
+            event:        'form_submit_error',
+            session_id:    sessionId,
+            error_reason: 'network',
+            error_message: String(err && err.message || err)
+          });
+          console.warn('[Lead] webhook error:', err);
+        });
+      } catch(err) {
+        window.dataLayer.push({
+          event:        'form_submit_error',
+          session_id:    sessionId,
+          error_reason: 'exception',
+          error_message: String(err && err.message || err)
+        });
+        console.warn('[Lead] fetch threw:', err);
+      }
+    };
 
   })();
   </script>
