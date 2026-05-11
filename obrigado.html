@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=block" rel="stylesheet" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://player.vimeo.com/api/player.js"></script>
@@ -54,7 +54,18 @@
     body { font-family: 'Geist', sans-serif; }
 
     .material-symbols-rounded {
+      font-family: 'Material Symbols Rounded';
+      font-weight: normal;
+      font-style: normal;
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      letter-spacing: normal;
+      text-transform: none;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'liga';
       user-select: none;
       vertical-align: middle;
       line-height: 1;
@@ -553,7 +564,7 @@
   <main class="relative z-10">
 
     <!-- HERO -->
-    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pt-16 lg:pt-24 pb-14 lg:pb-20 text-center">
+    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pt-16 lg:pt-24 pb-10 lg:pb-12 text-center">
 
       <div class="anim-rise">
         <div class="ty-check-wrap">
@@ -579,9 +590,29 @@
       <p class="mt-7 max-w-2xl mx-auto text-base sm:text-lg lg:text-xl text-zinc-400 leading-relaxed anim-rise-3">
         Em instantes alguém do nosso time entra em contato pelo <strong class="text-white">WhatsApp</strong> pra alinhar o melhor horário pra conversa de 15 minutos.
       </p>
+    </section>
 
-      <!-- Live status -->
-      <div class="mt-8 max-w-md mx-auto anim-rise-3">
+    <!-- VIDEO -->
+    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pb-12 lg:pb-16 anim-rise-3">
+      <div class="vsl-wrap">
+        <div class="vsl-badge">
+          <span class="vsl-badge__pulse"></span>
+          enquanto isso, assista
+        </div>
+        <div class="vsl-frame">
+          <iframe
+            id="ty-vsl-frame"
+            src=""
+            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live status -->
+    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pb-12 lg:pb-16 anim-rise-4">
+      <div class="max-w-md mx-auto">
         <div class="live-card">
           <div class="live-card__avatars">
             <div class="live-card__avatar" title="Gabriel"><img src="brand/team/gabriel.png" alt="Gabriel" onerror="this.outerHTML='GA'" /></div>
@@ -595,24 +626,6 @@
             </div>
             <p class="text-xs text-zinc-500 mt-0.5">tempo médio de retorno · <span class="text-zinc-300 font-medium">3 min</span></p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- VIDEO -->
-    <section class="relative max-w-[900px] mx-auto px-5 lg:px-12 pb-16 lg:pb-24 anim-rise-4">
-      <div class="vsl-wrap">
-        <div class="vsl-badge">
-          <span class="vsl-badge__pulse"></span>
-          enquanto isso, assista
-        </div>
-        <div class="vsl-frame">
-          <iframe
-            id="ty-vsl-frame"
-            src=""
-            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen></iframe>
         </div>
       </div>
     </section>
