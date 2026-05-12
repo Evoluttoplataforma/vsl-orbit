@@ -2,17 +2,50 @@
 //
 // Recebe o submit do chat da LP e dispara em paralelo:
 //   1. Append no Google Sheet (via Apps Script Web App URL — env: SHEETS_WEBHOOK_URL)
-//   2. Pipedrive: cria Organization → Person → Deal (no funil PIPEDRIVE_PIPELINE_ID,
-//      com label PIPEDRIVE_LABEL_ID) → Note pinned no deal com tudo que o lead preencheu
+//   2. Pipedrive: cria Organization → Person (com cargo) → Deal (no funil
+//      PIPEDRIVE_PIPELINE_ID, com label_ids da env, campos personalizados de
+//      cargo/atuação/faturamento/projetos/prioridade + UTMs + click IDs +
+//      Fonte do lead = Evolutto) → Note pinned com o resumo completo.
 //
 // Env vars necessárias (Cloudflare Pages → Settings → Environment variables):
 //   PIPEDRIVE_API_TOKEN     — token da API do Pipedrive (NÃO commitar)
 //   PIPEDRIVE_PIPELINE_ID   — ID do funil Orbit (default: 35)
-//   PIPEDRIVE_LABEL_ID      — ID(s) da etiqueta "Orbit Canal" (CSV se múltiplas: "1,2")
+//   PIPEDRIVE_LABEL_ID      — IDs das etiquetas em CSV. Recomendado:
+//                              "598,675" (CANAL ORBIT + ACAO EVOLUTTO)
 //   SHEETS_WEBHOOK_URL      — URL do Apps Script Web App (ver docs/apps-script-sheet.js)
 
 const HIGH_REVENUE  = ['R$100k-R$500k/mês', 'R$500k-R$1mi/mês', 'Acima de R$1mi/mês'];
 const HIGH_PRIORITY = ['Urgente', '30 dias'];
+
+// Pipedrive custom field keys — Deal level
+const DEAL_FIELDS = {
+  cargo:        'def95ff43857bf5b0306029dde8531907148a09e',
+  atuacao:      'f4db9a04ffbc75b678f54bc6d7d51d324387b1ff', // "O que sua consultoria faz?"
+  faturamento:  'd05e9330fb1c1e577799c536f41d800627fbc917',
+  projetos:     '85d09a2357b58128a1345ae3a9ee86616d03bfd3', // "Quantos projetos atuais?"
+  prioridade:   'df50943dc8fa6ca8238c97e1636c49589d21c9c4',
+  origin_page:  '8d4c55ec5393d556b73e796698223688479f4d44',
+  landing_page: '608310cc7e4d358731a2fa2e6b6d00c789e89697',
+  session_id:   '43091e3081136004843998d26c80abe6a7cb78b0',
+  utm_source:   '92f5fbfb2cfdcbe4d46a72b5acf06ca15f29ac14',
+  utm_medium:   '15bdeb9558dc89ed77d92cbfa0d04a4ee26d4d1f',
+  utm_campaign: '6b578f95362c28ee95473982525671ff43435b38',
+  utm_content:  '921482eae8dae5a8b2c830100038a17801df8b45',
+  utm_term:     '5c22fd65ac5f7dbfbef6c07347fde9154bcdc385',
+  gclid:        '9aeff85ea6f6fe1bedbe6e67cfd5eb612a7257ab',
+  fbclid:       '143f49947826ce1d1b3e995baa842e96de518e74',
+  ttclid:       'ff6bb10f4d8c2e7d4587d07bd4dd3cc85aee2bc0',
+  msclkid:      '0b7b86f5b1cee3f89394f6ed27e60d017a3b0de2',
+  fonte_lead:   'efe80f446bb74880b16689786a75ac3d08fc9205', // enum
+};
+
+// "Fonte do lead" → opção "Evolutto"
+const FONTE_LEAD_EVOLUTTO = 169;
+
+// Pipedrive custom field keys — Person level
+const PERSON_FIELDS = {
+  cargo: '3078c5f8dcaaa787df5fbc87260ec8fd5fc7f95c',
+};
 
 const onlyDigits = (v) => String(v || '').replace(/\D/g, '');
 
@@ -148,6 +181,7 @@ async function createInPipedrive(lead, env) {
   if (orgId) personBody.org_id = orgId;
   if (lead.email) personBody.email = [{ value: lead.email, primary: true, label: 'work' }];
   if (lead.phone) personBody.phone = [{ value: lead.phone, primary: true, label: 'work' }];
+  if (lead.cargo) personBody[PERSON_FIELDS.cargo] = lead.cargo;
 
   const personRes = await pdFetch('/persons', token, {
     method: 'POST',
@@ -155,16 +189,35 @@ async function createInPipedrive(lead, env) {
   });
   const personId = personRes.data && personRes.data.id;
 
-  // 3. Deal
+  // 3. Deal — inclui campos personalizados, labels e Fonte do lead = Evolutto
   const dealTitle = `Orbit Canal — ${lead.name || 'Lead'}${lead.empresa ? ' · ' + lead.empresa : ''}`;
   const dealBody = { title: dealTitle, pipeline_id: pipelineId };
   if (personId) dealBody.person_id = personId;
   if (orgId)    dealBody.org_id = orgId;
-  // Pipedrive v1: contas antigas usam `label` (singular, integer);
-  // contas com multi-label usam `label_ids` (array). Tentamos label
-  // primeiro pois é a forma mais compatível.
-  if (labelIds.length === 1) dealBody.label = labelIds[0];
-  else if (labelIds.length > 1) dealBody.label_ids = labelIds;
+  // Conta multi-label — sempre usar label_ids (array).
+  if (labelIds.length) dealBody.label_ids = labelIds;
+
+  // Campos personalizados — só envia o que veio preenchido
+  if (lead.cargo)        dealBody[DEAL_FIELDS.cargo]        = lead.cargo;
+  if (lead.atuacao)      dealBody[DEAL_FIELDS.atuacao]      = lead.atuacao;
+  if (lead.faturamento)  dealBody[DEAL_FIELDS.faturamento]  = lead.faturamento;
+  if (lead.projetos)     dealBody[DEAL_FIELDS.projetos]     = lead.projetos;
+  if (lead.prioridade)   dealBody[DEAL_FIELDS.prioridade]   = lead.prioridade;
+  if (lead.origin_page)  dealBody[DEAL_FIELDS.origin_page]  = lead.origin_page;
+  if (lead.landing_page) dealBody[DEAL_FIELDS.landing_page] = lead.landing_page;
+  if (lead.session_id)   dealBody[DEAL_FIELDS.session_id]   = lead.session_id;
+  if (lead.utm_source)   dealBody[DEAL_FIELDS.utm_source]   = lead.utm_source;
+  if (lead.utm_medium)   dealBody[DEAL_FIELDS.utm_medium]   = lead.utm_medium;
+  if (lead.utm_campaign) dealBody[DEAL_FIELDS.utm_campaign] = lead.utm_campaign;
+  if (lead.utm_content)  dealBody[DEAL_FIELDS.utm_content]  = lead.utm_content;
+  if (lead.utm_term)     dealBody[DEAL_FIELDS.utm_term]     = lead.utm_term;
+  if (lead.gclid)        dealBody[DEAL_FIELDS.gclid]        = lead.gclid;
+  if (lead.fbclid)       dealBody[DEAL_FIELDS.fbclid]       = lead.fbclid;
+  if (lead.ttclid)       dealBody[DEAL_FIELDS.ttclid]       = lead.ttclid;
+  if (lead.msclkid)      dealBody[DEAL_FIELDS.msclkid]      = lead.msclkid;
+
+  // Fonte do lead → Evolutto (fixo nessa LP)
+  dealBody[DEAL_FIELDS.fonte_lead] = FONTE_LEAD_EVOLUTTO;
 
   const dealRes = await pdFetch('/deals', token, {
     method: 'POST',
