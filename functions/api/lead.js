@@ -176,12 +176,12 @@ async function createInPipedrive(lead, env) {
   });
   const orgId = orgRes.data && orgRes.data.id;
 
-  // 2. Person
+  // 2. Person — só campos default. Cargo entra em PUT separado pra não
+  // derrubar a criação se a hash estiver errada.
   const personBody = { name: lead.name || lead.email || 'Lead sem nome' };
   if (orgId) personBody.org_id = orgId;
   if (lead.email) personBody.email = [{ value: lead.email, primary: true, label: 'work' }];
   if (lead.phone) personBody.phone = [{ value: lead.phone, primary: true, label: 'work' }];
-  if (lead.cargo) personBody[PERSON_FIELDS.cargo] = lead.cargo;
 
   const personRes = await pdFetch('/persons', token, {
     method: 'POST',
@@ -189,41 +189,73 @@ async function createInPipedrive(lead, env) {
   });
   const personId = personRes.data && personRes.data.id;
 
-  // 3. Deal — inclui campos personalizados, labels e Fonte do lead = Evolutto
+  // 3. Deal — payload MÍNIMO. Esse precisa subir.
   const dealTitle = `Orbit Canal — ${lead.name || 'Lead'}${lead.empresa ? ' · ' + lead.empresa : ''}`;
   const dealBody = { title: dealTitle, pipeline_id: pipelineId };
   if (personId) dealBody.person_id = personId;
   if (orgId)    dealBody.org_id = orgId;
-  // Conta multi-label — sempre usar label_ids (array).
-  if (labelIds.length) dealBody.label_ids = labelIds;
-
-  // Campos personalizados — só envia o que veio preenchido
-  if (lead.cargo)        dealBody[DEAL_FIELDS.cargo]        = lead.cargo;
-  if (lead.atuacao)      dealBody[DEAL_FIELDS.atuacao]      = lead.atuacao;
-  if (lead.faturamento)  dealBody[DEAL_FIELDS.faturamento]  = lead.faturamento;
-  if (lead.projetos)     dealBody[DEAL_FIELDS.projetos]     = lead.projetos;
-  if (lead.prioridade)   dealBody[DEAL_FIELDS.prioridade]   = lead.prioridade;
-  if (lead.origin_page)  dealBody[DEAL_FIELDS.origin_page]  = lead.origin_page;
-  if (lead.landing_page) dealBody[DEAL_FIELDS.landing_page] = lead.landing_page;
-  if (lead.session_id)   dealBody[DEAL_FIELDS.session_id]   = lead.session_id;
-  if (lead.utm_source)   dealBody[DEAL_FIELDS.utm_source]   = lead.utm_source;
-  if (lead.utm_medium)   dealBody[DEAL_FIELDS.utm_medium]   = lead.utm_medium;
-  if (lead.utm_campaign) dealBody[DEAL_FIELDS.utm_campaign] = lead.utm_campaign;
-  if (lead.utm_content)  dealBody[DEAL_FIELDS.utm_content]  = lead.utm_content;
-  if (lead.utm_term)     dealBody[DEAL_FIELDS.utm_term]     = lead.utm_term;
-  if (lead.gclid)        dealBody[DEAL_FIELDS.gclid]        = lead.gclid;
-  if (lead.fbclid)       dealBody[DEAL_FIELDS.fbclid]       = lead.fbclid;
-  if (lead.ttclid)       dealBody[DEAL_FIELDS.ttclid]       = lead.ttclid;
-  if (lead.msclkid)      dealBody[DEAL_FIELDS.msclkid]      = lead.msclkid;
-
-  // Fonte do lead → Evolutto (fixo nessa LP)
-  dealBody[DEAL_FIELDS.fonte_lead] = FONTE_LEAD_EVOLUTTO;
+  // Mandamos as duas formas pra cobrir contas legacy (label singular)
+  // e multi-label (label_ids). Pipedrive ignora a que não reconhece.
+  if (labelIds.length === 1) {
+    dealBody.label = labelIds[0];
+    dealBody.label_ids = labelIds;
+  } else if (labelIds.length > 1) {
+    dealBody.label_ids = labelIds;
+    dealBody.label = labelIds.join(','); // CSV string — formato aceito por contas legacy multi-valor
+  }
 
   const dealRes = await pdFetch('/deals', token, {
     method: 'POST',
     body: JSON.stringify(dealBody),
   });
   const dealId = dealRes.data && dealRes.data.id;
+
+  // 4. Update do Deal com campos personalizados — isolado em try/catch
+  // pra que uma hash errada não impeça a Note nem retorne erro fatal.
+  const customFieldUpdates = {};
+  if (lead.cargo)        customFieldUpdates[DEAL_FIELDS.cargo]        = lead.cargo;
+  if (lead.atuacao)      customFieldUpdates[DEAL_FIELDS.atuacao]      = lead.atuacao;
+  if (lead.faturamento)  customFieldUpdates[DEAL_FIELDS.faturamento]  = lead.faturamento;
+  if (lead.projetos)     customFieldUpdates[DEAL_FIELDS.projetos]     = lead.projetos;
+  if (lead.prioridade)   customFieldUpdates[DEAL_FIELDS.prioridade]   = lead.prioridade;
+  if (lead.origin_page)  customFieldUpdates[DEAL_FIELDS.origin_page]  = lead.origin_page;
+  if (lead.landing_page) customFieldUpdates[DEAL_FIELDS.landing_page] = lead.landing_page;
+  if (lead.session_id)   customFieldUpdates[DEAL_FIELDS.session_id]   = lead.session_id;
+  if (lead.utm_source)   customFieldUpdates[DEAL_FIELDS.utm_source]   = lead.utm_source;
+  if (lead.utm_medium)   customFieldUpdates[DEAL_FIELDS.utm_medium]   = lead.utm_medium;
+  if (lead.utm_campaign) customFieldUpdates[DEAL_FIELDS.utm_campaign] = lead.utm_campaign;
+  if (lead.utm_content)  customFieldUpdates[DEAL_FIELDS.utm_content]  = lead.utm_content;
+  if (lead.utm_term)     customFieldUpdates[DEAL_FIELDS.utm_term]     = lead.utm_term;
+  if (lead.gclid)        customFieldUpdates[DEAL_FIELDS.gclid]        = lead.gclid;
+  if (lead.fbclid)       customFieldUpdates[DEAL_FIELDS.fbclid]       = lead.fbclid;
+  if (lead.ttclid)       customFieldUpdates[DEAL_FIELDS.ttclid]       = lead.ttclid;
+  if (lead.msclkid)      customFieldUpdates[DEAL_FIELDS.msclkid]      = lead.msclkid;
+  customFieldUpdates[DEAL_FIELDS.fonte_lead] = FONTE_LEAD_EVOLUTTO;
+
+  let customFieldsError = null;
+  if (dealId && Object.keys(customFieldUpdates).length) {
+    try {
+      await pdFetch(`/deals/${dealId}`, token, {
+        method: 'PUT',
+        body: JSON.stringify(customFieldUpdates),
+      });
+    } catch (e) {
+      customFieldsError = String(e.message || e);
+    }
+  }
+
+  // Cargo na Person — também isolado
+  let personCargoError = null;
+  if (personId && lead.cargo) {
+    try {
+      await pdFetch(`/persons/${personId}`, token, {
+        method: 'PUT',
+        body: JSON.stringify({ [PERSON_FIELDS.cargo]: lead.cargo }),
+      });
+    } catch (e) {
+      personCargoError = String(e.message || e);
+    }
+  }
 
   // 4. Note pinned no deal
   const noteBody = {
@@ -234,12 +266,22 @@ async function createInPipedrive(lead, env) {
   if (personId) noteBody.person_id = personId;
   if (orgId)    noteBody.org_id = orgId;
 
-  await pdFetch('/notes', token, {
-    method: 'POST',
-    body: JSON.stringify(noteBody),
-  });
+  let noteError = null;
+  try {
+    await pdFetch('/notes', token, {
+      method: 'POST',
+      body: JSON.stringify(noteBody),
+    });
+  } catch (e) {
+    noteError = String(e.message || e);
+  }
 
-  return { orgId, personId, dealId };
+  return {
+    orgId, personId, dealId,
+    customFieldsError,
+    personCargoError,
+    noteError,
+  };
 }
 
 export async function onRequest(context) {
