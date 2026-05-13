@@ -194,15 +194,10 @@ async function createInPipedrive(lead, env) {
   const dealBody = { title: dealTitle, pipeline_id: pipelineId };
   if (personId) dealBody.person_id = personId;
   if (orgId)    dealBody.org_id = orgId;
-  // Mandamos as duas formas pra cobrir contas legacy (label singular)
-  // e multi-label (label_ids). Pipedrive ignora a que não reconhece.
-  if (labelIds.length === 1) {
-    dealBody.label = labelIds[0];
-    dealBody.label_ids = labelIds;
-  } else if (labelIds.length > 1) {
-    dealBody.label_ids = labelIds;
-    dealBody.label = labelIds.join(','); // CSV string — formato aceito por contas legacy multi-valor
-  }
+  // Pipedrive v1: 1 label → field `label` (int). >1 → `label_ids` (array).
+  // Mandar os dois juntos pode dar 400 de validação em algumas contas.
+  if (labelIds.length === 1) dealBody.label = labelIds[0];
+  else if (labelIds.length > 1) dealBody.label_ids = labelIds;
 
   const dealRes = await pdFetch('/deals', token, {
     method: 'POST',
