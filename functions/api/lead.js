@@ -194,10 +194,11 @@ async function createInPipedrive(lead, env) {
   const dealBody = { title: dealTitle, pipeline_id: pipelineId };
   if (personId) dealBody.person_id = personId;
   if (orgId)    dealBody.org_id = orgId;
-  // Pipedrive v1: 1 label → field `label` (int). >1 → `label_ids` (array).
-  // Mandar os dois juntos pode dar 400 de validação em algumas contas.
+  // Pipedrive: essa conta só aceita o campo `label` (singular). Nunca
+  // `label_ids` (que retorna 400). Mandamos como CSV string quando há
+  // mais de uma label — contas com field type `set` aceitam esse formato.
   if (labelIds.length === 1) dealBody.label = labelIds[0];
-  else if (labelIds.length > 1) dealBody.label_ids = labelIds;
+  else if (labelIds.length > 1) dealBody.label = labelIds.join(',');
 
   const dealRes = await pdFetch('/deals', token, {
     method: 'POST',
