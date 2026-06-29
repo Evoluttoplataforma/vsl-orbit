@@ -18,6 +18,16 @@
   })(window,document,'script','dataLayer','GTM-W6H3729J');</script>
   <!-- End Google Tag Manager -->
 
+  <!-- Google Analytics 4 — G-HW382YDH23 (gtag direto, sem GTM) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HW382YDH23"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HW382YDH23');
+  </script>
+  <!-- End GA4 -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -1224,7 +1234,7 @@
       <a href="#" class="flex items-center shrink-0">
         <img src="brand/logo-orbit-white.png" alt="Orbit" class="h-6 lg:h-7 w-auto select-none" />
       </a>
-      <a href="#agendar" class="inline-flex items-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-4 lg:px-5 py-2 lg:py-2.5 rounded-full text-[0.65rem] font-bold uppercase tracking-widest transition-all hover:scale-[1.03]">
+      <a href="#agendar" data-cta-loc="header" class="inline-flex items-center gap-2 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi px-4 lg:px-5 py-2 lg:py-2.5 rounded-full text-[0.65rem] font-bold uppercase tracking-widest transition-all hover:scale-[1.03]">
         <span class="hidden sm:inline" data-v="a">Quebrar o ciclo</span>
         <span class="hidden sm:inline" data-v="b">Entender o modelo</span>
         <span class="sm:hidden">Agendar</span>
@@ -1292,7 +1302,7 @@
 
       <!-- Hero CTA -->
       <div class="mt-10 lg:mt-12 flex flex-col items-center text-center anim-rise-3">
-        <a href="#agendar" class="inline-flex items-center gap-3 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-8 lg:px-10 py-4 lg:py-5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_18px_40px_-12px_rgba(255,186,26,0.55)] anim-pulse-yellow">
+        <a href="#agendar" data-cta-loc="hero" class="inline-flex items-center gap-3 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-8 lg:px-10 py-4 lg:py-5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_18px_40px_-12px_rgba(255,186,26,0.55)] anim-pulse-yellow">
           <span data-v="a">Quero quebrar esse ciclo</span>
           <span data-v="b">Quero entender o modelo</span>
           <span class="material-symbols-rounded">arrow_forward</span>
@@ -2032,7 +2042,7 @@
       </h2>
 
       <div class="mt-10 flex justify-center">
-        <a href="#agendar" id="cta-agendar" data-cta-modal class="inline-flex items-center gap-3 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-8 sm:px-10 py-4 lg:py-5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_24px_60px_-12px_rgba(255,186,26,0.6)]">
+        <a href="#agendar" id="cta-agendar" data-cta-modal data-cta-loc="final" class="inline-flex items-center gap-3 bg-orbit-yellow text-orbit-black hover:bg-orbit-yellow-hi active:bg-orbit-yellow-lo px-8 sm:px-10 py-4 lg:py-5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-widest transition-all hover:scale-[1.03] hover:shadow-[0_24px_60px_-12px_rgba(255,186,26,0.6)]">
           Agendar minha conversa
           <span class="material-symbols-rounded">arrow_forward</span>
         </a>
@@ -2060,7 +2070,7 @@
        STICKY MOBILE CTA
        ============================================ -->
   <div id="mobile-cta" class="md:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-orbit-bg/95 backdrop-blur-md border-t border-orbit-border">
-    <a href="#agendar" class="flex items-center justify-center gap-2 bg-orbit-yellow text-orbit-black px-6 py-4 rounded-full text-xs font-bold uppercase tracking-widest shadow-2xl">
+    <a href="#agendar" data-cta-loc="mobile" class="flex items-center justify-center gap-2 bg-orbit-yellow text-orbit-black px-6 py-4 rounded-full text-xs font-bold uppercase tracking-widest shadow-2xl">
       <span data-v="a">Agendar conversa</span>
       <span data-v="b">Agendar conversa</span>
       <span class="material-symbols-rounded text-base">arrow_forward</span>
@@ -2200,12 +2210,24 @@
       window.__orbit = { variant: variant, segment: segment };
       console.log('[Orbit LP] variant=' + variant + (segment ? ' · segment=' + segment : ''));
 
+      // Marca os CTAs com a variante ativa pra tracking
+      document.querySelectorAll('[data-cta-loc]').forEach(function(el) {
+        el.dataset.ctaVariant = variant.toUpperCase();
+      });
+
       // ─── Vimeo Player SDK: unmute + milestones + (gating) ──
       iframe.addEventListener('load', function() {
         if (typeof Vimeo === 'undefined') return;
 
         var player = new Vimeo.Player(iframe);
         var fired = { 25: false, 50: false, 75: false, 100: false };
+
+        var startFired = false;
+        player.on('play', function() {
+          if (startFired) return;
+          startFired = true;
+          if (window.gtag) window.gtag('event', 'video_start', { video_variant: variant });
+        });
 
         player.on('timeupdate', function(data) {
           if (!data.duration) return;
@@ -2235,11 +2257,36 @@
       });
 
       function trackVSLMilestone(pct, variant) {
-        // TODO wire pixel: Meta Pixel / GA4 / postback
+        var evtName = pct === 100 ? 'video_complete' : 'video_progress';
+        var gParams = pct < 100
+          ? { percent: pct, video_variant: variant }
+          : { video_variant: variant };
         if (window.fbq) window.fbq('trackCustom', 'VSLProgress', { milestone: pct, variant: variant });
-        if (window.gtag) window.gtag('event', 'vsl_progress', { milestone: pct, variant: variant });
+        if (window.gtag) window.gtag('event', evtName, gParams);
         console.log('[VSL] milestone', pct + '%', '· variant', variant);
       }
+    })();
+
+    // ─── Scroll depth ────────────────────────────────────────
+    (function() {
+      var fired = {};
+      var ticking = false;
+      function checkScroll() {
+        var total = document.documentElement.scrollHeight - window.innerHeight;
+        if (!total) return;
+        var pct = Math.round((window.scrollY || document.documentElement.scrollTop) / total * 100);
+        [25, 50, 75, 100].forEach(function(m) {
+          if (!fired[m] && pct >= m) {
+            fired[m] = true;
+            gtag('event', 'scroll_depth', { percent_scrolled: m });
+          }
+        });
+      }
+      window.addEventListener('scroll', function() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(function() { checkScroll(); ticking = false; });
+      }, { passive: true });
     })();
 
     // ─── Oportunidade: dot grid (11 prod + 38 piloto) ──────
@@ -2617,7 +2664,21 @@
         var trigger = e.target.closest('a[href="#agendar"], a[href*="#agendar"], [data-cta-modal]');
         if (!trigger) return;
         e.preventDefault();
-        irParaChat();
+
+        var done = false;
+        function irMesmo() {
+          if (done) return;
+          done = true;
+          irParaChat();
+        }
+
+        gtag('event', 'cta_click', {
+          cta_location: trigger.dataset.ctaLoc || '',
+          cta_variant:  trigger.dataset.ctaVariant || '',
+          cta_text:     trigger.textContent.replace(/arrow_forward/g, '').replace(/\s+/g, ' ').trim(),
+          event_callback: irMesmo
+        });
+        setTimeout(irMesmo, 800);
       });
 
       closeBtn.addEventListener('click', closeModal);
