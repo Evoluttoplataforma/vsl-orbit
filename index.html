@@ -2311,6 +2311,12 @@
       counters.forEach(function(c) { observer.observe(c); });
     })();
 
+    // ─── Helper: navega para o chat preservando a query string ───
+    function irParaChat() {
+      var base = 'https://demonstracao.orbitgestao.com.br/chat';
+      window.location.assign(base + window.location.search);
+    }
+
     // ─── CTA Modal — Chat conversacional ───────────────────
     (function() {
       var modal = document.getElementById('cta-modal');
@@ -2606,13 +2612,12 @@
         thread.style.display = '';
       }
 
-      // Triggers de abertura
+      // Triggers de abertura (overlay desconectado — dead code; CTAs agora usam irParaChat)
       document.addEventListener('click', function(e) {
         var trigger = e.target.closest('a[href="#agendar"], a[href*="#agendar"], [data-cta-modal]');
         if (!trigger) return;
         e.preventDefault();
-        resetVisual();
-        openModal();
+        irParaChat();
       });
 
       closeBtn.addEventListener('click', closeModal);
